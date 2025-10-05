@@ -1,30 +1,4 @@
-// import http from "http";
-// import app from "./app";
-// import { initSocket } from "./config/socket";
-// import { RoundEngineJob } from "./jobs/roundEngine.job";
-// import { connectDB } from "./config/db";
-// import { MetService } from "./modules/met/met.service";
-// import { SettingsService } from "./modules/settings/settings.service";
 
-// const PORT = Number(process.env.PORT || 5000);
-
-// (async () => {
-//   await connectDB();
-//   await MetService.syncRoundCounterWithDB();
-//   // await SettingsService.set("roundDuration", 30); // seconds
-//   const server = http.createServer(app);
-//   const { game } = initSocket(server);
-
-//   server.listen(PORT, async () => {
-//     console.log(`🚀 Server running on port ${PORT}`);
-
-
-//     const engine = new RoundEngineJob(game);
-//     await engine.startNewRound();
-//   });
-// })();
-
-// New Server 
 import "dotenv/config";
 import http from "http";
 import app from "./app";

@@ -22,7 +22,7 @@ export const UserController = {
           .json({ message: "Username and password required" });
       }
 
-      const existing = await UserService.findByUsername(username);
+      const existing = await UserService.getByUsername(username);
       if (existing) {
         return res.status(400).json({ message: "Username already exists" });
       }
@@ -55,11 +55,12 @@ export const UserController = {
           .json({ message: "Username and password required" });
       }
 
-      const user = await UserService.findByUsername(username);
+      const user = await UserService.getByUsername(username);
       if (!user)
         return res.status(400).json({ message: "Invalid credentials" });
 
       const isMatch = await UserService.verifyPassword(user, password);
+
       if (!isMatch)
         return res.status(400).json({ message: "Invalid credentials" });
 
@@ -86,7 +87,7 @@ export const UserController = {
         return res.status(401).json({ message: "Unauthorized" });
       }
       const userId = req.user.userId;
-      const profile = await UserService.getProfile(userId);
+      const profile = await UserService.getById(userId);
       if (!profile) return res.status(404).json({ message: "User not found" });
 
       res.status(200).json(profile);
