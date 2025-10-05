@@ -4,10 +4,40 @@ import { UserService } from "../modules/user/user.service";
 import { MetService } from "../modules/met/met.service";
 import Round from "../modules/round/round.model";
 import { getRoundEngine } from "../jobs/roundEngine.instance";
+import { socketAuthMiddleware } from "../middlewares/socket.auth.middleware";
 
 export const initGameSocket = (io: Server) => {
+
+  // create /game namespace
+  const nsp = io.of("/game");
+
+  // attach auth (guests allowed; joins user/role rooms if token present)
+  socketAuthMiddleware(nsp, { strict: false, joinRooms: true });
+
+
   io.on("connection", async (socket: Socket) => {
     console.log(`🎮 User connected: ${socket.id}`);
+
+
+     // --- put get_balance here ---
+    socket.on("get_balance", async (_payload, ack?: (res: any) => void) => {
+
+      console.log("Called");
+      
+      const reply = typeof ack === "function" ? ack : () => {};
+      try {
+        if (!socket.data?.user) {
+          return reply({ success: false, code: "AUTH_REQUIRED", message: "Authentication required" });
+        }
+        const doc = await UserService.getById(socket.data.user._id);
+        console.log("doc: ",doc);
+        // .select({ balance: 1 }).lean();
+        if (!doc) return reply({ success: false, code: "NOT_FOUND", message: "User not found" });
+        reply({ success: true, balance: doc.balance ?? 0 });
+      } catch (e: any) {
+        reply({ success: false, code: "INTERNAL", message: e?.message || "Could not fetch balance" });
+      }
+    });
 
     /**
      * 🟢 Handle bet placement

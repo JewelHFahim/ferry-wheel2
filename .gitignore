@@ -1,72 +1,42 @@
-# Node modules
-node_modules/
-jspm_packages/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Logs
-logs/
-*.log
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
+# env files (can opt-in for committing if needed)
+.env*
 
-# TypeScript
-dist/
-build/
+# vercel
+.vercel
+
+# typescript
 *.tsbuildinfo
+next-env.d.ts
 
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# VSCode
-.vscode/
-.history/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# MongoDB local files (if any)
-*.bson
-*.dump
-*.json
-
-# Optional npm cache
-.npm
-
-# Optional Yarn cache
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-
-# ts-node / ts-node-dev temp
-tsconfig.tsbuildinfo
-
-# Optional coverage directory
-coverage/
-*.lcov
-
-# Next.js / React (if any)
-.next/
-out/
-*.next/
-
-# JetBrains IDEs
-.idea/
-
-# Mac specific
-.AppleDouble
-.LSOverride
-
-# Windows specific
-ehthumbs.db
+.vercel
