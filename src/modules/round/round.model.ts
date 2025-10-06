@@ -2,17 +2,19 @@ import mongoose, { Schema, Types, HydratedDocument, Model } from "mongoose";
 
 /** Status enum (reusable in services) */
 export const ROUND_STATUS = {
+  OPEN: "open",
   BETTING: "betting",
   CLOSED: "closed",
   COMPLETED: "completed",
 } as const;
+
 export type RoundStatus = typeof ROUND_STATUS[keyof typeof ROUND_STATUS];
 
 /** Individual box stats for a round */
 export interface IRoundBox {
-  title: string;          // e.g., "Meat", "Tomato"
-  icon: string;           // emoji/icon
-  multiplier?: number;    // undefined => treat as 2x in your logic if desired
+  title: string;          
+  icon: string;           
+  multiplier?: number;
   totalBet: number;
   userCount: number;
 }
@@ -48,7 +50,7 @@ const RoundBoxSchema = new Schema<IRoundBox>(
   {
     title: { type: String, required: true },
     icon: { type: String, required: true },
-    multiplier: { type: Number },              // optional
+    multiplier: { type: Number },              
     totalBet: { type: Number, default: 0 },
     userCount: { type: Number, default: 0 },
   },

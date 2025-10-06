@@ -5,8 +5,6 @@ import { SettingsService } from "../modules/settings/settings.service";
 import { BetService } from "../modules/bet/bet.service";
 import { UserService } from "../modules/user/user.service";
 import { MetService } from "../modules/met/met.service";
-import { logRoundStart, logRoundClose, logRoundResult, } from "../utils/gameEventLogger";
-
 
 export class RoundEngineJob {
   private nsp: Namespace;
@@ -17,14 +15,15 @@ export class RoundEngineJob {
   }
 
   async startNewRound(): Promise<void> {
-
     if (this.isRunning) return;
     this.isRunning = true;
 
     try {
       const settings = await SettingsService.getSettings();
-      const raw = settings.roundDuration ?? 60;
-      const durationMs = raw > 1000 ? raw : raw * 1000;
+
+      // Accept either seconds or milliseconds from settings
+      const raw = settings.roundDuration ?? 60; // your schema comment says ms; older code used seconds
+      const durationMs = raw > 1000 ? raw : raw * 1000; // if small assume seconds, else already ms
 
       const roundNumber = await MetService.incrementRoundCounter();
 
@@ -32,7 +31,6 @@ export class RoundEngineJob {
       const endTime = new Date(startTime.getTime() + durationMs);
       const boxes = await SettingsService.getInitialBoxes();
 
-      // Create a round
       const round = await Round.create({
         roundNumber,
         startTime,
@@ -51,13 +49,8 @@ export class RoundEngineJob {
         roundStatus: "betting",
       });
 
-      // log round
-      logRoundStart(round);
-
-      //set current round
       await MetService.setCurrentRound(round._id.toString());
 
-      //emit round start
       this.nsp.emit("roundStarted", {
         _id: round._id,
         roundNumber,
@@ -66,9 +59,7 @@ export class RoundEngineJob {
         boxes,
       });
 
-      // end the round call
       setTimeout(() => this.endRound(round._id.toString()), durationMs);
-
     } catch (err) {
       console.error("❌ Failed to start new round:", err);
       this.isRunning = false;
@@ -79,7 +70,6 @@ export class RoundEngineJob {
     try {
       const settings = await SettingsService.getSettings();
       const round = await Round.findById(roundId);
-
       if (!round) {
         console.warn("⚠️ Round not found:", roundId);
         this.isRunning = false;
@@ -93,10 +83,6 @@ export class RoundEngineJob {
         _id: round._id,
         roundNumber: round.roundNumber,
       });
-
-      // log close round
-      logRoundClose(round);
-
 
       // Gather bets and pools
       const bets = await BetService.getBetsByRound(round._id);
@@ -114,9 +100,6 @@ export class RoundEngineJob {
         bets as any,
         distributable
       );
-
-      // log result
-      logRoundResult(round, winnerBox, payouts);
 
       // Credit each winner, then PUSH updated balances in real time
       const topWinners: { userId: Types.ObjectId; amountWon: number }[] = [];

@@ -3,12 +3,11 @@ import type http from "http";
 import { UserModel } from "../modules/user/user.model";
 import { BetService } from "../modules/bet/bet.service";
 import { socketAuthMiddleware } from "../middlewares/socket.auth.middleware";
-import { logBetAccepted } from "../utils/gameEventLogger";
+import { logBetAccepted, logError } from "../utils/gameEventLogger";
 
 export function initSocket(server: http.Server) {
-
   const io = new Server(server, {
-    cors: { origin: "*", methods: ["GET", "POST"], credentials: false }
+    cors: { origin: "*", methods: ["GET", "POST"], credentials: false },
   });
 
   // Dedicated name space
@@ -22,7 +21,8 @@ export function initSocket(server: http.Server) {
 
     //Join Room
     socket.on("join", (data?: { room?: string }, ack?: (res: any) => void) => {
-      if (data?.room && /^table:\w{1,32}$/.test(data.room)) socket.join(data.room);
+      if (data?.room && /^table:\w{1,32}$/.test(data.room))
+        socket.join(data.room);
       if (socket.data?.user) socket.join(`user:${socket.data.user._id}`);
       ack?.({ ok: true });
     });
@@ -32,70 +32,129 @@ export function initSocket(server: http.Server) {
       const reply = typeof ack === "function" ? ack : () => {};
       try {
         if (!socket.data?.user) {
-          return reply({ success: false, code: "AUTH_REQUIRED", message: "Authentication required" });
+          logError("Authentication required");
+          return reply({
+            success: false,
+            code: "AUTH_REQUIRED",
+            message: "Authentication required",
+          });
         }
-        const doc = await UserModel.findById(socket.data.user._id).select({ balance: 1 }).lean();
-        if (!doc) return reply({ success: false, code: "NOT_FOUND", message: "User not found" });
+        const doc = await UserModel.findById(socket.data.user._id)
+          .select({ balance: 1 })
+          .lean();
+        if (!doc)
+          return reply({
+            success: false,
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
         reply({ success: true, balance: doc.balance ?? 0 });
         socket.emit("balance:update", { balance: doc.balance ?? 0 });
       } catch (e: any) {
-        reply({ success: false, code: "INTERNAL", message: e?.message || "Could not fetch balance" });
+        logError(`${e?.message} || "Could not fetch balance"`);
+        reply({
+          success: false,
+          code: "INTERNAL",
+          message: e?.message || "Could not fetch balance",
+        });
       }
     });
 
     // Place bet
     socket.on("place_bet", async (payload: any, ack?: (res: any) => void) => {
-  const reply = typeof ack === "function" ? ack : (res: any) => socket.emit("bet_error", res);
-  try {
-    if (!socket.data?.user) {
-      return reply({ success: false, code: "AUTH_REQUIRED", message: "Authentication required" });
-    }
+      const reply =
+        typeof ack === "function"
+          ? ack
+          : (res: any) => socket.emit("bet_error", res);
+      try {
+        if (!socket.data?.user) {
+          return reply({
+            success: false,
+            code: "AUTH_REQUIRED",
+            message: "Authentication required",
+          });
+        }
 
-    const { roundId, box, amount } = payload || {};
-    if (!roundId || !box || typeof amount !== "number") {
-      return reply({ success: false, code: "INVALID_PAYLOAD", message: "Invalid payload" });
-    }
+        const { roundId, box, amount } = payload || {};
+        if (!roundId || !box || typeof amount !== "number") {
+          return reply({
+            success: false,
+            code: "INVALID_PAYLOAD",
+            message: "Invalid payload",
+          });
+        }
 
-    const bet = await BetService.placeBet({
-      userId: socket.data.user._id,
-      roundId,
-      box,
-      amount
-    });
+        const bet = await BetService.placeBet({
+          userId: socket.data.user._id,
+          roundId,
+          box,
+          amount,
+        });
 
-    // Let client append bet
-    socket.emit("bet_accepted", { bet });
-    logBetAccepted(bet.id , bet.userId.toString(), bet.roundId.toString(), bet.box, bet.amount)
+        // Let client append bet
+        socket.emit("bet_accepted", { bet });
+        logBetAccepted(
+          bet.id,
+          bet.userId.toString(),
+          bet.roundId.toString(),
+          bet.box,
+          bet.amount
+        );
 
-    // Push the post-deduction balance (authoritative)
-    const me = await UserModel.findById(socket.data.user._id).select({ balance: 1 }).lean();
-    if (me) {
-      // to caller socket
-      socket.emit("balance:update", { balance: me.balance, delta: -Math.abs(amount), reason: "bet", roundId });
-      // to other tabs/devices of same user
-      socket.to(`user:${socket.data.user._id}`).emit("balance:update", { balance: me.balance, delta: -Math.abs(amount), reason: "bet", roundId });
-    }
+        // Push the post-deduction balance (authoritative)
+        const me = await UserModel.findById(socket.data.user._id)
+          .select({ balance: 1 })
+          .lean();
+        if (me) {
+          // to caller socket
+          socket.emit("balance:update", {
+            balance: me.balance,
+            delta: -Math.abs(amount),
+            reason: "bet",
+            roundId,
+          });
+          // to other tabs/devices of same user
+          socket
+            .to(`user:${socket.data.user._id}`)
+            .emit("balance:update", {
+              balance: me.balance,
+              delta: -Math.abs(amount),
+              reason: "bet",
+              roundId,
+            });
+        }
 
-    // optional public feed
-    const game = socket.nsp;
-    game.emit("public_bet", { user: socket.data.user._id.slice(-4), box, amount });
+        // optional public feed
+        const game = socket.nsp;
+        game.emit("public_bet", {
+          user: socket.data.user._id.slice(-4),
+          box,
+          amount,
+        });
 
-    return reply({ success: true, bet });
-  } catch (e: any) {
-    const msg = String(e?.message || "Failed to place bet");
-    let code = "INTERNAL";
-    if (/Insufficient balance/i.test(msg)) code = "INSUFFICIENT_BALANCE";
-    else if (/Bet amount must be between/.test(msg)) code = "AMOUNT_RANGE";
+        return reply({ success: true, bet });
+      } catch (e: any) {
+        const msg = String(e?.message || "Failed to place bet");
+        let code = "INTERNAL";
+        if (/Insufficient balance/i.test(msg)) code = "INSUFFICIENT_BALANCE";
+        else if (/Bet amount must be between/.test(msg)) code = "AMOUNT_RANGE";
 
-    try {
-      if (socket.data?.user) {
-        const doc = await UserModel.findById(socket.data.user._id).select({ balance: 1 }).lean();
-        return reply({ success: false, code, message: msg, balance: doc?.balance ?? 0 });
+        try {
+          if (socket.data?.user) {
+            const doc = await UserModel.findById(socket.data.user._id)
+              .select({ balance: 1 })
+              .lean();
+            return reply({
+              success: false,
+              code,
+              message: msg,
+              balance: doc?.balance ?? 0,
+            });
+          }
+        } catch {}
+        return reply({ success: false, code, message: msg });
       }
-    } catch {}
-    return reply({ success: false, code, message: msg });
-  }
-});
+    });
 
     socket.on("disconnect", (reason) => {
       console.log("❌ [game] disconnect", socket.id, reason);
