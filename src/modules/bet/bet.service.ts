@@ -11,10 +11,11 @@ interface PlaceBetArgs {
   roundId: string;
   box: string;
   amount: number;
+  nsp: Namespace
 }
 
 export class BetService {
-  static async placeBet({ userId, roundId, box, amount }: PlaceBetArgs) {
+  static async placeBet({ userId, roundId, box, amount, nsp }: PlaceBetArgs) {
     // Fetch required data in parallel
     const [round, settings, user] = await Promise.all([
       Round.findById(roundId),
@@ -23,7 +24,6 @@ export class BetService {
     ]);
 
     logPlaceBet(userId, roundId, box, amount);
-
 
 
     if (!round) throw new Error("Invalid round");
@@ -63,14 +63,12 @@ export class BetService {
     );
     
 
-    // console.log("round: ", round);
-    // const updatedRound = await Round.findById(roundId).exec();
-    // nsp.emit("roundUpdated", {
-    //   _id: updatedRound._id,
-    //   roundNumber: updatedRound.roundNumber,
-    //   boxStats: updatedRound.boxStats,
-    // });
-
+    // Emit updated round data to all clients
+    nsp.emit("roundUpdated", {
+      _id: round._id,
+      roundNumber: round.roundNumber,
+      boxStats: round.boxStats,
+    });
     
 
     return bet;
@@ -99,9 +97,7 @@ export class BetService {
       { winningBets: [], totalWinningAmount: 0 }
     );
 
-    const payouts =
-      totalWinningAmount > 0
-        ? winningBets.map((b) => ({
+    const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
             userId: String(b.userId),
             box: b.box,
             amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),

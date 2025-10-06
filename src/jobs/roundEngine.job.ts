@@ -66,6 +66,7 @@ export class RoundEngineJob {
     }
   }
 
+
   async endRound(roundId: string): Promise<void> {
     try {
       const settings = await SettingsService.getSettings();
@@ -104,10 +105,8 @@ export class RoundEngineJob {
       // Credit each winner, then PUSH updated balances in real time
       const topWinners: { userId: Types.ObjectId; amountWon: number }[] = [];
       for (const p of payouts) {
-        // Credit and get the updated balance atomically
         const updated = await UserService.updateBalance(p.userId, p.amount);
 
-        // Nice UX: send a dedicated payout event
         this.nsp.to(`user:${p.userId}`).emit("payout", {
           roundId: round._id,
           winnerBox,
@@ -115,23 +114,21 @@ export class RoundEngineJob {
           newBalance: updated.balance,
         });
 
-        // Also send the generic balance snapshot used across the app
-        this.nsp.to(`user:${p.userId}`).emit("balance:update", {
-          balance: updated.balance,
-          delta: p.amount,
-          reason: "payout",
-          roundId: round._id,
-        });
-
         topWinners.push({
           userId: new Types.ObjectId(p.userId),
           amountWon: p.amount,
         });
+
+          // Also emit the balance update to other tabs/devices of the same user
+  this.nsp.to(`user:${p.userId}`).emit("balance:update", {
+    balance: updated.balance,
+    delta: p.amount,
+    reason: "payout",
+    roundId: round._id,
+  });
       }
 
-      round.topWinners = topWinners
-        .sort((a, b) => b.amountWon - a.amountWon)
-        .slice(0, 3);
+      round.topWinners = topWinners.sort((a, b) => b.amountWon - a.amountWon).slice(0, 3);
 
       round.winningBox = winnerBox;
       round.distributedAmount = payouts.reduce((s, p) => s + p.amount, 0);
@@ -148,6 +145,13 @@ export class RoundEngineJob {
       });
 
       await round.save();
+
+      // Emit final round data to all clients
+      this.nsp.emit("roundUpdated", {
+        _id: round._id,
+        roundNumber: round.roundNumber,
+        boxStats: round.boxStats,
+      });
 
       // Announce results
       this.nsp.emit("winnerRevealed", {
@@ -168,7 +172,6 @@ export class RoundEngineJob {
 
       await MetService.clearCurrentRound();
 
-      // Schedule next round
       this.isRunning = false;
       setTimeout(() => this.startNewRound(), 5000);
     } catch (err) {

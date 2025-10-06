@@ -1,28 +1,32 @@
 import { Server } from "socket.io";
-import type http from "http";
+import http from "http";
 import { UserModel } from "../modules/user/user.model";
 import { BetService } from "../modules/bet/bet.service";
 import { socketAuthMiddleware } from "../middlewares/socket.auth.middleware";
 import { logBetAccepted, logError } from "../utils/gameEventLogger";
 
+// Initialize socket server
 export function initSocket(server: http.Server) {
+  // Declare 'game' first before using it
   const io = new Server(server, {
     cors: { origin: "*", methods: ["GET", "POST"], credentials: false },
   });
 
-  // Dedicated name space
+  // Dedicated namespace for game
   const game = io.of("/game");
 
   // Check Authentication
   socketAuthMiddleware(game, { strict: false, joinRooms: true });
 
+  // Handling connection to the game namespace
   game.on("connection", (socket) => {
     console.log("🔌 [game]", socket.id, socket.data?.user || "(guest)");
 
-    //Join Room
+    // Join Room
     socket.on("join", (data?: { room?: string }, ack?: (res: any) => void) => {
-      if (data?.room && /^table:\w{1,32}$/.test(data.room))
+      if (data?.room && /^table:\w{1,32}$/.test(data.room)) {
         socket.join(data.room);
+      }
       if (socket.data?.user) socket.join(`user:${socket.data.user._id}`);
       ack?.({ ok: true });
     });
@@ -33,30 +37,19 @@ export function initSocket(server: http.Server) {
       try {
         if (!socket.data?.user) {
           logError("Authentication required");
-          return reply({
-            success: false,
-            code: "AUTH_REQUIRED",
-            message: "Authentication required",
-          });
+          return reply({ success: false, code: "AUTH_REQUIRED", message: "Authentication required", });
         }
-        const doc = await UserModel.findById(socket.data.user._id)
-          .select({ balance: 1 })
-          .lean();
-        if (!doc)
-          return reply({
-            success: false,
-            code: "NOT_FOUND",
-            message: "User not found",
-          });
+
+        const doc = await UserModel.findById(socket.data.user._id).select({ balance: 1 }).lean();
+
+        if (!doc) return reply({ success: false, code: "NOT_FOUND", message: "User not found",});
+
         reply({ success: true, balance: doc.balance ?? 0 });
+
         socket.emit("balance:update", { balance: doc.balance ?? 0 });
       } catch (e: any) {
         logError(`${e?.message} || "Could not fetch balance"`);
-        reply({
-          success: false,
-          code: "INTERNAL",
-          message: e?.message || "Could not fetch balance",
-        });
+        reply({ success: false, code: "INTERNAL", message: e?.message || "Could not fetch balance", });
       }
     });
 
@@ -84,14 +77,16 @@ export function initSocket(server: http.Server) {
           });
         }
 
+        // Pass the `nsp` (namespace) to BetService
         const bet = await BetService.placeBet({
           userId: socket.data.user._id,
           roundId,
           box,
           amount,
+          nsp: game, // Pass the nsp (namespace) here
         });
 
-        // Let client append bet
+        // Emit success and provide bet details to the client
         socket.emit("bet_accepted", { bet });
         logBetAccepted(
           bet.id,
@@ -101,22 +96,17 @@ export function initSocket(server: http.Server) {
           bet.amount
         );
 
-        // Push the post-deduction balance (authoritative)
-        const me = await UserModel.findById(socket.data.user._id)
-          .select({ balance: 1 })
-          .lean();
+        // Refresh balance
+        const me = await UserModel.findById(socket.data.user._id).select({ balance: 1 }).lean();
         if (me) {
-          // to caller socket
           socket.emit("balance:update", {
             balance: me.balance,
             delta: -Math.abs(amount),
             reason: "bet",
             roundId,
           });
-          // to other tabs/devices of same user
-          socket
-            .to(`user:${socket.data.user._id}`)
-            .emit("balance:update", {
+          
+          socket.to(`user:${socket.data.user._id}`).emit("balance:update", {
               balance: me.balance,
               delta: -Math.abs(amount),
               reason: "bet",
@@ -124,8 +114,7 @@ export function initSocket(server: http.Server) {
             });
         }
 
-        // optional public feed
-        const game = socket.nsp;
+        // Optional public feed
         game.emit("public_bet", {
           user: socket.data.user._id.slice(-4),
           box,

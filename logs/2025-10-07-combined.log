@@ -1,0 +1,353 @@
+[2025-10-06T18:38:51.972Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 50 on Meat for round #68e40cb86674e259e0779eb6
+[2025-10-06T18:38:54.448Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 50 on Tomato for round #68e40cb86674e259e0779eb6
+[2025-10-06T18:39:00.945Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e40cb86674e259e0779eb6
+[2025-10-06T18:39:00.959Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e40cc46674e259e0779ee3)
+[2025-10-06T18:39:29.288Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e40cdb6674e259e0779f0e
+[2025-10-06T18:39:29.296Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e40ce16674e259e0779f1f)
+[2025-10-06T18:40:06.392Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e40cfe6674e259e0779f4a
+[2025-10-06T18:40:06.399Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e40d066674e259e0779f5b)
+[2025-10-06T18:46:52.166Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e40e9a24890d0734fb0ea8
+[2025-10-06T18:46:52.179Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e40e9c24890d0734fb0eb9)
+[2025-10-06T19:09:53.971Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e413f302cb1808014fe614
+[2025-10-06T19:09:53.984Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4140102cb1808014fe625)
+[2025-10-06T19:10:23.357Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e4141602cb1808014fe650
+[2025-10-06T19:10:23.364Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4141f02cb1808014fe661)
+[2025-10-06T19:12:06.933Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e4147f02cb1808014fe6e3
+[2025-10-06T19:12:06.934Z] [33mwarn[39m: Warning: Insufficient balance, current balance: 450, bet amount: 500
+[2025-10-06T19:12:08.948Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e4147f02cb1808014fe6e3
+[2025-10-06T19:12:08.949Z] [33mwarn[39m: Warning: Insufficient balance, current balance: 450, bet amount: 500
+[2025-10-06T19:13:02.129Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e414a202cb1808014fe72a
+[2025-10-06T19:13:02.138Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e414be02cb1808014fe73c)
+[2025-10-06T19:13:17.485Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e414c502cb1808014fe767
+[2025-10-06T19:13:17.493Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e414cd02cb1808014fe778)
+[2025-10-06T19:13:57.211Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e414e802cb1808014fe7a3
+[2025-10-06T19:13:57.218Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e414f502cb1808014fe7b4)
+[2025-10-06T19:14:57.483Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e4152f02cb1808014fe809
+[2025-10-06T19:14:57.492Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4153102cb1808014fe81a)
+[2025-10-06T19:23:45.868Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Meat for round #68e4173c02cb1808014fea92
+[2025-10-06T19:23:45.877Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Meat (Bet ID: 68e4174102cb1808014feaa3)
+[2025-10-06T19:36:06.355Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:06.363Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e41a2602cb1808014fee29)
+[2025-10-06T19:36:07.667Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:07.674Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e41a2702cb1808014fee3b)
+[2025-10-06T19:36:09.267Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:09.274Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e41a2902cb1808014fee4d)
+[2025-10-06T19:36:10.059Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:10.067Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e41a2a02cb1808014fee5f)
+[2025-10-06T19:36:10.833Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:10.840Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e41a2a02cb1808014fee71)
+[2025-10-06T19:36:12.044Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:12.051Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e41a2c02cb1808014fee83)
+[2025-10-06T19:36:12.906Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:12.912Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e41a2c02cb1808014fee95)
+[2025-10-06T19:36:13.986Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:13.992Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e41a2d02cb1808014feea7)
+[2025-10-06T19:36:14.748Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:14.755Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e41a2e02cb1808014feeb9)
+[2025-10-06T19:36:15.514Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:15.522Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e41a2f02cb1808014feecb)
+[2025-10-06T19:36:16.891Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:16.897Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e41a3002cb1808014feedd)
+[2025-10-06T19:36:17.858Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:17.864Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e41a3102cb1808014feeef)
+[2025-10-06T19:36:18.754Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:18.761Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e41a3202cb1808014fef01)
+[2025-10-06T19:36:23.274Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:23.281Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e41a3702cb1808014fef14)
+[2025-10-06T19:36:25.346Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e41a1c02cb1808014fee18
+[2025-10-06T19:36:25.352Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e41a3902cb1808014fef26)
+[2025-10-06T19:36:47.570Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e41a4002cb1808014fef52
+[2025-10-06T19:36:47.576Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e41a4f02cb1808014fef64)
+[2025-10-06T19:36:48.618Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e41a4002cb1808014fef52
+[2025-10-06T19:36:48.625Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e41a5002cb1808014fef76)
+[2025-10-06T19:36:49.187Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e41a4002cb1808014fef52
+[2025-10-06T19:36:49.193Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e41a5102cb1808014fef88)
+[2025-10-06T19:36:49.986Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e41a4002cb1808014fef52
+[2025-10-06T19:36:49.994Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e41a5102cb1808014fef9a)
+[2025-10-06T19:36:50.795Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e41a4002cb1808014fef52
+[2025-10-06T19:36:50.804Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e41a5202cb1808014fefac)
+[2025-10-06T19:36:57.890Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 250 on Tomato for round #68e41a4002cb1808014fef52
+[2025-10-06T19:37:13.979Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 3750 on Tomato for round #68e41a6302cb1808014fefe6
+[2025-10-06T19:37:13.985Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 3750 on Tomato (Bet ID: 68e41a6902cb1808014feff7)
+[2025-10-06T19:37:24.066Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 2250 on Sausage for round #68e41a6302cb1808014fefe6
+[2025-10-06T19:37:24.071Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 2250 on Sausage (Bet ID: 68e41a7402cb1808014ff00b)
+[2025-10-06T19:39:53.155Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e41aef02cb1808014ff0b7
+[2025-10-06T19:39:53.165Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e41b0902cb1808014ff0c8)
+[2025-10-06T19:40:05.251Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:05.258Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e41b1502cb1808014ff104)
+[2025-10-06T19:40:06.035Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:06.042Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e41b1602cb1808014ff116)
+[2025-10-06T19:40:06.627Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:06.634Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e41b1602cb1808014ff128)
+[2025-10-06T19:40:07.259Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:07.266Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e41b1702cb1808014ff13a)
+[2025-10-06T19:40:08.011Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:08.017Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e41b1802cb1808014ff14c)
+[2025-10-06T19:40:09.091Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:09.099Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e41b1902cb1808014ff15e)
+[2025-10-06T19:40:10.228Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:10.235Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e41b1a02cb1808014ff170)
+[2025-10-06T19:40:11.203Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:11.209Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e41b1b02cb1808014ff182)
+[2025-10-06T19:40:12.763Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:12.771Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e41b1c02cb1808014ff194)
+[2025-10-06T19:40:14.874Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:14.881Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e41b1e02cb1808014ff1a6)
+[2025-10-06T19:40:15.579Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e41b1202cb1808014ff0f3
+[2025-10-06T19:40:15.587Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e41b1f02cb1808014ff1b8)
+[2025-10-06T19:41:26.650Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 950 on Meat for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:26.656Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 950 on Meat (Bet ID: 68e41b6602cb1808014ff221)
+[2025-10-06T19:41:28.979Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:28.986Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e41b6802cb1808014ff233)
+[2025-10-06T19:41:29.515Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:29.523Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e41b6902cb1808014ff245)
+[2025-10-06T19:41:30.570Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:30.578Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e41b6a02cb1808014ff257)
+[2025-10-06T19:41:31.299Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:31.305Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e41b6b02cb1808014ff269)
+[2025-10-06T19:41:32.148Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:32.154Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e41b6c02cb1808014ff27b)
+[2025-10-06T19:41:32.706Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:32.713Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e41b6c02cb1808014ff28d)
+[2025-10-06T19:41:33.307Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:33.315Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e41b6d02cb1808014ff29f)
+[2025-10-06T19:41:33.986Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:33.992Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e41b6d02cb1808014ff2b1)
+[2025-10-06T19:41:35.778Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:35.785Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e41b6f02cb1808014ff2c3)
+[2025-10-06T19:41:36.963Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e41b5802cb1808014ff210
+[2025-10-06T19:41:36.969Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e41b7002cb1808014ff2d5)
+[2025-10-06T19:52:52.623Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 344 on Meat for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:53.910Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:53.920Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e41e15b0fa0de672030459)
+[2025-10-06T19:52:54.460Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:54.469Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e41e16b0fa0de67203046b)
+[2025-10-06T19:52:55.516Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:55.524Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e41e17b0fa0de67203047d)
+[2025-10-06T19:52:56.068Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:56.076Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e41e18b0fa0de67203048f)
+[2025-10-06T19:52:56.844Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:56.852Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e41e18b0fa0de6720304a1)
+[2025-10-06T19:52:57.396Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:57.405Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e41e19b0fa0de6720304b3)
+[2025-10-06T19:52:57.901Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:57.909Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e41e19b0fa0de6720304c5)
+[2025-10-06T19:52:58.468Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:58.476Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e41e1ab0fa0de6720304d7)
+[2025-10-06T19:52:59.284Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e41e05b0fa0de672030439
+[2025-10-06T19:52:59.293Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e41e1bb0fa0de6720304e9)
+[2025-10-06T19:53:13.188Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:13.194Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e41e29b0fa0de67203052d)
+[2025-10-06T19:53:13.875Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:13.883Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e41e29b0fa0de67203053f)
+[2025-10-06T19:53:14.604Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:14.612Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e41e2ab0fa0de672030551)
+[2025-10-06T19:53:15.100Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:15.106Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e41e2bb0fa0de672030563)
+[2025-10-06T19:53:15.580Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:15.586Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e41e2bb0fa0de672030575)
+[2025-10-06T19:53:16.443Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:16.450Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e41e2cb0fa0de672030587)
+[2025-10-06T19:53:16.787Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:16.793Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e41e2cb0fa0de672030599)
+[2025-10-06T19:53:17.365Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:17.372Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e41e2db0fa0de6720305ab)
+[2025-10-06T19:53:17.949Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:17.956Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e41e2db0fa0de6720305bd)
+[2025-10-06T19:53:19.060Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:19.074Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e41e2fb0fa0de6720305cf)
+[2025-10-06T19:53:19.876Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:19.884Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e41e2fb0fa0de6720305e1)
+[2025-10-06T19:53:27.092Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 505 on Corn for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:27.099Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 505 on Corn (Bet ID: 68e41e37b0fa0de6720305f3)
+[2025-10-06T19:53:36.483Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 900 on Cucumber for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:36.489Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 900 on Cucumber (Bet ID: 68e41e40b0fa0de672030606)
+[2025-10-06T19:53:40.997Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Tomato for round #68e41e28b0fa0de67203051c
+[2025-10-06T19:53:41.004Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Tomato (Bet ID: 68e41e45b0fa0de672030619)
+[2025-10-06T20:03:01.551Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Meat for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:01.564Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Meat (Bet ID: 68e42075913f846762d90e16)
+[2025-10-06T20:03:02.684Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Tomato for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:02.692Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Tomato (Bet ID: 68e42076913f846762d90e28)
+[2025-10-06T20:03:03.533Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Corn for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:03.541Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Corn (Bet ID: 68e42077913f846762d90e3a)
+[2025-10-06T20:03:04.427Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Sausage for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:04.436Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Sausage (Bet ID: 68e42078913f846762d90e4c)
+[2025-10-06T20:03:05.228Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Lettuce for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:05.236Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Lettuce (Bet ID: 68e42079913f846762d90e5e)
+[2025-10-06T20:03:06.227Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Carrot for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:06.235Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Carrot (Bet ID: 68e4207a913f846762d90e70)
+[2025-10-06T20:03:06.907Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Cucumber for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:06.917Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Cucumber (Bet ID: 68e4207a913f846762d90e82)
+[2025-10-06T20:03:07.757Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Pepper for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:07.765Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Pepper (Bet ID: 68e4207b913f846762d90e94)
+[2025-10-06T20:03:09.213Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Pizza for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:09.221Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Pizza (Bet ID: 68e4207d913f846762d90ea6)
+[2025-10-06T20:03:11.629Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Pizza for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:11.637Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Pizza (Bet ID: 68e4207f913f846762d90eb8)
+[2025-10-06T20:03:12.451Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Salad for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:12.458Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Salad (Bet ID: 68e42080913f846762d90eca)
+[2025-10-06T20:03:18.108Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 115 on Meat for round #68e4206e913f846762d90e05
+[2025-10-06T20:03:43.292Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 6015 on Meat for round #68e42091913f846762d90f04
+[2025-10-06T20:03:43.300Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 6015 on Meat (Bet ID: 68e4209f913f846762d90f15)
+[2025-10-06T20:03:46.195Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Tomato for round #68e42091913f846762d90f04
+[2025-10-06T20:03:46.202Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Tomato (Bet ID: 68e420a2913f846762d90f27)
+[2025-10-06T20:03:46.981Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Corn for round #68e42091913f846762d90f04
+[2025-10-06T20:03:46.987Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Corn (Bet ID: 68e420a2913f846762d90f39)
+[2025-10-06T20:03:47.812Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Sausage for round #68e42091913f846762d90f04
+[2025-10-06T20:03:47.818Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Sausage (Bet ID: 68e420a3913f846762d90f4b)
+[2025-10-06T20:03:48.540Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Lettuce for round #68e42091913f846762d90f04
+[2025-10-06T20:03:48.547Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Lettuce (Bet ID: 68e420a4913f846762d90f5d)
+[2025-10-06T20:03:49.412Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Carrot for round #68e42091913f846762d90f04
+[2025-10-06T20:03:49.420Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Carrot (Bet ID: 68e420a5913f846762d90f6f)
+[2025-10-06T20:03:50.035Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Cucumber for round #68e42091913f846762d90f04
+[2025-10-06T20:03:50.044Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Cucumber (Bet ID: 68e420a6913f846762d90f81)
+[2025-10-06T20:03:50.516Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Pepper for round #68e42091913f846762d90f04
+[2025-10-06T20:03:50.526Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Pepper (Bet ID: 68e420a6913f846762d90f93)
+[2025-10-06T20:03:51.155Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Pizza for round #68e42091913f846762d90f04
+[2025-10-06T20:03:51.163Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Pizza (Bet ID: 68e420a7913f846762d90fa5)
+[2025-10-06T20:03:51.836Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Salad for round #68e42091913f846762d90f04
+[2025-10-06T20:03:51.844Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Salad (Bet ID: 68e420a7913f846762d90fb7)
+[2025-10-06T20:03:53.500Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Salad for round #68e42091913f846762d90f04
+[2025-10-06T20:03:53.506Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Salad (Bet ID: 68e420a9913f846762d90fc9)
+[2025-10-06T20:04:24.700Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 4414 on Carrot for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:24.707Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 4414 on Carrot (Bet ID: 68e420c8913f846762d91006)
+[2025-10-06T20:04:26.755Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Meat for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:26.762Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Meat (Bet ID: 68e420ca913f846762d91018)
+[2025-10-06T20:04:27.244Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Tomato for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:27.254Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Tomato (Bet ID: 68e420cb913f846762d9102a)
+[2025-10-06T20:04:27.996Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Cucumber for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:28.003Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Cucumber (Bet ID: 68e420cb913f846762d9103c)
+[2025-10-06T20:04:28.380Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Pepper for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:28.388Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Pepper (Bet ID: 68e420cc913f846762d9104e)
+[2025-10-06T20:04:28.851Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Corn for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:28.857Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Corn (Bet ID: 68e420cc913f846762d91060)
+[2025-10-06T20:04:29.964Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Pizza for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:29.970Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Pizza (Bet ID: 68e420cd913f846762d91072)
+[2025-10-06T20:04:30.428Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Sausage for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:30.435Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Sausage (Bet ID: 68e420ce913f846762d91084)
+[2025-10-06T20:04:31.388Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Lettuce for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:31.394Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Lettuce (Bet ID: 68e420cf913f846762d91096)
+[2025-10-06T20:04:31.867Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Salad for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:31.873Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Salad (Bet ID: 68e420cf913f846762d910a8)
+[2025-10-06T20:04:33.707Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Salad for round #68e420b4913f846762d90ff5
+[2025-10-06T20:04:33.715Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Salad (Bet ID: 68e420d1913f846762d910ba)
+[2025-10-06T20:07:06.215Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42164913f846762d9118f
+[2025-10-06T20:07:06.223Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4216a913f846762d911a0)
+[2025-10-06T20:07:08.061Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e42164913f846762d9118f
+[2025-10-06T20:07:08.068Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e4216c913f846762d911b2)
+[2025-10-06T20:07:09.583Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e42164913f846762d9118f
+[2025-10-06T20:07:09.592Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e4216d913f846762d911c4)
+[2025-10-06T20:07:10.183Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e42164913f846762d9118f
+[2025-10-06T20:07:10.189Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e4216e913f846762d911d6)
+[2025-10-06T20:07:37.015Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42187913f846762d91202
+[2025-10-06T20:07:37.021Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e42189913f846762d91213)
+[2025-10-06T20:09:32.661Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e421f0913f846762d91293
+[2025-10-06T20:09:32.668Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e421fc913f846762d912a4)
+[2025-10-06T20:09:33.189Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e421f0913f846762d91293
+[2025-10-06T20:09:33.195Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e421fd913f846762d912b6)
+[2025-10-06T20:09:33.879Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e421f0913f846762d91293
+[2025-10-06T20:09:33.885Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e421fd913f846762d912c8)
+[2025-10-06T20:12:52.307Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e422c2913f846762d913c6
+[2025-10-06T20:12:52.314Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e422c4913f846762d913d7)
+[2025-10-06T20:13:40.297Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e422e5913f846762d91402
+[2025-10-06T20:13:40.307Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e422f4913f846762d91413)
+[2025-10-06T20:14:52.718Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e4232c913f846762d91468
+[2025-10-06T20:14:52.725Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e4233c913f846762d91479)
+[2025-10-06T20:15:19.175Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e4234f913f846762d914a4
+[2025-10-06T20:15:19.183Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e42357913f846762d914b5)
+[2025-10-06T20:15:20.293Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e4234f913f846762d914a4
+[2025-10-06T20:15:20.300Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e42358913f846762d914c7)
+[2025-10-06T20:15:56.919Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42372913f846762d914f2
+[2025-10-06T20:15:56.926Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4237c913f846762d91503)
+[2025-10-06T20:15:57.301Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42372913f846762d914f2
+[2025-10-06T20:15:57.307Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4237d913f846762d91515)
+[2025-10-06T20:15:57.558Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42372913f846762d914f2
+[2025-10-06T20:15:57.566Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4237d913f846762d91527)
+[2025-10-06T20:15:57.815Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42372913f846762d914f2
+[2025-10-06T20:15:57.821Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4237d913f846762d91539)
+[2025-10-06T20:15:58.054Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42372913f846762d914f2
+[2025-10-06T20:15:58.060Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e4237e913f846762d9154b)
+[2025-10-06T20:17:17.720Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e423b8913f846762d915a0
+[2025-10-06T20:17:17.728Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e423cd913f846762d915b1)
+[2025-10-06T20:17:19.366Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e423b8913f846762d915a0
+[2025-10-06T20:17:19.373Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e423cf913f846762d915c3)
+[2025-10-06T20:26:17.157Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 1000 on Corn for round #68e425e9913f846762d91869
+[2025-10-06T20:26:17.166Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 1000 on Corn (Bet ID: 68e425e9913f846762d9187a)
+[2025-10-06T20:38:00.430Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:00.440Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e428a8913f846762d91bd5)
+[2025-10-06T20:38:08.741Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:08.747Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e428b0913f846762d91be7)
+[2025-10-06T20:38:10.445Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:10.450Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e428b2913f846762d91bf9)
+[2025-10-06T20:38:11.212Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:11.220Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e428b3913f846762d91c0b)
+[2025-10-06T20:38:11.956Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:11.962Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e428b3913f846762d91c1d)
+[2025-10-06T20:38:12.821Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:12.828Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e428b4913f846762d91c2f)
+[2025-10-06T20:38:14.372Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:14.378Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e428b6913f846762d91c41)
+[2025-10-06T20:38:16.412Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:16.418Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e428b8913f846762d91c53)
+[2025-10-06T20:38:17.308Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:17.313Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e428b9913f846762d91c65)
+[2025-10-06T20:38:18.620Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:18.626Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e428ba913f846762d91c77)
+[2025-10-06T20:38:19.293Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e428a6913f846762d91bc4
+[2025-10-06T20:38:19.299Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e428bb913f846762d91c89)
+[2025-10-06T20:38:44.149Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:44.157Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e428d4913f846762d91cc6)
+[2025-10-06T20:38:46.572Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:46.578Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e428d6913f846762d91cd8)
+[2025-10-06T20:38:47.285Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:47.292Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e428d7913f846762d91cea)
+[2025-10-06T20:38:48.204Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:48.211Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e428d8913f846762d91cfc)
+[2025-10-06T20:38:48.854Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:48.860Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e428d8913f846762d91d0e)
+[2025-10-06T20:38:49.460Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Lettuce for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:49.467Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Lettuce (Bet ID: 68e428d9913f846762d91d20)
+[2025-10-06T20:38:50.253Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Carrot for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:50.259Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Carrot (Bet ID: 68e428da913f846762d91d32)
+[2025-10-06T20:38:50.670Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:50.677Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e428da913f846762d91d44)
+[2025-10-06T20:38:51.299Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:51.308Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e428db913f846762d91d56)
+[2025-10-06T20:38:51.836Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:51.845Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e428db913f846762d91d68)
+[2025-10-06T20:38:52.509Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Salad for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:52.515Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Salad (Bet ID: 68e428dc913f846762d91d7a)
+[2025-10-06T20:38:59.934Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428c9913f846762d91cb5
+[2025-10-06T20:38:59.941Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e428e3913f846762d91d8c)
+[2025-10-06T20:39:00.565Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428c9913f846762d91cb5
+[2025-10-06T20:39:00.572Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e428e4913f846762d91d9e)
+[2025-10-06T20:39:01.196Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428c9913f846762d91cb5
+[2025-10-06T20:39:01.203Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e428e5913f846762d91db0)
+[2025-10-06T20:39:33.294Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428ec913f846762d91ddc
+[2025-10-06T20:39:33.301Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e42905913f846762d91ded)
+[2025-10-06T20:39:37.957Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e428ec913f846762d91ddc
+[2025-10-06T20:39:37.964Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e42909913f846762d91dff)
+[2025-10-06T20:42:22.030Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e4299b913f846762d91ed2
+[2025-10-06T20:42:22.038Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e429ae913f846762d91ee3)
+[2025-10-06T20:58:48.264Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42d71913f846762d9237f
+[2025-10-06T20:58:48.273Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e42d88913f846762d92390)
+[2025-10-06T20:58:49.805Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Cucumber for round #68e42d71913f846762d9237f
+[2025-10-06T20:58:49.810Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Cucumber (Bet ID: 68e42d89913f846762d923a2)
+[2025-10-06T20:58:50.813Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e42d71913f846762d9237f
+[2025-10-06T20:58:50.819Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e42d8a913f846762d923b4)
+[2025-10-06T20:58:52.708Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42d71913f846762d9237f
+[2025-10-06T20:58:52.714Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e42d8c913f846762d923c6)
+[2025-10-06T20:58:52.917Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42d71913f846762d9237f
+[2025-10-06T20:58:52.924Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e42d8c913f846762d923d8)
+[2025-10-06T21:01:22.574Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e42e20913f846762d924ab
+[2025-10-06T21:01:22.581Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Meat (Bet ID: 68e42e22913f846762d924bc)
+[2025-10-06T21:01:23.725Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e42e20913f846762d924ab
+[2025-10-06T21:01:23.730Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Tomato (Bet ID: 68e42e23913f846762d924ce)
+[2025-10-06T21:01:24.862Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e42e20913f846762d924ab
+[2025-10-06T21:01:24.868Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Corn (Bet ID: 68e42e24913f846762d924e0)
+[2025-10-06T21:01:25.669Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pepper for round #68e42e20913f846762d924ab
+[2025-10-06T21:01:25.675Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pepper (Bet ID: 68e42e25913f846762d924f2)
+[2025-10-06T21:01:26.413Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Pizza for round #68e42e20913f846762d924ab
+[2025-10-06T21:01:26.419Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Pizza (Bet ID: 68e42e26913f846762d92504)
+[2025-10-06T21:01:27.262Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e42e20913f846762d924ab
+[2025-10-06T21:01:27.267Z] [32minfo[39m: Bet accepted: User 68e2abb4cbfc8a45544ecce0 placed 500 on Sausage (Bet ID: 68e42e27913f846762d92516)
