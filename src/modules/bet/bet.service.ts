@@ -11,7 +11,7 @@ interface PlaceBetArgs {
   roundId: string;
   box: string;
   amount: number;
-  nsp: Namespace
+  nsp: Namespace;
 }
 
 export class BetService {
@@ -25,12 +25,14 @@ export class BetService {
 
     logPlaceBet(userId, roundId, box, amount);
 
-
     if (!round) throw new Error("Invalid round");
-    if (round.roundStatus !== ROUND_STATUS.BETTING) throw new Error("Betting is closed");
+    if (round.roundStatus !== ROUND_STATUS.BETTING)
+      throw new Error("Betting is closed");
 
     if (amount < settings.minBet || amount > settings.maxBet) {
-      throw new Error(`Bet amount must be between ${settings.minBet} and ${settings.maxBet}`);
+      throw new Error(
+        `Bet amount must be between ${settings.minBet} and ${settings.maxBet}`
+      );
     }
 
     // Find the box and update stats
@@ -41,7 +43,9 @@ export class BetService {
     round.boxStats[boxIndex].bettorsCount += 1;
 
     if (!user || user.balance < amount) {
-      logWarning(`Insufficient balance, current balance: ${user?.balance}, bet amount: ${amount}`);
+      logWarning(
+        `Insufficient balance, current balance: ${user?.balance}, bet amount: ${amount}`
+      );
       throw new Error("Insufficient balance");
     }
 
@@ -57,17 +61,23 @@ export class BetService {
     });
 
     // Update the round stats (atomic update)
-   const res =  await Round.updateOne(
+    const res = await Round.updateOne(
       { _id: roundId, "boxStats.box": box },
-      { $inc: { "boxStats.$.totalAmount": amount, "boxStats.$.bettorsCount": 1 } }
+      {
+        $inc: {
+          "boxStats.$.totalAmount": amount,
+          "boxStats.$.bettorsCount": 1,
+        },
+      }
     );
-    
 
     // Emit updated round data to all clients
     nsp.emit("roundUpdated", {
       _id: round._id,
       roundNumber: round.roundNumber,
       boxStats: round.boxStats,
+      phase: ROUND_STATUS.BETTING,
+      phaseEndTime: round.endTime,
     });
     
 
@@ -97,10 +107,14 @@ export class BetService {
       { winningBets: [], totalWinningAmount: 0 }
     );
 
-    const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
+    const payouts =
+      totalWinningAmount > 0
+        ? winningBets.map((b) => ({
             userId: String(b.userId),
             box: b.box,
-            amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),
+            amount: Math.floor(
+              (b.amount / totalWinningAmount) * distributableAmount
+            ),
           }))
         : [];
 

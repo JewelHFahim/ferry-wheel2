@@ -1,10 +1,11 @@
 import { Types } from "mongoose";
 import type { Namespace } from "socket.io";
-import Round from "../modules/round/round.model";
+import Round, { ROUND_STATUS } from "../modules/round/round.model";
 import { SettingsService } from "../modules/settings/settings.service";
 import { BetService } from "../modules/bet/bet.service";
 import { UserService } from "../modules/user/user.service";
 import { MetService } from "../modules/met/met.service";
+import { env } from "../config/env";
 
 export class RoundEngineJob {
   private nsp: Namespace;
@@ -22,8 +23,8 @@ export class RoundEngineJob {
       const settings = await SettingsService.getSettings();
 
       // Accept either seconds or milliseconds from settings
-      const raw = settings.roundDuration ?? 60; // your schema comment says ms; older code used seconds
-      const durationMs = raw > 1000 ? raw : raw * 1000; // if small assume seconds, else already ms
+      const raw = settings.roundDuration ?? env.ROUND_DURATION;
+      const durationMs = raw > 1000 ? raw : raw * 1000;
 
       const roundNumber = await MetService.incrementRoundCounter();
 
@@ -42,6 +43,9 @@ export class RoundEngineJob {
         bets: [],
         boxStats: boxes.map((b) => ({
           box: b.title,
+          title: b.title,
+          icon: b.icon,
+          multiplier: b.multiplier,
           totalAmount: 0,
           bettorsCount: 0,
         })),
@@ -57,6 +61,8 @@ export class RoundEngineJob {
         startTime,
         endTime,
         boxes,
+        phase: ROUND_STATUS.BETTING,
+        phaseEndTime: endTime,
       });
 
       setTimeout(() => this.endRound(round._id.toString()), durationMs);
@@ -65,7 +71,6 @@ export class RoundEngineJob {
       this.isRunning = false;
     }
   }
-
 
   async endRound(roundId: string): Promise<void> {
     try {
@@ -78,11 +83,21 @@ export class RoundEngineJob {
       }
 
       // Close betting phase
-      round.roundStatus = "closed";
+      round.roundStatus = ROUND_STATUS.CLOSED;
       await round.save();
+      const revealStart = new Date();
+      const revealEnd = new Date(revealStart.getTime() + 5000); // 5s reveal
+
       this.nsp.emit("roundClosed", {
         _id: round._id,
         roundNumber: round.roundNumber,
+      });
+
+      // Immediately after closing, emit preparing results
+      this.nsp.emit("roundPreparing", {
+        roundId: round._id,
+        phase: ROUND_STATUS.REVEAL,
+        phaseEndTime: revealEnd,
       });
 
       // Gather bets and pools
@@ -119,16 +134,18 @@ export class RoundEngineJob {
           amountWon: p.amount,
         });
 
-          // Also emit the balance update to other tabs/devices of the same user
-  this.nsp.to(`user:${p.userId}`).emit("balance:update", {
-    balance: updated.balance,
-    delta: p.amount,
-    reason: "payout",
-    roundId: round._id,
-  });
+        // Also emit the balance update to other tabs/devices of the same user
+        this.nsp.to(`user:${p.userId}`).emit("balance:update", {
+          balance: updated.balance,
+          delta: p.amount,
+          reason: "payout",
+          roundId: round._id,
+        });
       }
 
-      round.topWinners = topWinners.sort((a, b) => b.amountWon - a.amountWon).slice(0, 3);
+      round.topWinners = topWinners
+        .sort((a, b) => b.amountWon - a.amountWon)
+        .slice(0, 3);
 
       round.winningBox = winnerBox;
       round.distributedAmount = payouts.reduce((s, p) => s + p.amount, 0);
@@ -139,6 +156,9 @@ export class RoundEngineJob {
         const boxBets = bets.filter((b) => b.box === stat.box);
         return {
           box: stat.box,
+          title: stat.title,
+          icon: stat.icon,
+          multiplier: stat.multiplier,
           totalAmount: boxBets.reduce((s, b) => s + b.amount, 0),
           bettorsCount: boxBets.length,
         };
@@ -171,6 +191,16 @@ export class RoundEngineJob {
       });
 
       await MetService.clearCurrentRound();
+
+      // After payouts, preparing next round
+      const prepareStart = new Date(revealEnd.getTime());
+      const prepareEnd = new Date(prepareStart.getTime() + 5000); // 5s prepare
+      this.nsp.emit("roundPreparing", {
+        _id: round._id,
+        roundNumber: round.roundNumber,
+        phase: "prepare",
+        phaseEndTime: prepareEnd,
+      });
 
       this.isRunning = false;
       setTimeout(() => this.startNewRound(), 5000);

@@ -2,6 +2,7 @@ import { ISettings, IRoundBox, SettingsModel } from "./settings.model";
 import { IRoundBox as IRoundBoxRound } from "../round/round.model";
 
 export const SettingsService = {
+  
   async getSettings(): Promise<ISettings> {
     const s = await SettingsModel.findOne();
     if (s) return s;

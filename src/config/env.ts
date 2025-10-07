@@ -20,4 +20,5 @@ export const env = {
   JWT_SECRET: getEnv("JWT_SECRET"),
   JWT_EXPIRY: getEnv("JWT_EXPIRY", "1h"),
   HOSTED_APP_API_URL: getEnv("HOSTED_APP_API_URL"),
+  ROUND_DURATION: getEnv("ROUND_DURATION"),
 };

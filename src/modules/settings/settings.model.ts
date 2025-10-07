@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { boxDatas } from "../../utils/statics/statics";
 
 export interface IRoundBox {
   title: string;
@@ -8,13 +9,16 @@ export interface IRoundBox {
 
 export interface ISettings extends Document {
   siteName: string;
+  currency: string;
   minBet: number;
   maxBet: number;
-  roundDuration: number;     // seconds per round
-  commissionRate: number;    // 0.1 => 10%
+  roundDuration: number; // seconds per round
+  commissionRate: number; // 0.1 => 10%
   boxes: IRoundBox[];
   chips: number[];
   maintenanceMode: boolean;
+  supportedLanguages: ["en", "bn"];
+  theme: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,35 +26,30 @@ export interface ISettings extends Document {
 const SettingsSchema = new Schema<ISettings>(
   {
     siteName: { type: String, default: "Ferry Wheel" },
+    currency: { type: String, default: "BD" },
     minBet: { type: Number, default: 50, min: 1 },
     maxBet: { type: Number, default: 10000 },
-    roundDuration: { type: Number, default: 60, min: 5 },
+    roundDuration: { type: Number, default: 30, min: 5 },
     commissionRate: { type: Number, default: 0.1, min: 0, max: 1 },
     boxes: {
       type: [
         {
           title: { type: String, required: true },
           icon: { type: String, required: true },
-          multiplier: { type: Number, required: true }
-        }
+          multiplier: { type: Number, required: true },
+        },
       ],
-      default: [
-        { title: "Meat", icon: "🥩", multiplier: 5 },
-        { title: "Tomato", icon: "🍅", multiplier: 3 },
-        { title: "Corn", icon: "🌽", multiplier: 4 },
-        { title: "Sausage", icon: "🌭", multiplier: 6 },
-        { title: "Lettuce", icon: "🥬", multiplier: 2 },
-        { title: "Carrot", icon: "🥕", multiplier: 4 },
-        { title: "Cucumber", icon: "🥒", multiplier: 3 },
-        { title: "Pepper", icon: "🫑", multiplier: 5 },
-        { title: "Pizza", icon: "🍕", multiplier: 0 },
-        { title: "Salad", icon: "🥗", multiplier: 0 }
-      ]
+      default: boxDatas,
     },
     chips: { type: [Number], default: [500, 1000, 2000, 5000, 10000] },
-    maintenanceMode: { type: Boolean, default: false }
+    maintenanceMode: { type: Boolean, default: false },
+    supportedLanguages: { type: [String] },
+    theme: { type: String, default: "Dark" },
   },
   { timestamps: true }
 );
 
-export const SettingsModel = mongoose.model<ISettings>("Settings", SettingsSchema);
+export const SettingsModel = mongoose.model<ISettings>(
+  "Settings",
+  SettingsSchema
+);

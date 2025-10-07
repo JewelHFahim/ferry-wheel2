@@ -77,13 +77,12 @@ export function initSocket(server: http.Server) {
           });
         }
 
-        // Pass the `nsp` (namespace) to BetService
         const bet = await BetService.placeBet({
           userId: socket.data.user._id,
           roundId,
           box,
           amount,
-          nsp: game, // Pass the nsp (namespace) here
+          nsp: game,
         });
 
         // Emit success and provide bet details to the client

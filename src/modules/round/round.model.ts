@@ -5,15 +5,16 @@ export const ROUND_STATUS = {
   OPEN: "open",
   BETTING: "betting",
   CLOSED: "closed",
+  REVEAL: "reveal",
   COMPLETED: "completed",
 } as const;
 
-export type RoundStatus = typeof ROUND_STATUS[keyof typeof ROUND_STATUS];
+export type RoundStatus = (typeof ROUND_STATUS)[keyof typeof ROUND_STATUS];
 
 /** Individual box stats for a round */
 export interface IRoundBox {
-  title: string;          
-  icon: string;           
+  title: string;
+  icon: string;
   multiplier?: number;
   totalBet: number;
   userCount: number;
@@ -21,7 +22,10 @@ export interface IRoundBox {
 
 /** Stats for bonus calculation and payout */
 export interface IBoxStat {
-  box: string | null;     // allow null
+  box: string | null; // allow null
+  title: string | null; // allow null
+  icon: string | null;
+  multiplier: string | null;
   totalAmount: number;
   bettorsCount: number;
 }
@@ -30,7 +34,7 @@ export interface IBoxStat {
 export interface IRound {
   _id: Types.ObjectId;
   roundNumber: number;
-  roundStatus: RoundStatus;       // "betting" | "closed" | "completed"
+  roundStatus: RoundStatus; // "betting" | "closed" | "completed"
   startTime: Date;
   endTime: Date;
   boxes: IRoundBox[];
@@ -50,7 +54,7 @@ const RoundBoxSchema = new Schema<IRoundBox>(
   {
     title: { type: String, required: true },
     icon: { type: String, required: true },
-    multiplier: { type: Number },              
+    multiplier: { type: Number },
     totalBet: { type: Number, default: 0 },
     userCount: { type: Number, default: 0 },
   },
@@ -59,7 +63,10 @@ const RoundBoxSchema = new Schema<IRoundBox>(
 
 const BoxStatSchema = new Schema<IBoxStat>(
   {
-    box: { type: String, default: null },      // allow null to match interface
+    box: { type: String, default: null }, // allow null to match interface
+    title: { type: String, default: null },
+    icon: { type: String, default: null },
+    multiplier: { type: Number },
     totalAmount: { type: Number, default: 0 },
     bettorsCount: { type: Number, default: 0 },
   },
@@ -78,7 +85,7 @@ const roundSchema = new Schema<IRound>(
       index: true,
     },
     startTime: { type: Date, required: true },
-    endTime:   { type: Date, required: true },
+    endTime: { type: Date, required: true },
 
     boxes: { type: [RoundBoxSchema], required: true },
 
@@ -95,7 +102,11 @@ const roundSchema = new Schema<IRound>(
       type: [
         new Schema(
           {
-            userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+            userId: {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+              required: true,
+            },
             amountWon: { type: Number, required: true },
           },
           { _id: false }
