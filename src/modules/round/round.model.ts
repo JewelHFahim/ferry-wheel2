@@ -41,6 +41,7 @@ export interface IRound {
   winningBox?: string | null;
   totalPool: number;
   companyCut: number;
+  reserveWallet: Number;
   distributedAmount: number;
   bets: Types.ObjectId[];
   boxStats: IBoxStat[];
@@ -86,14 +87,12 @@ const roundSchema = new Schema<IRound>(
     },
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
-
     boxes: { type: [RoundBoxSchema], required: true },
-
     winningBox: { type: String, default: null },
-
     totalPool: { type: Number, default: 0 },
     companyCut: { type: Number, default: 0 },
     distributedAmount: { type: Number, default: 0 },
+    reserveWallet: { type: Number, default: 0 },
 
     bets: [{ type: Schema.Types.ObjectId, ref: "Bet", default: [] }],
     boxStats: { type: [BoxStatSchema], default: [] },

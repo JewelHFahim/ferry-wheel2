@@ -45,4 +45,4 @@ async function seedSettings() {
 
 seedSettings();
 
-// ts-node src/seeds/seedSettings.ts
+// npx ts-node src/seeds/seedSettings.ts
