@@ -22,8 +22,8 @@ export interface IRoundBox {
 
 /** Stats for bonus calculation and payout */
 export interface IBoxStat {
-  box: string | null; // allow null
-  title: string | null; // allow null
+  box: string | null;
+  title: string | null;
   icon: string | null;
   multiplier: string | null;
   totalAmount: number;
@@ -34,7 +34,7 @@ export interface IBoxStat {
 export interface IRound {
   _id: Types.ObjectId;
   roundNumber: number;
-  roundStatus: RoundStatus; // "betting" | "closed" | "completed"
+  roundStatus: RoundStatus;
   startTime: Date;
   endTime: Date;
   boxes: IRoundBox[];
