@@ -115,11 +115,7 @@ export const getBetsByRound = async (roundId: string | Types.ObjectId) => {
 };
 
 // Refactored computeRoundResults as a function
-export const computeRoundResults = async (
-  round: any,
-  bets: Array<IBet & { _id: any }>,
-  distributableAmount: number
-) => {
+export const computeRoundResults = async ( round: any, bets: Array<IBet & { _id: any }>, distributableAmount: number ) => {
   const pool = round.boxStats.map((b: any) => b.box);
   const winnerBox = pool[Math.floor(Math.random() * pool.length)];
 
@@ -137,3 +133,4 @@ export const computeRoundResults = async (
 
   return { winnerBox, payouts };
 };
+

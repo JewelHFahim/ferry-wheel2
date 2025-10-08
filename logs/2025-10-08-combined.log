@@ -486,3 +486,9 @@
 [2025-10-08T12:00:47.375Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Carrot for round #68e6526b7ca6339d683c9d8b
 [2025-10-08T12:00:47.919Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Skewer for round #68e6526b7ca6339d683c9d8b
 [2025-10-08T12:00:48.430Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Ham for round #68e6526b7ca6339d683c9d8b
+[2025-10-08T17:07:38.480Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Meat for round #68e69a50889944ab8fc13272
+[2025-10-08T17:07:38.483Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-08T17:08:40.703Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Meat for round #68e69a96889944ab8fc133d6
+[2025-10-08T17:08:42.087Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Tomato for round #68e69a96889944ab8fc133d6
+[2025-10-08T17:08:46.390Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Corn for round #68e69a96889944ab8fc133d6
+[2025-10-08T17:08:48.270Z] [32minfo[39m: User 68e2abb4cbfc8a45544ecce0 placed a bet of 500 on Sausage for round #68e69a96889944ab8fc133d6

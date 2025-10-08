@@ -5,10 +5,17 @@ import { UserService } from "../modules/user/user.service";
 import Round, { ROUND_STATUS } from "../modules/round/round.model";
 import { Types } from "mongoose";
 import { env } from "../config/env";
-import { computeRoundResults, getBetsByRound } from './../modules/bet/bet.service';
-import { addRoundFunds, logTransaction } from "../modules/company/company.service";
+import {
+  computeRoundResults,
+  getBetsByRound,
+} from "./../modules/bet/bet.service";
+import {
+  addRoundFunds,
+  logTransaction,
+} from "../modules/company/company.service";
+import CompanyWallet from "../modules/company/company.model";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Helper function to handle errors more effectively
 const handleError = (error: any, nsp: Namespace, roundId: string) => {
@@ -16,17 +23,22 @@ const handleError = (error: any, nsp: Namespace, roundId: string) => {
   nsp.emit("roundError", { roundId, message: error.message });
 };
 
-
 export const startNewRound = async (nsp: Namespace): Promise<void> => {
   try {
-    const settings = await SettingsService.getSettings();
+    // const settings = await SettingsService.getSettings();
+    const [settings, roundNumber, boxes] = await Promise.all([
+      SettingsService.getSettings(),
+      MetService.incrementRoundCounter(),
+      SettingsService.getInitialBoxes(),
+    ]);
+
     const raw = settings.roundDuration ?? env.ROUND_DURATION;
     const durationMs = raw > 1000 ? raw : raw * 1000;
 
-    const roundNumber = await MetService.incrementRoundCounter();
+    // const roundNumber = await MetService.incrementRoundCounter();
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + durationMs);
-    const boxes = await SettingsService.getInitialBoxes();
+    // const boxes = await SettingsService.getInitialBoxes();
 
     const round = await Round.create({
       roundNumber,
@@ -36,7 +48,7 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       totalPool: 0,
       companyCut: 0,
       distributedAmount: 0,
-      reserveWallet: 0,  // New reserve wallet amount
+      reserveWallet: 0, // New reserve wallet amount
       boxStats: boxes.map((b) => ({
         box: b.title,
         title: b.title,
@@ -75,7 +87,7 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
   }
 };
 
-
+const version1 = "001"
 // export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
 //   try {
 //     const settings = await SettingsService.getSettings();
@@ -122,9 +134,8 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
 //     // Update the round with the distributed amount
 //     round.distributedAmount = remainingToDistribute;
 
-//     // Company Wallet 
+//     // Company Wallet
 //     await addRoundFunds(companyCut, Number(round.reserveWallet));
-
 
 //     // Compute winners and payouts
 //     const { winnerBox, payouts } = await computeRoundResults(round, bets as any, remainingToDistribute);
@@ -195,42 +206,200 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
 //   }
 // };
 
+const version2 = "002"
+// export const endRound = async ( roundId: string, nsp: Namespace ): Promise<void> => {
+//   try {
+//     // const settings = await SettingsService.getSettings();
+//     // const round = await Round.findById(roundId);
+//     const [round, settings] = await Promise.all([
+//       Round.findById(roundId),
+//       SettingsService.getSettings(),
+//     ]);
 
+//     if (!round) return console.warn("Round not found:", roundId);
+//     if (!settings) return console.warn("Settings not found");
 
+//     // Close betting
+//     round.roundStatus = ROUND_STATUS.CLOSED;
+//     await round.save();
+
+//     nsp.emit("roundClosed", { _id: round._id, roundNumber: round.roundNumber });
+
+//     // Gather bets
+//     const bets = await getBetsByRound(round._id);
+//     const totalPool = bets.reduce((s, b) => s + b.amount, 0);
+//     round.totalPool = totalPool;
+
+//     // Company cut (10%)
+//     const companyCut = Math.floor(totalPool * (settings.commissionRate ?? env.COMPANY_PROFIT_PERCENT));
+//     round.companyCut = companyCut;
+
+//     // Distributable amount (90% of the pool)
+//     let distributableAmount = totalPool - companyCut;
+
+//     // Compute winners and payouts
+//     const { winnerBox, payouts } = await computeRoundResults( round, bets, distributableAmount );
+
+//     // If no winner, move all to reserve wallet
+//     if (payouts.length === 0) {
+//       round.reserveWallet = Number(round.reserveWallet) + distributableAmount;
+//       distributableAmount = 0;
+//       await logTransaction(
+//         "reserveDeposit",
+//         distributableAmount,
+//         "No winner, moved to reserve wallet"
+//       );
+//     } else {
+//       // Handle payouts and update reserve wallet if needed
+//       const totalPayout = payouts.reduce((s, p) => s + p.amount, 0);
+//       if (totalPayout > distributableAmount + Number(round.reserveWallet)) {
+//         const deficit = totalPayout - distributableAmount;
+//         if (deficit <= Number(round.reserveWallet)) {
+//           round.reserveWallet = Number(round.reserveWallet) - deficit;
+//           distributableAmount += deficit;
+//           await logTransaction(
+//             "reserveWithdraw",
+//             deficit,
+//             "Covered payout from reserve wallet"
+//           );
+//         } else {
+//           const scale =
+//             (distributableAmount + Number(round.reserveWallet)) / totalPayout;
+//           payouts.forEach((p) => (p.amount = Math.floor(p.amount * scale)));
+//           round.reserveWallet = 0;
+//           await logTransaction(
+//             "reserveWithdraw",
+//             Number(round.reserveWallet),
+//             "Scaled payouts due to insufficient funds"
+//           );
+//         }
+//       } else {
+//         // No scaling required, payout fully from distributableAmount
+//         round.reserveWallet = 0;
+//       }
+//     }
+
+//     // Add company cut to company wallet and log the transaction
+//     await addRoundFunds(companyCut, Number(round.reserveWallet));
+//     await logTransaction("companyCut", companyCut, "Company cut from pool");
+
+//     // Pay winners
+//     const topWinners: { userId: Types.ObjectId; amountWon: number }[] = [];
+//     for (const p of payouts) {
+//       const updated = await UserService.updateBalance(p.userId, p.amount);
+//       nsp.to(`user:${p.userId}`).emit("payout", {
+//         roundId: round._id,
+//         winnerBox,
+//         amount: p.amount,
+//         newBalance: updated.balance,
+//       });
+
+//       topWinners.push({
+//         userId: new Types.ObjectId(p.userId),
+//         amountWon: p.amount,
+//       });
+//       nsp.to(`user:${p.userId}`).emit("balance:update", {
+//         balance: updated.balance,
+//         delta: p.amount,
+//         reason: "payout",
+//         roundId: round._id,
+//       });
+//     }
+
+//     // Update round stats
+//     round.topWinners = topWinners
+//       .sort((a, b) => b.amountWon - a.amountWon)
+//       .slice(0, 3);
+//     round.winningBox = winnerBox;
+//     round.distributedAmount = payouts.reduce((s, p) => s + p.amount, 0);
+//     await round.save();
+
+//     // Emit round results
+//     nsp.emit("roundUpdated", {
+//       _id: round._id,
+//       roundNumber: round.roundNumber,
+//       boxStats: round.boxStats,
+//     });
+//     nsp.emit("winnerRevealed", {
+//       _id: round._id,
+//       roundNumber: round.roundNumber,
+//       winnerBox,
+//       payouts,
+//       topWinners: round.topWinners,
+//     });
+//     nsp.emit("roundEnded", {
+//       _id: round._id,
+//       roundNumber: round.roundNumber,
+//       totalPool,
+//       companyCut,
+//       distributedAmount: round.distributedAmount,
+//     });
+
+//     // Start next round
+//     setTimeout(() => startNewRound(nsp), 5000);
+//   } catch (err) {
+//     console.error("Failed to end round:", err);
+//   }
+// };
 
 export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
   try {
-    const settings = await SettingsService.getSettings();
-    const round = await Round.findById(roundId);
-
+    const [round, settings] = await Promise.all([Round.findById(roundId), SettingsService.getSettings()]);
+    
     if (!round) return console.warn("Round not found:", roundId);
+    if (!settings) return console.warn("Settings not found");
 
-    // Close betting
+    // Close the round for betting (no more bets accepted)
     round.roundStatus = ROUND_STATUS.CLOSED;
     await round.save();
-
     nsp.emit("roundClosed", { _id: round._id, roundNumber: round.roundNumber });
 
-    // Gather bets
+    // Gather all the bets placed in this round
     const bets = await getBetsByRound(round._id);
     const totalPool = bets.reduce((s, b) => s + b.amount, 0);
     round.totalPool = totalPool;
 
-    // Company cut (10%)
-    const companyCut = Math.floor(totalPool * 0.1);
+    // Calculate Company Cut (10% of the total pool)
+    const companyCut = Math.floor(totalPool * (settings.commissionRate ?? env.COMPANY_PROFIT_PERCENT));
     round.companyCut = companyCut;
 
-    // Distributable amount (90% of the pool)
+    // Distributable Amount (90% of the total pool)
     let distributableAmount = totalPool - companyCut;
 
-    // Compute winners and payouts
-    const { winnerBox, payouts } = await computeRoundResults(round, bets, distributableAmount);
+    // Check eligible boxes
+    const eligibleBoxes: any = [];
+    const ineligibleBoxes = [];
+    
+    round.boxStats.forEach((box) => {
+      const totalBoxBet = bets.filter((bet) => bet.box === box.box).reduce((sum, bet) => sum + bet.amount, 0);
+      if (totalBoxBet > 0 && totalBoxBet <= distributableAmount + Number(round.reserveWallet)) {
+        eligibleBoxes.push(box);
+      } else {
+        ineligibleBoxes.push(box);
+      }
+    });
 
-    // If no winner, move all to reserve wallet
+    // If there are eligible boxes, randomly select a winner
+    let winnerBox = null;
+    if (eligibleBoxes.length > 0) {
+      winnerBox = eligibleBoxes[Math.floor(Math.random() * eligibleBoxes.length)].box;
+    }
+
+    // Handle payouts
+    const winningBets = bets.filter((b) => b.box === winnerBox);
+    const totalWinningAmount = winningBets.reduce((acc, b) => acc + b.amount, 0);
+    
+    const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
+      userId: String(b.userId),
+      box: b.box,
+      amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),
+    })) : [];
+
+    // If there are no winners, move all funds to the reserve wallet
     if (payouts.length === 0) {
       round.reserveWallet = Number(round.reserveWallet) + distributableAmount;
       distributableAmount = 0;
-      await logTransaction('reserveDeposit', distributableAmount, 'No winner, moved to reserve wallet');
+      await logTransaction("reserveDeposit", distributableAmount, "No winner, moved to reserve wallet");
     } else {
       // Handle payouts and update reserve wallet if needed
       const totalPayout = payouts.reduce((s, p) => s + p.amount, 0);
@@ -239,22 +408,21 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         if (deficit <= Number(round.reserveWallet)) {
           round.reserveWallet = Number(round.reserveWallet) - deficit;
           distributableAmount += deficit;
-          await logTransaction('reserveWithdraw', deficit, 'Covered payout from reserve wallet');
+          await logTransaction("reserveWithdraw", deficit, "Covered payout from reserve wallet");
         } else {
           const scale = (distributableAmount + Number(round.reserveWallet)) / totalPayout;
           payouts.forEach((p) => (p.amount = Math.floor(p.amount * scale)));
           round.reserveWallet = 0;
-          await logTransaction('reserveWithdraw', Number(round.reserveWallet), 'Scaled payouts due to insufficient funds');
+          await logTransaction("reserveWithdraw", Number(round.reserveWallet), "Scaled payouts due to insufficient funds");
         }
       } else {
-        // No scaling required, payout fully from distributableAmount
         round.reserveWallet = 0;
       }
     }
 
-    // Add company cut to company wallet and log the transaction
+    // Add company cut to the company wallet and log the transaction
     await addRoundFunds(companyCut, Number(round.reserveWallet));
-    await logTransaction('companyCut', companyCut, 'Company cut from pool');
+    await logTransaction("companyCut", companyCut, "Company cut from pool");
 
     // Pay winners
     const topWinners: { userId: Types.ObjectId; amountWon: number }[] = [];
@@ -267,7 +435,11 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         newBalance: updated.balance,
       });
 
-      topWinners.push({ userId: new Types.ObjectId(p.userId), amountWon: p.amount });
+      topWinners.push({
+        userId: new Types.ObjectId(p.userId),
+        amountWon: p.amount,
+      });
+
       nsp.to(`user:${p.userId}`).emit("balance:update", {
         balance: updated.balance,
         delta: p.amount,
@@ -282,14 +454,34 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     round.distributedAmount = payouts.reduce((s, p) => s + p.amount, 0);
     await round.save();
 
-    // Emit round results
-    nsp.emit("roundUpdated", { _id: round._id, roundNumber: round.roundNumber, boxStats: round.boxStats });
-    nsp.emit("winnerRevealed", { _id: round._id, roundNumber: round.roundNumber, winnerBox, payouts, topWinners: round.topWinners });
-    nsp.emit("roundEnded", { _id: round._id, roundNumber: round.roundNumber, totalPool, companyCut, distributedAmount: round.distributedAmount });
+    // Emit updated round data
+    nsp.emit("roundUpdated", {
+      _id: round._id,
+      roundNumber: round.roundNumber,
+      boxStats: round.boxStats,
+    });
 
-    // Start next round
+    // Announce results to users
+    nsp.emit("winnerRevealed", {
+      _id: round._id,
+      roundNumber: round.roundNumber,
+      winnerBox,
+      payouts,
+      topWinners: round.topWinners,
+    });
+
+    nsp.emit("roundEnded", {
+      _id: round._id,
+      roundNumber: round.roundNumber,
+      totalPool,
+      companyCut,
+      distributedAmount: round.distributedAmount,
+    });
+
+    // Start the next round
     setTimeout(() => startNewRound(nsp), 5000);
   } catch (err) {
-    console.error("Failed to end round:", err);
+    console.error("❌ Failed to end round:", err);
   }
 };
+
