@@ -342,6 +342,7 @@ const version2 = "002"
 //   }
 // };
 
+const version3 = "003"
 export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
   try {
     const [round, settings] = await Promise.all([Round.findById(roundId), SettingsService.getSettings()]);
@@ -359,6 +360,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     const totalPool = bets.reduce((s, b) => s + b.amount, 0);
     round.totalPool = totalPool;
 
+    console.log("totalPool: ", totalPool)
+
     // Calculate Company Cut (10% of the total pool)
     const companyCut = Math.floor(totalPool * (settings.commissionRate ?? env.COMPANY_PROFIT_PERCENT));
     round.companyCut = companyCut;
@@ -366,18 +369,29 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     // Distributable Amount (90% of the total pool)
     let distributableAmount = totalPool - companyCut;
 
-    // Check eligible boxes
+    console.log("distributableAmount: ", distributableAmount )
+
+    // Eligible vs Ineligible Boxes
     const eligibleBoxes: any = [];
-    const ineligibleBoxes = [];
-    
+    const ineligibleBoxes: any = [];
+
     round.boxStats.forEach((box) => {
       const totalBoxBet = bets.filter((bet) => bet.box === box.box).reduce((sum, bet) => sum + bet.amount, 0);
-      if (totalBoxBet > 0 && totalBoxBet <= distributableAmount + Number(round.reserveWallet)) {
+      const requiredPayout = totalBoxBet * Number(box.multiplier);
+
+      console.log("requiredPayout: ", requiredPayout)
+
+      // Check if the box is eligible (either active bets or sufficient funds for payout)
+      if (totalBoxBet > 0 || requiredPayout <= distributableAmount + Number(round.reserveWallet)) {
         eligibleBoxes.push(box);
       } else {
         ineligibleBoxes.push(box);
       }
     });
+
+    console.log("distributableAmount + Number(round.reserveWallet", distributableAmount + Number(round.reserveWallet))
+    console.log("Eligible Boxes:", eligibleBoxes);
+    console.log("Ineligible Boxes:", ineligibleBoxes);
 
     // If there are eligible boxes, randomly select a winner
     let winnerBox = null;
@@ -385,40 +399,97 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       winnerBox = eligibleBoxes[Math.floor(Math.random() * eligibleBoxes.length)].box;
     }
 
-    // Handle payouts
-    const winningBets = bets.filter((b) => b.box === winnerBox);
-    const totalWinningAmount = winningBets.reduce((acc, b) => acc + b.amount, 0);
-    
-    const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
-      userId: String(b.userId),
-      box: b.box,
-      amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),
-    })) : [];
-
-    // If there are no winners, move all funds to the reserve wallet
-    if (payouts.length === 0) {
+    // If no eligible box, move funds to reserve wallet and exit
+    if (!winnerBox) {
       round.reserveWallet = Number(round.reserveWallet) + distributableAmount;
       distributableAmount = 0;
       await logTransaction("reserveDeposit", distributableAmount, "No winner, moved to reserve wallet");
-    } else {
-      // Handle payouts and update reserve wallet if needed
-      const totalPayout = payouts.reduce((s, p) => s + p.amount, 0);
-      if (totalPayout > distributableAmount + Number(round.reserveWallet)) {
-        const deficit = totalPayout - distributableAmount;
-        if (deficit <= Number(round.reserveWallet)) {
-          round.reserveWallet = Number(round.reserveWallet) - deficit;
-          distributableAmount += deficit;
-          await logTransaction("reserveWithdraw", deficit, "Covered payout from reserve wallet");
-        } else {
-          const scale = (distributableAmount + Number(round.reserveWallet)) / totalPayout;
-          payouts.forEach((p) => (p.amount = Math.floor(p.amount * scale)));
-          round.reserveWallet = 0;
-          await logTransaction("reserveWithdraw", Number(round.reserveWallet), "Scaled payouts due to insufficient funds");
-        }
-      } else {
-        round.reserveWallet = 0;
-      }
+      return;
     }
+
+    console.log("winnerBox: ", winnerBox)
+
+    // Handle payouts
+    // const winningBets = bets.filter((b) => b.box === winnerBox);
+    // const totalWinningAmount = winningBets.reduce((acc, b) => acc + b.amount, 0);
+    // console.log("totalWinningAmount: ", totalWinningAmount);
+    
+    // const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
+    //   userId: String(b.userId),
+    //   box: b.box,
+    //   amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),
+    // })) : [];
+    // Handle payouts and calculate total payout for each winning user
+    const winningBets = bets.filter((b) => b.box === winnerBox);
+    console.log("winningBets: ", winningBets)
+    const totalWinningAmount = winningBets.reduce((acc, b) => acc + b.amount, 0);
+
+    // Calculate payouts
+    const payouts = totalWinningAmount > 0
+      ? winningBets.map((b) => {
+          // Find the multiplier for the winning box, default to 0 if not found
+    const multiplier = round.boxStats.find(box => box.box === winnerBox)?.multiplier ?? 1;
+
+    // Calculate the payout for each user
+    const payoutAmount = b.amount * Number(multiplier);
+          return {
+            userId: String(b.userId),
+            box: b.box,
+            amount: payoutAmount,  // Payout is the bet multiplied by the box multiplier
+          };
+        })
+      : [];
+
+
+      console.log("payouts: ", payouts)
+    // If there are no winners, move all funds to reserve wallet
+    // if (payouts.length === 0) {
+    //   round.reserveWallet = Number(round.reserveWallet) + distributableAmount;
+    //   distributableAmount = 0;
+    //   await logTransaction("reserveDeposit", distributableAmount, "No winner, moved to reserve wallet");
+    // } else {
+    //   // Handle payouts and update reserve wallet if needed
+    //   const totalPayout = payouts.reduce((s, p) => s + p.amount, 0);
+    //   if (totalPayout > distributableAmount + Number(round.reserveWallet)) {
+    //     const deficit = totalPayout - distributableAmount;
+    //     if (deficit <= Number(round.reserveWallet)) {
+    //       round.reserveWallet = Number(round.reserveWallet) - deficit;
+    //       distributableAmount += deficit;
+    //       await logTransaction("reserveWithdraw", deficit, "Covered payout from reserve wallet");
+    //     } else {
+    //       const scale = (distributableAmount + Number(round.reserveWallet)) / totalPayout;
+    //       payouts.forEach((p) => (p.amount = Math.floor(p.amount * scale)));
+    //       round.reserveWallet = 0;
+    //       await logTransaction("reserveWithdraw", Number(round.reserveWallet), "Scaled payouts due to insufficient funds");
+    //     }
+    //   } else {
+    //     round.reserveWallet = 0;
+    //   }
+    // }
+
+    // If payouts exceed available funds (distributable + reserve), scale payouts
+if (payouts.length > 0) {
+  const totalPayout = payouts.reduce((s, p) => s + p.amount, 0);  // Sum of all payouts
+
+  if (totalPayout > distributableAmount + Number(round.reserveWallet)) {
+    const deficit = totalPayout - distributableAmount;  // Check if the payout exceeds available funds
+    if (deficit <= Number(round.reserveWallet)) {
+      // If the reserve wallet can cover the deficit, withdraw from reserve wallet
+      round.reserveWallet = Number(round.reserveWallet) - deficit;
+      distributableAmount += deficit;
+      await logTransaction("reserveWithdraw", deficit, "Covered payout from reserve wallet");
+    } else {
+      // Scale payouts if there’s not enough in reserve
+      const scale = (distributableAmount + Number(round.reserveWallet)) / totalPayout;
+      payouts.forEach((p) => p.amount = Math.floor(p.amount * scale));  // Scale the payout for each winner
+      round.reserveWallet = 0;
+      await logTransaction("reserveWithdraw", Number(round.reserveWallet), "Scaled payouts due to insufficient funds");
+    }
+  } else {
+    // No scaling needed, use full payout amounts from distributable funds
+    round.reserveWallet = 0;
+  }
+}
 
     // Add company cut to the company wallet and log the transaction
     await addRoundFunds(companyCut, Number(round.reserveWallet));
@@ -484,4 +555,3 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     console.error("❌ Failed to end round:", err);
   }
 };
-

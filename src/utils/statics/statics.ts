@@ -1,12 +1,13 @@
 export const boxDatas = [
-  { title: "Meat", icon: "🥩", multiplier: 45 },
-  { title: "Tomato", icon: "🍅", multiplier: 5 },
-  { title: "Corn", icon: "🌽", multiplier: 5 },
-  { title: "Sausage", icon: "🌭", multiplier: 10 },
-  { title: "Lettuce", icon: "🥬", multiplier: 5 },
-  { title: "Carrot", icon: "🥕", multiplier: 5 },
-  { title: "Skewer", icon: "🍢", multiplier: 15 },
-  { title: "Ham", icon: "🍗", multiplier: 5 },
-  { title: "Pizza", icon: "🍕", multiplier: 0 },
-  { title: "Salad", icon: "🥗", multiplier: 0 },
+  { title: "Meat", icon: "🥩", group: "Pizza", multiplier: 45 },
+  { title: "Tomato", icon: "🍅", group: "Salad", multiplier: 5 },
+  { title: "Corn", icon: "🌽", group: "Salad", multiplier: 5 },
+  { title: "Sausage", icon: "🌭", group: "Pizza", multiplier: 10 },
+  { title: "Lettuce", icon: "🥬", group: "Salad", multiplier: 5 },
+  { title: "Carrot", icon: "🥕", group: "Salad", multiplier: 5 },
+  { title: "Skewer", icon: "🍢", group: "Pizza", multiplier: 15 },
+  { title: "Ham", icon: "🍗", group: "Pizza", multiplier: 5 },
+
+  { title: "Pizza", icon: "🍕", multiplier: 4.37 },
+  { title: "Salad", icon: "🥗", multiplier: 1.25 },
 ];
