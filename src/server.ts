@@ -2,17 +2,10 @@ import "dotenv/config";
 import http from "http";
 import app from "./app";
 import { connectDB } from "./config/db";
-import { initSocket } from "./config/socket";
+import { initSocket } from "./sockets/socket";
 import { startNewRound } from "./jobs/roundEngine.job";
-import { env } from "./config/env";
 
 const PORT = Number(process.env.PORT || 5000);
-
-// Ensure the DB URI is available
-if (!env.MONGO_URI) {
-  console.error("❌ Missing required DB_URI environment variable");
-  process.exit(1);
-}
 
 // Retry mechanism for connecting to the database
 const retryConnectDB = async (retries = 5, delay = 5000) => {
@@ -23,7 +16,9 @@ const retryConnectDB = async (retries = 5, delay = 5000) => {
       console.error("❌ Failed to connect to the database:", err);
       process.exit(1);
     }
-    console.log(`Retrying to connect to the database... ${retries} retries left`);
+    console.log(
+      `Retrying to connect to the database... ${retries} retries left`
+    );
     setTimeout(() => retryConnectDB(retries - 1, delay), delay);
   }
 };
@@ -36,11 +31,12 @@ const retryConnectDB = async (retries = 5, delay = 5000) => {
 
     // Create HTTP server
     const server = http.createServer(app);
+    
     const { io, game } = initSocket(server);
 
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      
+
       startNewRound(game);
     });
 
