@@ -128,14 +128,13 @@ export const handlePlaceBet = (socket: any, nsp: Namespace) => {
         return reply({ success: false, code: gameCodes.INVALID_PAYLOAD, message: "Invalid payload" });
       }
 
-      // Place the bet (your existing logic)
+      // Place the bet
       const bet = await placeBet({ userId: socket.data.user._id, roundId, box, amount, nsp });
 
       // Emit bet accepted event to the user
       socket.emit("bet_accepted", { bet });
 
-      // **Emit user's total bet for this round**
-      // You can calculate it by summing up all bets of the user in this round
+      // Calculate all bets of the user in this round
       const userBets = await Bet.find({ roundId, userId: socket.data.user._id }).lean();
       const totalUserBet = userBets.reduce((sum, b) => sum + b.amount, 0);
 
@@ -144,7 +143,7 @@ export const handlePlaceBet = (socket: any, nsp: Namespace) => {
       reply({ success: true, bet });
 
     } catch (e: any) {
-      return reply({ success: false, code: "INTERNAL", message: e?.message || "Failed to place bet" });
+      return reply({ success: false, code: gameCodes.INTERNAL, message: e?.message || "Failed to place bet" });
     }
   });
 };
