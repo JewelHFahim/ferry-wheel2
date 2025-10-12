@@ -4,6 +4,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import appRoutes from "./routes/routes";
+import { origins } from "./utils/statics/statics";
 
 const app = express();
 
@@ -16,13 +17,16 @@ app.use(express.urlencoded({ extended: false, limit: "1mb" }));
 
 app.use(
   cors({
-    origin: "*",
-    credentials: false,
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    origin: origins,
+    credentials: true,
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }));
+
+// app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }));
+app.use(helmet({ crossOriginResourcePolicy: false }));
+
 app.use(cookieParser());
 app.use(morgan("dev"));
 

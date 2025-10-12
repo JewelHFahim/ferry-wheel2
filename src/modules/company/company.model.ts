@@ -5,10 +5,10 @@ const companyWalletSchema = new mongoose.Schema({
   reserveWallet: { type: Number, default: 0 },
   lastUpdated: { type: Date, default: Date.now },
   transactionHistory: [{
-    type: { type: String }, // 'companyCut', 'reserveDeposit', 'reserveWithdraw', etc.
-    amount: { type: Number }, // Amount added or deducted
+    type: { type: String },
+    amount: { type: Number },
     date: { type: Date, default: Date.now },
-    description: { type: String } // Description of the transaction
+    description: { type: String }
   }]
 });
 

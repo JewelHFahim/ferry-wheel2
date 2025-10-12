@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { UserService } from "./user.service";
 import { env } from "../../config/env";
+import { UserModel } from "./user.model";
 
 const generateToken = (userId: string, role: string) => {
   return jwt.sign({ userId, role }, env.JWT_SECRET, { expiresIn: "7d" });
@@ -17,12 +18,11 @@ export const UserController = {
     try {
       const { username, password } = req.body;
       if (!username || !password) {
-        return res
-          .status(400)
-          .json({ message: "Username and password required" });
+        return res.status(400).json({ message: "Username and password required" });
       }
 
       const existing = await UserService.getByUsername(username);
+      
       if (existing) {
         return res.status(400).json({ message: "Username already exists" });
       }
@@ -95,4 +95,47 @@ export const UserController = {
       res.status(500).json({ message: error.message || "Server error" });
     }
   },
+};
+
+// ==========================
+// @desc    Register a new user
+// @route   POST /api/v1/users/register
+// ==========================
+
+export const handleRegistration = async (req: Request, res: Response) => {
+  try {
+
+    const { username, email, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password required" });
+    }
+
+    const existing = await UserModel.findOne({
+      $or: [{ username }, { email }],
+    });
+
+    if (existing) {
+      return res.status(400).json({ message: "Username or Email already exists" });
+    }
+
+    const user = await UserModel.create({ username, email, password });
+    console.log(user);
+
+    // const token = generateToken(user._id.toString(), user.role);
+
+    res.status(201).json({
+      status: true,
+      message: "Account created successfull",
+      user
+      // user: {
+      //   id: user._id,
+      //   username: user.username,
+      //   email: user.email,
+      //   role: user.role,
+      //   balance: user.balance,
+      // },
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || "Server error" });
+  }
 };

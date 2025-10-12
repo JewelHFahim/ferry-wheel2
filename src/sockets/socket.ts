@@ -9,6 +9,7 @@ import betModel from "../modules/bet/bet.model";
 import Bet from "../modules/bet/bet.model";
 import Round from "../modules/round/round.model";
 import CompanyWallet from "../modules/company/company.model";
+import { gameCodes, origins } from "../utils/statics/statics";
 
 // Utility function for error responses
 const sendErrorResponse = (
@@ -20,6 +21,7 @@ const sendErrorResponse = (
   ack({ success: false, code, message, balance });
 };
 
+// Cretae & Join room, Count total active user in room
 export const handleJoinRoom = (socket: any) => {
   socket.on( "join", async (data?: { room?: string }, ack?: (res: any) => void) => {
       try {
@@ -118,22 +120,21 @@ export const handlePlaceBet = (socket: any, nsp: Namespace) => {
 
     try {
       if (!socket.data?.user) {
-        return reply({ success: false, code: "AUTH_REQUIRED", message: "Authentication required" });
+        return reply({ success: false, code: gameCodes.AUTH_REQUIRED, message: "Authentication required" });
       }
 
       const { roundId, box, amount } = payload || {};
       if (!roundId || !box || typeof amount !== "number") {
-        return reply({ success: false, code: "INVALID_PAYLOAD", message: "Invalid payload" });
+        return reply({ success: false, code: gameCodes.INVALID_PAYLOAD, message: "Invalid payload" });
       }
 
-      // Place the bet (your existing logic)
+      // Place the bet
       const bet = await placeBet({ userId: socket.data.user._id, roundId, box, amount, nsp });
 
       // Emit bet accepted event to the user
       socket.emit("bet_accepted", { bet });
 
-      // **Emit user's total bet for this round**
-      // You can calculate it by summing up all bets of the user in this round
+      // Calculate all bets of the user in this round
       const userBets = await Bet.find({ roundId, userId: socket.data.user._id }).lean();
       const totalUserBet = userBets.reduce((sum, b) => sum + b.amount, 0);
 
@@ -142,7 +143,7 @@ export const handlePlaceBet = (socket: any, nsp: Namespace) => {
       reply({ success: true, bet });
 
     } catch (e: any) {
-      return reply({ success: false, code: "INTERNAL", message: e?.message || "Failed to place bet" });
+      return reply({ success: false, code: gameCodes.INTERNAL, message: e?.message || "Failed to place bet" });
     }
   });
 };
@@ -162,19 +163,20 @@ export const handleDisconnect = (socket: any) => {
 // Main function to initialize the socket server and events
 export const initSocket = (server: http.Server) => {
   const io = new Server(server, {
-    cors: { origin: "*", methods: ["GET", "POST"], credentials: false },
+    cors: { origin: origins,
+    methods: ["GET", "POST"], credentials: false },
   });
 
   const game = io.of("/game");
 
-  // Apply socket authentication middleware
+  // Socket authentication middleware
   socketAuthMiddleware(game, { strict: true, joinRooms: true });
 
-  // Handle socket connections and events
+  // Socket connections and events
   game.on("connection", (socket) => {
     console.log("🔌 [game]", socket.id, socket.data?.user || "(guest)");
 
-    // Register socket event listeners
+    // Socket event listeners
     handleJoinRoom(socket);
     handleGetBalance(socket);
     handlePlaceBet(socket, game);

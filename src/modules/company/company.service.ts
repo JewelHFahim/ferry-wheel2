@@ -8,10 +8,7 @@ export const getCompanyWallet = async () => {
   return wallet;
 };
 
-export const addRoundFunds = async (
-  companyCut: number,
-  reserveAmount: number
-) => {
+export const addRoundFunds = async ( companyCut: number, reserveAmount: number) => {
   const wallet = await getCompanyWallet();
 
   wallet.balance += companyCut;
@@ -19,7 +16,16 @@ export const addRoundFunds = async (
 
   wallet.lastUpdated = new Date();
   await wallet.save();
+  
   return wallet;
+};
+
+export const getReserveWallet = async () => {
+  const wallet = await getCompanyWallet();
+
+  const reserveWallet = wallet.reserveWallet;
+
+  return reserveWallet;
 };
 
 

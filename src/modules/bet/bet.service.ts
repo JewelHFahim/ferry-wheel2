@@ -7,6 +7,7 @@ import { UserService } from "../user/user.service";
 import { SettingsService } from "../settings/settings.service";
 import { logPlaceBet, logWarning } from "../../utils/gameEventLogger";
 import { Namespace } from "socket.io";
+import { gameCodes } from "../../utils/statics/statics";
 
 interface PlaceBetArgs {
   userId: string;
@@ -15,6 +16,7 @@ interface PlaceBetArgs {
   amount: number;
   nsp: Namespace;
 }
+
 // Custom error classes for better error context
 class BetError extends Error {
   constructor(public code: string, message: string) {
@@ -43,8 +45,9 @@ interface PlaceBetArgs {
   nsp: Namespace;
 }
 
-// Refactored placeBet as a function
+// Function for place bet
 export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetArgs) => {
+
   // Fetch required data concurrently
   const [round, settings, user] = await Promise.all([
     Round.findById(roundId),
@@ -52,28 +55,33 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
     UserService.getById(userId),
   ]);
 
+  // Bet place log
   logPlaceBet(userId, roundId, box, amount);
 
   // Validate data
-  if (!round) throw new BetError("INVALID_ROUND", "Round does not exist.");
+  if (!round) throw new BetError(gameCodes.INVALID_ROUND, "Round does not exist.");
+
+  //Betting closed for this round
   if (round.roundStatus !== ROUND_STATUS.BETTING)
-    throw new BetError("BETTING_CLOSED", "Betting is closed for this round.");
+    throw new BetError(gameCodes.BETTING_CLOSED, "Betting is closed for this round.");
+  
+  //Betting amount check
   if (amount < settings.minBet || amount > settings.maxBet)
     throw new InvalidBetAmountError(settings.minBet, settings.maxBet);
-  
-  // Find the box to place the bet
-  const boxIndex = round.boxes.findIndex((b) => b.title === box);
-  if (boxIndex === -1) throw new BetError("INVALID_BOX", "Box does not exist.");
 
-  // Update box stats
-  round.boxStats[boxIndex].totalAmount += amount;
-  round.boxStats[boxIndex].bettorsCount += 1;
-
-  // Check if user has enough balance
+    // Check if user has enough balance
   if (!user || user.balance < amount) {
     logWarning(`Insufficient balance, current balance: ${user?.balance}, bet amount: ${amount}`);
     throw new InsufficientBalanceError(user?.balance ?? 0, amount);
   }
+  
+  // Find the box to place the bet
+  const boxIndex = round.boxes.findIndex((b) => b.title === box);
+  if (boxIndex === -1) throw new BetError(gameCodes.INVALID_BOX, "Box does not exist.");
+
+  // Update box stats
+  round.boxStats[boxIndex].totalAmount += amount;
+  round.boxStats[boxIndex].bettorsCount += 1;
 
   // Deduct user balance
   await UserService.updateBalance(userId, -amount);
@@ -102,8 +110,6 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
     _id: round._id,
     roundNumber: round.roundNumber,
     boxStats: round.boxStats,
-    phase: ROUND_STATUS.BETTING,
-    phaseEndTime: round.endTime,
   });
 
   return bet;
@@ -111,7 +117,7 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
 
 // Refactored getBetsByRound as a function
 export const getBetsByRound = async (roundId: string | Types.ObjectId) => {
-  return Bet.find({ roundId }).lean().exec();
+  return await Bet.find({ roundId }).lean().exec();
 };
 
 // Refactored computeRoundResults as a function

@@ -1,11 +1,10 @@
 import express from "express";
-import { authMiddleware } from "../../middlewares/auth.middleware";
-import { UserController } from "./user.controller";
+import { handleRegistration, UserController } from "./user.controller";
 
 const router = express.Router();
 
 // Auth
-router.post("/register", UserController.register);
+router.post("/register", handleRegistration);
 router.post("/login", UserController.login);
 
 // Protected

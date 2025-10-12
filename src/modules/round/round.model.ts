@@ -24,6 +24,7 @@ export interface IRoundBox {
 export interface IBoxStat {
   box: string | null;
   title: string | null;
+  group: string | null,
   icon: string | null;
   multiplier: string | null;
   totalAmount: number;
