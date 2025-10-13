@@ -128,14 +128,25 @@ export const handlePlaceBet = (socket: any, nsp: Namespace) => {
         return reply({ success: false, code: gameCodes.INVALID_PAYLOAD, message: "Invalid payload" });
       }
 
+   console.log("...................Sockets................")
+      console.log("userId: ", socket.data.user._id);
+      console.log("roundId: ", roundId,);
+      console.log("box, amount: ", box);
+      console.log("amount: ",amount )
+
       // Place the bet
       const bet = await placeBet({ userId: socket.data.user._id, roundId, box, amount, nsp });
+
+      console.log("bet...: ", bet)
 
       // Emit bet accepted event to the user
       socket.emit("bet_accepted", { bet });
 
       // Calculate all bets of the user in this round
       const userBets = await Bet.find({ roundId, userId: socket.data.user._id }).lean();
+
+      console.log("userBets: ", userBets);
+
       const totalUserBet = userBets.reduce((sum, b) => sum + b.amount, 0);
 
       socket.emit("user_bet_total", { roundId, totalUserBet });

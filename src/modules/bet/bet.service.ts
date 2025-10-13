@@ -27,13 +27,13 @@ class BetError extends Error {
 
 class InsufficientBalanceError extends BetError {
   constructor(balance: number, required: number) {
-    super("INSUFFICIENT_BALANCE", `Balance: ${balance}, Bet: ${required}`);
+    super(gameCodes.INSUFFICIENT_FUNDS, `Balance: ${balance}, Bet: ${required}`);
   }
 }
 
 class InvalidBetAmountError extends BetError {
   constructor(min: number, max: number) {
-    super("INVALID_BET_AMOUNT", `Bet must be between ${min} and ${max}`);
+    super(gameCodes.INVALID_BET_AMOUNT, `Bet must be between ${min} and ${max}`);
   }
 }
 
@@ -59,15 +59,22 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
   logPlaceBet(userId, roundId, box, amount);
 
   // Validate data
-  if (!round) throw new BetError(gameCodes.INVALID_ROUND, "Round does not exist.");
+  if (!round) {
+    logWarning(`${gameCodes.INVALID_ROUND}, Round does not exist.`);
+    throw new BetError(gameCodes.INVALID_ROUND, "Round does not exist.");
+  }
 
   //Betting closed for this round
-  if (round.roundStatus !== ROUND_STATUS.BETTING)
+  if (round.roundStatus !== ROUND_STATUS.BETTING){
+    logWarning(`${gameCodes.BETTING_CLOSED}, Betting is closed for this round.`);
     throw new BetError(gameCodes.BETTING_CLOSED, "Betting is closed for this round.");
+  }
   
   //Betting amount check
-  if (amount < settings.minBet || amount > settings.maxBet)
+  if (amount < settings.minBet || amount > settings.maxBet){
+    logWarning(`Minimum bet amount: ${settings.minBet}, Max bet amount: ${settings.maxBet}`);
     throw new InvalidBetAmountError(settings.minBet, settings.maxBet);
+  }
 
     // Check if user has enough balance
   if (!user || user.balance < amount) {
@@ -77,9 +84,12 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
   
   // Find the box to place the bet
   const boxIndex = round.boxes.findIndex((b) => b.title === box);
-  if (boxIndex === -1) throw new BetError(gameCodes.INVALID_BOX, "Box does not exist.");
+  if (boxIndex === -1) {
+    logWarning(`${gameCodes.INVALID_BOX}, Box does not exist`);
+    throw new BetError(gameCodes.INVALID_BOX, "Box does not exist.");
+  };
 
-  // Update box stats
+  // Update box statst
   round.boxStats[boxIndex].totalAmount += amount;
   round.boxStats[boxIndex].bettorsCount += 1;
 

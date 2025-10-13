@@ -22,13 +22,17 @@ export enum gameCodes {
   INVALID_ROUND = "INVALID_ROUND",
   INVALID_PAYLOAD = "INVALID_PAYLOAD",
   INSUFFICIENT_FUNDS = "INSUFFICIENT_FUNDS",
+  INVALID_BET_AMOUNT = "INVALID_BET_AMOUNT",
 
   NO_WINNER = "NO_WINNER",
 }
 
 export const origins = [
   "http://192.168.1.100:3000",
+  "http://192.168.68.121:3000",
+  "http://192.168.1.122:3000",
   "http://192.168.68.125:5174",
   "http://localhost:3000",
   "http://localhost:5174",
+  "http://192.168.68.130:3000",
 ];

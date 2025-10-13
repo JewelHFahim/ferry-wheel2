@@ -38,8 +38,8 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + durationMs);
     const bettingDuration = durationMs; // 30s default
-    const revealDuration = 5000; // 5s reveal
-    const prepareDuration = 5000; // 5s prepare
+    const revealDuration = 3000; // 5s reveal
+    const prepareDuration = 3000; // 5s prepare
     const now = Date.now();
 
 

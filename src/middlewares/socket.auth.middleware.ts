@@ -111,6 +111,7 @@ export function socketAuthMiddleware(nsp: Namespace, opts: { strict?: boolean; j
     }
 
     const claims = verify(token);
+
     if (!claims) return strict ? next(new Error("Unauthorized: Invalid token")) : next();
 
     const uid = claims.userId || claims.id || claims._id;

@@ -3,47 +3,51 @@
 // import { env } from "../config/env";
 // import { UserServices } from "../modules/user/user.service";
 
-// interface JwtPayload {
-//   hostedUserId: string;
-//   username: string;
-//   role?: "user" | "bot" | "admin";
-// }
+interface JwtPayload {
+  hostedUserId: string;
+  username: string;
+  role: "user" | "bot" | "admin";
+}
 
-// export const authMiddleware = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const authHeader = req.headers["authorization"];
-//     if (!authHeader && !authHeader?.startsWith("Bearer ")) {
-//       return res.status(401).json({ status: false, message: "Unauthorized: token missing" });
-//     }
+export const authMiddleware2 = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader && !authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ status: false, message: "Unauthorized: token missing" });
+    }
 
-//     const token = authHeader.split(" ")[1];
-//     if (!token) {
-//       return res.status(401).json({ status: false, message: "Token formate wrong" });
-//     }
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ status: false, message: "Token formate wrong" });
+    }
 
-//     const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+    const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
 
-//     let user = await UserServices.findByHostedId(payload.hostedUserId);
+    let user = await UserService.getById(payload.hostedUserId);
     
-//     if (!user) {
-//       user = await UserServices.createUser({
-//         hostedUserId: payload.hostedUserId,
-//         username: payload.username,
-//         role: payload.role ?? "user",
-//       });
-//     }
+        // hostedUserId: payload.hostedUserId,
+        // username: payload.username,
+        // role: payload.role ?? "user"
+    
+    // if (!user) {
+    //   user = await UserService.createUser({
+    //     hostedUserId: payload.hostedUserId,
+    //     role: payload.role ?? "user",
+    //     username: payload.username
+    //   });
+    // }
 
-//     (req as any).user = user;
-//     next();
-//   } catch (error) {
-//     console.error("Auth error:", error);
-//     return res.status(401).json({ status: false, message: "Unauthorized" });
-//   }
-// };
+    (req as any).user = user;
+    next();
+  } catch (error) {
+    console.error("Auth error:", error);
+    return res.status(401).json({ status: false, message: "Unauthorized" });
+  }
+};
 
 
 
@@ -60,6 +64,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
+import { UserService } from "../modules/user/user.service";
+import { UserModel } from "../modules/user/user.model";
 
 interface JwtPayload {
   userId: string;
@@ -75,7 +81,7 @@ declare module "express-serve-static-core" {
   }
 }
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -83,11 +89,13 @@ export const authMiddleware = (
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Authorization header missing" });
+      return res.status(401).json({ message: "Authorization  failed" });
     }
 
     const token = authHeader.split(" ")[1];
     if (!token) return res.status(401).json({ message: "Token missing" });
+
+    console.log("token: ", token)
 
     const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
     req.user = decoded;
