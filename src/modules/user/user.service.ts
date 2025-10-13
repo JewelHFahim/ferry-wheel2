@@ -5,30 +5,7 @@ import { MetService } from "../met/met.service";
 
 export const UserService = {
   
-  async createUser({
-    hostedUserId,
-    username,
-    // password,
-    role = "user" as "user" | "bot" | "admin",
-  }: {
-    hostedUserId: string,
-    username: string;
-    password: string;
-    role: "user" | "bot" | "admin"
-  }): Promise<IUser> {
-    const s = await SettingsService.getSettings();
-    const initial = s.minBet || 0;
-    // const hashed = await bcrypt.hash(password, 10);
-    const user = await UserModel.create({
-      hostedUserId,
-      username,
-      // password: hashed,
-      role,
-      balance: initial,
-    });
-    await MetService.incrementTotalUsers();
-    return user;
-  },
+
 
   async getById(userId: string): Promise<IUser | null> {
     return UserModel.findById(userId);
@@ -62,4 +39,5 @@ export const UserService = {
       throw new Error("Error verifying password.");
     }
   },
+
 };

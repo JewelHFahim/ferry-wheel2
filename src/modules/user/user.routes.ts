@@ -1,6 +1,6 @@
 import express from "express";
 import { handleGetProfile, handleLogin, handleRegistration, UserController } from "./user.controller";
-import { authMiddleware } from "../../middlewares/auth.middleware";
+import { authMiddleware, requireRole } from "../../middlewares/auth.middleware";
 
 const router = express.Router();
 
@@ -9,6 +9,6 @@ router.post("/register", handleRegistration);
 router.post("/login", handleLogin);
 
 // Protected
-router.get("/profile/:id", authMiddleware, handleGetProfile);
+router.get("/profile/:id", authMiddleware, requireRole(["user"]), handleGetProfile);
 
 export default router;

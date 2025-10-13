@@ -187,6 +187,16 @@ export const initSocket = (server: http.Server) => {
   game.on("connection", (socket) => {
     console.log("🔌 [game]", socket.id, socket.data?.user || "(guest)");
 
+    //ping server
+
+    socket.on("ping_server", (_data, callback)=>{
+      callback({ok: true})
+    });
+
+   socket.on("ping_server", (_data, callback) => {
+    callback({ ok: true }); // immediately respond
+  });
+
     // Socket event listeners
     handleJoinRoom(socket);
     handleGetBalance(socket);
