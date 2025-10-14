@@ -1,71 +1,12 @@
-// import { NextFunction, Request, Response } from "express";
-// import jwt from "jsonwebtoken";
-// import { env } from "../config/env";
-// import { UserServices } from "../modules/user/user.service";
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env";
 
 interface JwtPayload {
   hostedUserId: string;
   username: string;
   role: "user" | "bot" | "admin";
 }
-
-export const authMiddleware2 = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const authHeader = req.headers["authorization"];
-    if (!authHeader && !authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ status: false, message: "Unauthorized: token missing" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ status: false, message: "Token formate wrong" });
-    }
-
-    const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
-
-    let user = await UserService.getById(payload.hostedUserId);
-    
-        // hostedUserId: payload.hostedUserId,
-        // username: payload.username,
-        // role: payload.role ?? "user"
-    
-    // if (!user) {
-    //   user = await UserService.createUser({
-    //     hostedUserId: payload.hostedUserId,
-    //     role: payload.role ?? "user",
-    //     username: payload.username
-    //   });
-    // }
-
-    (req as any).user = user;
-    next();
-  } catch (error) {
-    console.error("Auth error:", error);
-    return res.status(401).json({ status: false, message: "Unauthorized" });
-  }
-};
-
-
-
-// // optional role-based middleware
-// export const requireRole = (roles: string[]) => {
-//   return (req: Request, res: Response, next: NextFunction) => {
-//     if (!req.user || !roles.includes(req.user.role)) {
-//       return res.status(403).json({ message: "Forbidden: insufficient role" });
-//     }
-//     next();
-//   };
-// };
-
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { env } from "../config/env";
-import { UserService } from "../modules/user/user.service";
-import { UserModel } from "../modules/user/user.model";
 
 interface JwtPayload {
   userId: string;
@@ -89,7 +30,7 @@ export const authMiddleware = async (
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Authorization  failed" });
+      return res.status(401).json({ message: "Authorization failed" });
     }
 
     const token = authHeader.split(" ")[1];
@@ -107,4 +48,14 @@ export const authMiddleware = async (
     }
     return res.status(401).json({ message: "Invalid token" });
   }
+};
+
+// optional role-based middleware
+export const requireRole = (roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Forbidden access" });
+    }
+    next();
+  };
 };

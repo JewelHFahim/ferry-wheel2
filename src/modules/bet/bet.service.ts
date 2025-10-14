@@ -131,22 +131,22 @@ export const getBetsByRound = async (roundId: string | Types.ObjectId) => {
 };
 
 // Refactored computeRoundResults as a function
-export const computeRoundResults = async ( round: any, bets: Array<IBet & { _id: any }>, distributableAmount: number ) => {
-  const pool = round.boxStats.map((b: any) => b.box);
-  const winnerBox = pool[Math.floor(Math.random() * pool.length)];
+// export const computeRoundResults = async ( round: any, bets: Array<IBet & { _id: any }>, distributableAmount: number ) => {
+//   const pool = round.boxStats.map((b: any) => b.box);
+//   const winnerBox = pool[Math.floor(Math.random() * pool.length)];
 
-  // Filter winning bets
-  const winningBets = bets.filter((b) => b.box === winnerBox);
-  const totalWinningAmount = winningBets.reduce((acc, b) => acc + b.amount, 0);
+//   // Filter winning bets
+//   const winningBets = bets.filter((b) => b.box === winnerBox);
+//   const totalWinningAmount = winningBets.reduce((acc, b) => acc + b.amount, 0);
 
-  // Calculate payouts
-  const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
-        userId: String(b.userId),
-        box: b.box,
-        amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),
-      }))
-    : [];
+//   // Calculate payouts
+//   const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
+//         userId: String(b.userId),
+//         box: b.box,
+//         amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),
+//       }))
+//     : [];
 
-  return { winnerBox, payouts };
-};
+//   return { winnerBox, payouts };
+// };
 

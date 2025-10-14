@@ -9,12 +9,8 @@ const generateToken = (userId: string, role: string) => {
   return jwt.sign({ userId, role }, env.JWT_SECRET, { expiresIn: "7d" });
 };
 
-
 export const UserController = {
-
-  /**
-   * Get user profile
-   */
+  // Get user profile
   getProfile: async (req: Request, res: Response) => {
     try {
       if (!req.user) {
@@ -35,7 +31,6 @@ export const UserController = {
 // @desc    Register a new user
 // @route   POST /api/v1/users/register
 // ==========================
-
 export const handleRegistration = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
@@ -80,7 +75,6 @@ export const handleRegistration = async (req: Request, res: Response) => {
 // @desc    Login a new user
 // @route   POST /api/v1/users/login
 // ==========================
-
 export const handleLogin = async (req: Request, res: Response) => {
     try {
       const { username, password } = req.body;
@@ -116,18 +110,26 @@ export const handleLogin = async (req: Request, res: Response) => {
 // @route   POST /api/v1/users/profile
 // ==========================
   export const handleGetProfile = async (req: Request, res: Response) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+  try {
+    const userId = req.params.id;
 
-      const userId = req.user.userId || req.params.userId;
-      const profile = await UserModel.findById(userId).select("-password");
-      if (!profile) return res.status(404).json({ message: "User not found" });
-
-      res.status(200).json(profile);
-      return res.status(200).json({ stats: true, message: "User profile",  profile});
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || "Server error" });
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID required" });
+    }
+
+    const user = await UserModel.findById(userId).lean().select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ status: true, user });
+  } catch (error: any) {
+    console.error(error);
+
+    return res.status(500).json({ message: error.message || "Server error" });
   }
+};

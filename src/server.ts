@@ -7,7 +7,7 @@ import { startNewRound } from "./jobs/roundEngine.job";
 
 const PORT = Number(process.env.PORT || 5000);
 
-// Retry mechanism for connecting to the database
+// Retry connecting to the db
 const retryConnectDB = async (retries = 5, delay = 5000) => {
   try {
     await connectDB();
@@ -23,13 +23,13 @@ const retryConnectDB = async (retries = 5, delay = 5000) => {
   }
 };
 
-// Start the server and initialize the game
+// Start server and initialize game
 (async () => {
   try {
-    // Ensure DB connection
+    // DB connection
     await retryConnectDB();
 
-    // Create HTTP server
+    // server
     const server = http.createServer(app);
     
     const { io, game } = initSocket(server);
