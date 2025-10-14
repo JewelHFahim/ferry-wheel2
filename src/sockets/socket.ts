@@ -1,14 +1,14 @@
-import { Server } from "socket.io";
-import { UserModel } from "../modules/user/user.model";
-import { logBetAccepted, logError } from "../utils/gameEventLogger";
-import { Namespace } from "socket.io";
 import http from "http";
-import { placeBet } from "../modules/bet/bet.service";
-import { socketAuthMiddleware } from "../middlewares/socket.auth.middleware";
+import { Server } from "socket.io";
+import { Namespace } from "socket.io";
 import Bet from "../modules/bet/bet.model";
+import { EMIT } from "../utils/statics/emitEvents";
+import { placeBet } from "../modules/bet/bet.service";
+import { UserModel } from "../modules/user/user.model";
 import CompanyWallet from "../modules/company/company.model";
 import { gameCodes, origins } from "../utils/statics/statics";
-import { EMIT } from "../utils/statics/emitEvents";
+import { logBetAccepted, logError } from "../utils/gameEventLogger";
+import { socketAuthMiddleware } from "../middlewares/socket.auth.middleware";
 
 // Utility function for error responses
 const sendErrorResponse = (
