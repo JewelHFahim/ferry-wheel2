@@ -23,9 +23,9 @@ async function seedSettings() {
       siteName: "Ferry Wheel",
       maintenanceMode: false,
       minBet: 500,
-      maxBet: 10000,
+      maxBet: 50000,
       roundDuration: 30000,
-      commissionRate: 0.1, // 10%
+      commissionRate: 0.1,
       currency: "BDT",
       supportedLanguages: ["en", "bn"],
       theme: "dark",

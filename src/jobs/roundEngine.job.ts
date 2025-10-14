@@ -21,7 +21,6 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const startNewRound = async (nsp: Namespace): Promise<void> => {
   try {
 
-    // const settings = await SettingsService.getSettings();
     const [settings, roundNumber, boxes] = await Promise.all([
       SettingsService.getSettings(),
       MetService.incrementRoundCounter(),
@@ -29,16 +28,17 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
     ]);
 
     const raw = settings.roundDuration ?? env.BETTING_DURATION;
-    const durationMs = raw > 1000 ? raw : raw * 1000;
+    const bettingDuration = raw > 1000 ? raw : raw * 1000;
+    const rawRevealDuration = settings.revealDuration ?? env.REVEAL_DURATION;
+    const revealDuration = rawRevealDuration > 1000 ? rawRevealDuration : rawRevealDuration * 1000;
+    const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
+    const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
 
     const startTime = new Date();
-    const endTime = new Date(startTime.getTime() + durationMs);
-    const bettingDuration = durationMs;
-    const revealDuration =  3000;
-    const prepareDuration = 3000;
+    const endTime = new Date(startTime.getTime() + bettingDuration);
     const now = Date.now();
 
-
+    //Event times
     const endBettingTime = new Date(startTime.getTime() + bettingDuration);
     const endRevealTime = new Date(endBettingTime.getTime() + revealDuration);
     const endPrepareTime = new Date(endRevealTime.getTime() + prepareDuration);
@@ -47,7 +47,7 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
     const round = await Round.create({
       roundNumber,
       startTime,
-      endTime:endPrepareTime,
+      endTime: endPrepareTime,
       phaseEndTimes: {
         betting: endBettingTime,
         reveal: endRevealTime,
@@ -71,12 +71,11 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
 
     await MetService.setCurrentRound(round._id.toString());
 
+    
+    // ==========================
     // Emit the round started event
     // ==========================
-    // @desc    Register a new user
-    // @route   POST /api/v1/users/register
-    // ==========================
-    nsp.emit("roundStarted", {
+    nsp.emit(EMIT.ROUND_STARTED, {
       _id: round._id,
       roundNumber,
       startTime,
@@ -85,8 +84,10 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       roundStatus: ROUND_STATUS.BETTING,
     });
 
-    // Betting Phase
-    nsp.emit("phaseUpdate", { phase: ROUND_STATUS.BETTING, phaseStartTime: now, phaseEndTime: now + bettingDuration });
+    // ==========================
+    // Emit the Betting Phase
+    // ==========================
+    nsp.emit(EMIT.PHASE_UPDATED, { phase: ROUND_STATUS.BETTING, phaseStartTime: now, phaseEndTime: now + bettingDuration });
     await sleep(bettingDuration);
 
     // End the round and prepare for the next phase
@@ -99,16 +100,17 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
 // End the rund, gather pool, calculate, choose winner, distribute apyouts
 export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
   try {
-    const revealDuration = 5000; // 5 seconds
-    const prepareDuration = 5000; // 5 seconds
-    const now = Date.now();
-
     // Fetch round, settings, and company wallet
     const [round, settings, companyWallet] = await Promise.all([
-      Round.findById(roundId),
-      SettingsService.getSettings(),
-      getCompanyWallet(),
+    Round.findById(roundId),
+    SettingsService.getSettings(),
+    getCompanyWallet(),
     ]);
+    const rawRevealDuration = settings.revealDuration ?? env.REVEAL_DURATION;
+    const revealDuration = rawRevealDuration > 1000 ? rawRevealDuration : rawRevealDuration * 1000;
+    const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
+    const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
+    const now = Date.now();
 
     if (!round) return console.warn("Round not found:", roundId);
     if (!settings) return console.warn("Settings not found");
@@ -118,29 +120,30 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     round.phase = "reveal";
     round.phaseEndTime = new Date(Date.now() + revealDuration);
     await round.save();
-    nsp.emit("roundClosed", { _id: round._id, roundNumber: round.roundNumber, roundStatus: ROUND_STATUS.CLOSED });
+
+    //Emit closed round
+    nsp.emit(EMIT.ROUND_CLOSED, { _id: round._id, roundNumber: round.roundNumber, roundStatus: ROUND_STATUS.CLOSED });
 
     // Fetch all bets
     const bets = await getBetsByRound(round._id);
     const totalPool = bets.reduce((sum, b) => sum + b.amount, 0);
     round.totalPool = totalPool;
-    console.log("totalPool: ", totalPool)
-
+    
     // Company cut (10% of total pool)
     const companyCut = Math.floor(totalPool * (settings.commissionRate ?? 0.1));
     round.companyCut = companyCut;
-    console.log("companyCut: ", companyCut)
-
+    
     // Distributable funds for winners
     let distributableAmount = totalPool - companyCut;
     const availableFunds = distributableAmount + companyWallet.reserveWallet;
-    console.log("companyWallet: ", companyWallet.reserveWallet);
-    console.log("availableFunds: ", availableFunds)
+    
+
 
     // Determine eligible and ineligible boxes
     const eligibleBoxes: any[] = [];
     const ineligibleBoxes: any[] = [];
 
+    // Round Stats
     round.boxStats.forEach(box => {
       const totalBoxBet = bets.filter(bet => bet.box === box.box).reduce((sum, b) => sum + b.amount, 0);
       console.log("totalBoxBet", totalBoxBet);
@@ -159,14 +162,21 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       else ineligibleBoxes.push(box);
     });
 
-    console.log("Eligible Boxes:", eligibleBoxes.map(b => b.box));
-    console.log("Ineligible Boxes:", ineligibleBoxes.map(b => b.box));
+ 
 
     // Select winner randomly from eligible boxes
     let winnerBox: string | null = null;
     if (eligibleBoxes.length > 0) {
       winnerBox = eligibleBoxes[Math.floor(Math.random() * eligibleBoxes.length)].box;
-    }
+    };
+
+    // All Logs
+    console.log("totalPool: ", totalPool);
+    console.log("companyCut: ", companyCut);
+    console.log("companyWallet: ", companyWallet.reserveWallet);
+    console.log("availableFunds: ", availableFunds);
+    console.log("Eligible Boxes:", eligibleBoxes.map(b => b.box));
+    console.log("Ineligible Boxes:", ineligibleBoxes.map(b => b.box));
     console.log("winnerBox: ", winnerBox);
 
     // If no eligible winner, move distributable to reserve wallet
@@ -217,6 +227,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     const topWinners: { userId: Types.ObjectId; amountWon: number }[] = [];
     for (const p of payouts) {
       const updated = await UserService.updateBalance(p.userId, p.amount);
+      
+      // EMit private payout
       nsp.to(`user:${p.userId}`).emit(EMIT.PAYOUT, {
         roundId: round._id,
         winnerBox,
@@ -229,7 +241,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         amountWon: p.amount
        });
 
-      nsp.to(`user:${p.userId}`).emit("balanceUpdate", {
+      //Emit private blance update
+      nsp.to(`user:${p.userId}`).emit(EMIT.BALANCE_UPDATE, {
         balance: updated.balance,
         delta: p.amount,
         reason: "payout",
@@ -251,14 +264,15 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     await logTransaction("companyCut", companyCut, "Company cut from pool");
 
     // Emit final round results
-    nsp.emit("roundUpdated", {
+    nsp.emit(EMIT.ROUND_UPDATED, {
       _id: round._id,
       roundNumber: round.roundNumber,
       boxStats: round.boxStats,
       roundStatus: round.roundStatus
     });
 
-    nsp.emit("winnerRevealed", {
+    //Emit  winner reveal
+    nsp.emit(EMIT.WINNER_REVEALED, {
       _id: round._id,
       roundNumber: round.roundNumber,
       winnerBox,
@@ -268,7 +282,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     });
 
     // Reveal Phase
-    nsp.emit("phaseUpdate", {
+    nsp.emit(EMIT.PHASE_UPDATED, {
       phase: phaseStatus.REVEAL,
       phaseStartTime: now,
       phaseEndTime: round.phaseEndTime.getTime(),
@@ -276,7 +290,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
 
     await sleep(revealDuration);
 
-    nsp.emit("roundEnded", {
+    // EMit round end
+    nsp.emit(EMIT.ROUND_ENDED, {
       _id: round._id,
       roundNumber: round.roundNumber,
       totalPool,
@@ -286,8 +301,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: round.roundStatus
     });
 
-    // Prepare Next
-    nsp.emit("phaseUpdate", {
+    // Emit prepare for next
+    nsp.emit(EMIT.PHASE_UPDATED, {
       phase: phaseStatus.PREPARE,
       phaseStartTime: Date.now(),
       phaseEndTime: Date.now() + prepareDuration,

@@ -4,7 +4,7 @@ import { boxDatas } from "../../utils/statics/statics";
 export interface IRoundBox {
   title: string;
   icon: string;
-  multiplier: number; // 0 for non-betting result boxes like Pizza/Salad
+  multiplier: number;
 }
 
 export interface ISettings extends Document {
@@ -12,8 +12,11 @@ export interface ISettings extends Document {
   currency: string;
   minBet: number;
   maxBet: number;
-  roundDuration: number; // seconds per round
-  commissionRate: number; // 0.1 => 10%
+  roundDuration: number;
+  beetingDuration: number;
+  prepareDuration: number;
+  revealDuration: number;
+  commissionRate: number;
   boxes: IRoundBox[];
   chips: number[];
   maintenanceMode: boolean;
@@ -30,6 +33,9 @@ const SettingsSchema = new Schema<ISettings>(
     minBet: { type: Number, default: 50, min: 1 },
     maxBet: { type: Number, default: 10000 },
     roundDuration: { type: Number, default: 30, min: 5 },
+    beetingDuration: { type: Number, default: 30, min: 15},
+    prepareDuration: { type: Number, default: 5, min: 3},
+    revealDuration: { type: Number, default: 5, min: 3},
     commissionRate: { type: Number, default: 0.1, min: 0, max: 1 },
     boxes: {
       type: [
