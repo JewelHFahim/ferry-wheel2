@@ -5,11 +5,10 @@ import { Namespace } from "socket.io";
 import http from "http";
 import { placeBet } from "../modules/bet/bet.service";
 import { socketAuthMiddleware } from "../middlewares/socket.auth.middleware";
-import betModel from "../modules/bet/bet.model";
 import Bet from "../modules/bet/bet.model";
-import Round from "../modules/round/round.model";
 import CompanyWallet from "../modules/company/company.model";
 import { gameCodes, origins } from "../utils/statics/statics";
+import { EMIT } from "../utils/statics/emitEvents";
 
 // Utility function for error responses
 const sendErrorResponse = (
@@ -23,7 +22,9 @@ const sendErrorResponse = (
 
 // Cretae & Join room, Count total active user in room
 export const handleJoinRoom = (socket: any) => {
-  socket.on( "join", async (data?: { room?: string }, ack?: (res: any) => void) => {
+  socket.on(
+    "join",
+    async (data?: { room?: string }, ack?: (res: any) => void) => {
       try {
         let roomName: string | undefined;
 
@@ -44,8 +45,8 @@ export const handleJoinRoom = (socket: any) => {
           const clients = socket.adapter.rooms.get(roomName);
           joinedTotalUsers = clients ? clients.size : 0;
 
-          socket.to(roomName).emit("joinedTotalUsers", { count: joinedTotalUsers });
-          socket.emit("joinedTotalUsers", { count: joinedTotalUsers });
+          socket.to(roomName).emit(EMIT.JOINED_TOTAL_USERS, { count: joinedTotalUsers });
+          socket.emit(EMIT.JOINED_TOTAL_USERS, { count: joinedTotalUsers });
         }
 
         // Ack callback for the joining socket
@@ -68,7 +69,9 @@ export const handleGetBalance = (socket: any) => {
 
     try {
       // Find the user's balance
-      const user = await UserModel.findById(socket.data.user._id).select({ balance: 1 }).lean();
+      const user = await UserModel.findById(socket.data.user._id)
+        .select({ balance: 1 })
+        .lean();
 
       // Handle case where the user is not found
       if (!user) {
@@ -81,7 +84,8 @@ export const handleGetBalance = (socket: any) => {
       socket.emit("balance:update", { balance });
     } catch (e) {
       // Handle errors during the process
-      const errorMessage = e instanceof Error ? e.message : "Could not fetch balance";
+      const errorMessage =
+        e instanceof Error ? e.message : "Could not fetch balance";
       logError(`${errorMessage} || "Could not fetch balance"`);
       sendErrorResponse(ack, "INTERNAL", errorMessage);
     }
@@ -89,72 +93,91 @@ export const handleGetBalance = (socket: any) => {
 };
 
 // Function to get company wallet
-export const handleGetCompanyWallet = async (socket:any) => {
-  socket.on("get_company_wallet", async(payload: any, ack?: (res:any)=> void)=>{
-    // Ensure the admin
-    if(!socket.data.user){
-       return sendErrorResponse(ack, "AUTH_REQUIRED", "Authentication required- for admin");
+export const handleGetCompanyWallet = async (socket: any) => {
+  socket.on(
+    "get_company_wallet",
+    async (payload: any, ack?: (res: any) => void) => {
+      // Ensure the admin
+      if (!socket.data.user) {
+        return sendErrorResponse(
+          ack,
+          "AUTH_REQUIRED",
+          "Authentication required- for admin"
+        );
+      }
+
+      try {
+        const wallet = await CompanyWallet.find({});
+
+        console.log("wallet", wallet);
+
+        socket.emit("get_company_wallet", wallet);
+      } catch (error) {
+        // Handle errors during the process
+        const errorMessage =
+          error instanceof Error ? error.message : "Could not fetch balance";
+        logError(`${errorMessage} || "Could not fetch wallet"`);
+        sendErrorResponse(ack, "INTERNAL", errorMessage);
+      }
     }
-
-    try {
-      const wallet = await CompanyWallet.find({});
-
-      console.log("wallet", wallet)
-
-
-      socket.emit("get_company_wallet", wallet)
-       
-    } catch (error) {
-      // Handle errors during the process
-      const errorMessage = error instanceof Error ? error.message : "Could not fetch balance";
-      logError(`${errorMessage} || "Could not fetch wallet"`);
-      sendErrorResponse(ack, "INTERNAL", errorMessage);
-    }
-  })
-}
+  );
+};
 
 // Function to handle placing a bet
 export const handlePlaceBet = (socket: any, nsp: Namespace) => {
   socket.on("place_bet", async (payload: any, ack?: (res: any) => void) => {
-    const reply = typeof ack === "function" ? ack : (res: any) => socket.emit("bet_error", res);
+    const reply =
+      typeof ack === "function"
+        ? ack
+        : (res: any) => socket.emit("bet_error", res);
 
     try {
       if (!socket.data?.user) {
-        return reply({ success: false, code: gameCodes.AUTH_REQUIRED, message: "Authentication required" });
+        return reply({
+          success: false,
+          code: gameCodes.AUTH_REQUIRED,
+          message: "Authentication required",
+        });
       }
 
       const { roundId, box, amount } = payload || {};
       if (!roundId || !box || typeof amount !== "number") {
-        return reply({ success: false, code: gameCodes.INVALID_PAYLOAD, message: "Invalid payload" });
+        return reply({
+          success: false,
+          code: gameCodes.INVALID_PAYLOAD,
+          message: "Invalid payload",
+        });
       }
 
-   console.log("...................Sockets................")
-      console.log("userId: ", socket.data.user._id);
-      console.log("roundId: ", roundId,);
-      console.log("box, amount: ", box);
-      console.log("amount: ",amount )
-
       // Place the bet
-      const bet = await placeBet({ userId: socket.data.user._id, roundId, box, amount, nsp });
-
-      console.log("bet...: ", bet)
+      const bet = await placeBet({
+        userId: socket.data.user._id,
+        roundId,
+        box,
+        amount,
+        nsp,
+      });
 
       // Emit bet accepted event to the user
       socket.emit("bet_accepted", { bet });
 
       // Calculate all bets of the user in this round
-      const userBets = await Bet.find({ roundId, userId: socket.data.user._id }).lean();
-
-      console.log("userBets: ", userBets);
+      const userBets = await Bet.find({
+        roundId,
+        userId: socket.data.user._id,
+      }).lean();
 
       const totalUserBet = userBets.reduce((sum, b) => sum + b.amount, 0);
 
       socket.emit("user_bet_total", { roundId, totalUserBet });
 
       reply({ success: true, bet });
-
     } catch (e: any) {
-      return reply({ success: false, code: gameCodes.INTERNAL, message: e?.message || "Failed to place bet" });
+      return reply({
+        success: false,
+        code: gameCodes.INTERNAL,
+        message: e?.message || "Failed to place bet",
+      });
     }
   });
 };
@@ -173,11 +196,12 @@ export const handleDisconnect = (socket: any) => {
 
 // Main function to initialize the socket server and events
 export const initSocket = (server: http.Server) => {
+  
   const io = new Server(server, {
-    cors: { origin: origins,
-    methods: ["GET", "POST"], credentials: false },
+    cors: { origin: origins, methods: ["GET", "POST"], credentials: false },
   });
 
+  // Namespace
   const game = io.of("/game");
 
   // Socket authentication middleware
@@ -185,24 +209,19 @@ export const initSocket = (server: http.Server) => {
 
   // Socket connections and events
   game.on("connection", (socket) => {
-    console.log("🔌 [game]", socket.id, socket.data?.user || "(guest)");
+    console.log("🔌 [game]", socket.id, socket.data?.user  || "(guest)");
 
     //ping server
-
-    socket.on("ping_server", (_data, callback)=>{
-      callback({ok: true})
+    socket.on(EMIT.PING_SERVER, (_data, callback) => {
+      callback({ ok: true });
     });
-
-   socket.on("ping_server", (_data, callback) => {
-    callback({ ok: true }); // immediately respond
-  });
 
     // Socket event listeners
     handleJoinRoom(socket);
     handleGetBalance(socket);
     handlePlaceBet(socket, game);
     handleDisconnect(socket);
-    handleGetCompanyWallet(socket)
+    handleGetCompanyWallet(socket);
   });
 
   return { io, game };

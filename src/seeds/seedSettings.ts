@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import { env } from "../config/env";
 config();
 
-const MONGO_URI = env.MONGO_URI || "mongodb://127.0.0.1:27017/ferrywheel";
+const MONGO_URI = env.MONGO_URI;
 
 async function seedSettings() {
   try {

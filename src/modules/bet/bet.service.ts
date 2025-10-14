@@ -1,13 +1,14 @@
 
 // Version-003 Function Based
 import { Types } from "mongoose";
-import Bet, { IBet } from "./bet.model";
+import Bet from "./bet.model";
 import Round, { ROUND_STATUS } from "../round/round.model";
 import { UserService } from "../user/user.service";
 import { SettingsService } from "../settings/settings.service";
-import { logPlaceBet, logWarning } from "../../utils/gameEventLogger";
+import { logBetAccepted, logPlaceBet, logWarning } from "../../utils/gameEventLogger";
 import { Namespace } from "socket.io";
 import { gameCodes } from "../../utils/statics/statics";
+import { EMIT } from "../../utils/statics/emitEvents";
 
 interface PlaceBetArgs {
   userId: string;
@@ -96,6 +97,11 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
   // Deduct user balance
   await UserService.updateBalance(userId, -amount);
 
+  if (round.roundStatus !== ROUND_STATUS.BETTING) {
+    logWarning(`${gameCodes.BETTING_CLOSED}, Betting is closed for this phase.`);
+    throw new BetError(gameCodes.BETTING_CLOSED, "Betting is closed for this phase.");
+  }
+
   // Create the bet
   const bet = await Bet.create({
     userId: new Types.ObjectId(userId),
@@ -116,7 +122,7 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
   );
 
   // Emit updated round data to all clients
-  nsp.emit("roundUpdated", {
+  nsp.emit(EMIT.ROUND_UPDATED, {
     _id: round._id,
     roundNumber: round.roundNumber,
     boxStats: round.boxStats,
@@ -129,24 +135,4 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
 export const getBetsByRound = async (roundId: string | Types.ObjectId) => {
   return await Bet.find({ roundId }).lean().exec();
 };
-
-// Refactored computeRoundResults as a function
-// export const computeRoundResults = async ( round: any, bets: Array<IBet & { _id: any }>, distributableAmount: number ) => {
-//   const pool = round.boxStats.map((b: any) => b.box);
-//   const winnerBox = pool[Math.floor(Math.random() * pool.length)];
-
-//   // Filter winning bets
-//   const winningBets = bets.filter((b) => b.box === winnerBox);
-//   const totalWinningAmount = winningBets.reduce((acc, b) => acc + b.amount, 0);
-
-//   // Calculate payouts
-//   const payouts = totalWinningAmount > 0 ? winningBets.map((b) => ({
-//         userId: String(b.userId),
-//         box: b.box,
-//         amount: Math.floor((b.amount / totalWinningAmount) * distributableAmount),
-//       }))
-//     : [];
-
-//   return { winnerBox, payouts };
-// };
 

@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import Bet from "./bet.model";
+import Round from "../round/round.model";
 
 
-
+// ==========================
+// @desc    Betting History Winners
+// @route   GET /api/v1/bettings/bet-history
+// ==========================
 export const handleGetBettingHistory = async (req: Request, res: Response) => {
     try {
         // Validate and set pagination parameters
@@ -63,3 +67,49 @@ export const handleGetBettingHistory = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+// ==========================
+// @desc    Betting History Winners
+// @route   GET /api/v1/bettings/current-history
+// ==========================
+export const handleGetBettingHistoryTenData = async (req: Request, res: Response) => {
+    try {
+        const bettingHistory = (await Bet.find().sort({ createdAt: -1 })).splice(0, 10);
+
+        const count = bettingHistory.length;
+        if (count === 0) {
+            return res.status(200).json({ status: true, message: "No betting history available now", bettingHistory: [] });
+        }
+
+        return res.status(200).json({ status: true, message: "Betting history retrieved", count, bettingHistory});
+    } catch (error) {
+        console.log("Server error", error);
+        return res.status(500).json({ status: false, message: "Server error, try again later",  error });
+    }
+};
+
+// ==========================
+// @desc    Top Winners
+// @route   GET /api/v1/bettings/top-winners/:roundId
+// ==========================
+export const handleGetTopWinners = async (req:Request, res: Response) => {
+    try {
+        const roundId = req.params.id;
+        if(!roundId){
+             return res.status(400).json({ status: false, message: "roundId not valid" })
+        }
+
+        const topWinners =  await Round.findById(roundId);
+        const count = topWinners?.topWinners.length;
+
+        if(count === 0){
+            return res.status(200).json({ status: true, message: "Top winners empty", topWinners: [] })
+        }
+
+        return res.status(200).json({ status: true, message: "Top winners retrive", count, topWinners: topWinners?.topWinners })
+    } catch (error) {
+        console.log("Something went wrong", error);
+        return res.status(500).json({ status: false, message: "Server error, try again later", error })
+    }
+}

@@ -13,18 +13,16 @@ export const boxDatas = [
 
 export enum gameCodes {
   AUTH_REQUIRED = "AUTH_REQUIRED",
-
   BETTING_CLOSED = "BETTING_CLOSED",
   BET_NOT_PLACED = "BET_NOT_PLACED",
-
   INTERNAL = "INTERNAL",
   INVALID_BOX = "INVALID_BOX",
   INVALID_ROUND = "INVALID_ROUND",
   INVALID_PAYLOAD = "INVALID_PAYLOAD",
   INSUFFICIENT_FUNDS = "INSUFFICIENT_FUNDS",
   INVALID_BET_AMOUNT = "INVALID_BET_AMOUNT",
-
   NO_WINNER = "NO_WINNER",
+  NOT_FOUND = "NOT_FOUND",
 }
 
 export const origins = [
@@ -35,11 +33,17 @@ export const origins = [
   "http://localhost:3000",
   "http://localhost:5174",
   "http://192.168.68.130:3000",
+   "http://192.168.68.119:3000"
 ];
-
 
 export enum Roles {
   BOT = "bot",
   USER = "user",
   ADMIN = "admin",
+}
+
+export enum phaseStatus {
+  "BETTING" = "betting",
+  "REVEAL" = "reveal",
+  "PREPARE" = "prepare",
 }

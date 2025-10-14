@@ -1,0 +1,16 @@
+export enum EMIT {
+  PHASE_UPDATED = "phaseUpdate",
+  ROUND_STARTED = "roundStarted",
+  ROUND_CLOSED = "roundClosed",
+  ROUND_ENDED = "roundEnded",
+  ROUND_UPDATED = "roundUpdated",
+  PAYOUT = "payout",
+  BALANCE_UPDATE = "balanceUpdate",
+  WINNER_REVEALED = "winnerRevealed",
+  JOINED_TOTAL_USERS = "joinedTotalUsers",
+  GET_COMPANY_WALLET = "get_company_wallet",
+  BET_ERROR = "bet_error",
+  BET_ACCEPTED = "bet_accepted",
+  USER_BET_TOTAL = "user_bet_total",
+  PING_SERVER = "ping_server",
+}
