@@ -4,6 +4,7 @@ export enum EMIT {
   ROUND_CLOSED = "roundClosed",
   ROUND_ENDED = "roundEnded",
   ROUND_UPDATED = "roundUpdated",
+  ROUND_RESET = "resetRound",
   PAYOUT = "payout",
   BALANCE_UPDATE = "balanceUpdate",
   WINNER_REVEALED = "winnerRevealed",

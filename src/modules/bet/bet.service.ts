@@ -2,13 +2,14 @@
 // Version-003 Function Based
 import { Types } from "mongoose";
 import Bet from "./bet.model";
-import Round, { ROUND_STATUS } from "../round/round.model";
+import Round from "../round/round.model";
 import { UserService } from "../user/user.service";
 import { SettingsService } from "../settings/settings.service";
 import { logBetAccepted, logPlaceBet, logWarning } from "../../utils/gameEventLogger";
 import { Namespace } from "socket.io";
 import { gameCodes } from "../../utils/statics/statics";
 import { EMIT } from "../../utils/statics/emitEvents";
+import { ROUND_STATUS } from "../round/round.types";
 
 interface PlaceBetArgs {
   userId: string;
@@ -126,6 +127,7 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
     _id: round._id,
     roundNumber: round.roundNumber,
     boxStats: round.boxStats,
+    roundStatus: ROUND_STATUS.BETTING
   });
 
   return bet;

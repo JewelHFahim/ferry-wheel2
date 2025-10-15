@@ -7,6 +7,8 @@ import betRoutes from "../modules/bet/bet.routes";
 
 const router = express.Router();
 
+
+//App All Primary Routes
 router.use("/users", userRoutes);
 router.use("/company", compnayRoutes);
 router.use("/settings", settingRoutes);

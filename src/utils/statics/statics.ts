@@ -33,7 +33,8 @@ export const origins = [
   "http://localhost:3000",
   "http://localhost:5174",
   "http://192.168.68.130:3000",
-   "http://192.168.68.119:3000"
+  "http://192.168.68.119:3000",
+  "https://ferry-wheel-game.vercel.app"
 ];
 
 export enum Roles {

@@ -36,8 +36,6 @@ export const authMiddleware = async (
     const token = authHeader.split(" ")[1];
     if (!token) return res.status(401).json({ message: "Token missing" });
 
-    console.log("token: ", token)
-
     const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
     req.user = decoded;
 

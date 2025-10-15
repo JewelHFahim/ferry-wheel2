@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import Bet from "./bet.model";
 import Round from "../round/round.model";
 
-
 // ==========================
 // @desc    Betting History Winners
 // @route   GET /api/v1/bettings/bet-history
@@ -68,7 +67,6 @@ export const handleGetBettingHistory = async (req: Request, res: Response) => {
     }
 };
 
-
 // ==========================
 // @desc    Betting History Winners
 // @route   GET /api/v1/bettings/current-history
@@ -89,22 +87,24 @@ export const handleGetBettingHistoryTenData = async (req: Request, res: Response
     }
 };
 
-
 // ==========================
 // @desc    Top Winners
 // @route   GET /api/v1/bettings/top-winners/:roundId
 // ==========================
 export const handleGetTopWinners = async (req:Request, res: Response) => {
     try {
-        const roundId = req.params.id;
+        const roundId = req.params.roundId;
+        console.log("roundId: ", roundId);
+
         if(!roundId){
              return res.status(400).json({ status: false, message: "roundId not valid" })
         }
 
         const topWinners =  await Round.findById(roundId);
-        const count = topWinners?.topWinners.length;
+        console.log("topWinners: ", topWinners)
+        const count = topWinners?.topWinners.length || 0;
 
-        if(count === 0){
+        if(count <= 0){
             return res.status(200).json({ status: true, message: "Top winners empty", topWinners: [] })
         }
 
