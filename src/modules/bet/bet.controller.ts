@@ -94,14 +94,12 @@ export const handleGetBettingHistoryTenData = async (req: Request, res: Response
 export const handleGetTopWinners = async (req:Request, res: Response) => {
     try {
         const roundId = req.params.roundId;
-        console.log("roundId: ", roundId);
 
         if(!roundId){
              return res.status(400).json({ status: false, message: "roundId not valid" })
         }
 
         const topWinners =  await Round.findById(roundId);
-        console.log("topWinners: ", topWinners)
         const count = topWinners?.topWinners.length || 0;
 
         if(count <= 0){
