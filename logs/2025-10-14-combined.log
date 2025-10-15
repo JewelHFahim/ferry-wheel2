@@ -1368,3 +1368,117 @@
 [2025-10-14T11:22:16.674Z] [33mwarn[39m: Warning: Minimum bet amount: 50, Max bet amount: 10000
 [2025-10-14T11:22:17.399Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 50000 on Sausage for round #68ee3250783f85be19641378
 [2025-10-14T11:22:17.400Z] [33mwarn[39m: Warning: Minimum bet amount: 50, Max bet amount: 10000
+[2025-10-14T11:28:39.610Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Meat for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:39.612Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:40.055Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Tomato for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:40.056Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:40.493Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Corn for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:40.494Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:40.882Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Sausage for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:40.882Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:41.558Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Lettuce for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:41.559Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:42.243Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Carrot for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:42.244Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:42.609Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Skewer for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:42.610Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:43.061Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Ham for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:43.062Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:44.069Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Pizza for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:44.070Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:28:44.528Z] [32minfo[39m: User 68e211688b00d1a21b178838 placed a bet of 500 on Salad for round #68ee33e417e24ae742f7e037
+[2025-10-14T11:28:44.529Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 500
+[2025-10-14T11:30:09.400Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Meat for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:10.368Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Tomato for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:10.887Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Corn for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:11.479Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Sausage for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:11.925Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Lettuce for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:12.595Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Carrot for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:12.974Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Skewer for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:13.447Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Ham for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:13.920Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Pizza for round #68ee344017e24ae742f7e166
+[2025-10-14T11:30:14.598Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Salad for round #68ee344017e24ae742f7e166
+[2025-10-14T11:31:27.681Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Ham for round #68ee346d17e24ae742f7e265
+[2025-10-14T11:31:27.682Z] [33mwarn[39m: Warning: BETTING_CLOSED, Betting is closed for this round.
+[2025-10-14T11:31:28.839Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Meat for round #68ee346d17e24ae742f7e265
+[2025-10-14T11:31:28.840Z] [33mwarn[39m: Warning: BETTING_CLOSED, Betting is closed for this round.
+[2025-10-14T11:31:29.652Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Tomato for round #68ee346d17e24ae742f7e265
+[2025-10-14T11:31:29.653Z] [33mwarn[39m: Warning: BETTING_CLOSED, Betting is closed for this round.
+[2025-10-14T11:31:41.719Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Corn for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:41.720Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:42.541Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Tomato for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:42.542Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:43.463Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Meat for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:43.464Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:44.472Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Ham for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:44.473Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:45.718Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Skewer for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:45.719Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:46.318Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Carrot for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:46.319Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:46.796Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Lettuce for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:46.797Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:47.507Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Sausage for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:47.508Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:31:53.347Z] [32minfo[39m: User 68ec8e43bec3a9b4c67379aa placed a bet of 2000 on Corn for round #68ee349b17e24ae742f7e335
+[2025-10-14T11:31:53.348Z] [33mwarn[39m: Warning: Insufficient balance, current balance: undefined, bet amount: 2000
+[2025-10-14T11:34:03.163Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:04.676Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:05.207Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Tomato for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:05.846Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Meat for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:06.394Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Ham for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:06.952Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Skewer for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:07.414Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Carrot for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:07.890Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Lettuce for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:09.893Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee352417e24ae742f7e541
+[2025-10-14T11:34:10.617Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee352417e24ae742f7e541
+[2025-10-14T11:37:09.520Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Tomato for round #68ee35db17e24ae742f7e800
+[2025-10-14T11:37:11.138Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Tomato for round #68ee35db17e24ae742f7e800
+[2025-10-14T11:37:13.267Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee35db17e24ae742f7e800
+[2025-10-14T11:37:14.239Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee35db17e24ae742f7e800
+[2025-10-14T11:37:14.943Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee35db17e24ae742f7e800
+[2025-10-14T11:37:28.977Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Skewer for round #68ee35db17e24ae742f7e800
+[2025-10-14T11:37:30.190Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Ham for round #68ee35db17e24ae742f7e800
+[2025-10-14T11:37:30.191Z] [33mwarn[39m: Warning: BETTING_CLOSED, Betting is closed for this round.
+[2025-10-14T11:37:45.824Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:49.805Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:50.426Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Lettuce for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:51.251Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Carrot for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:52.376Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Skewer for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:53.429Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Ham for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:54.236Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Meat for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:55.054Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Tomato for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:37:56.110Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:01.913Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:04.969Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Tomato for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:06.666Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:07.382Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:08.670Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Lettuce for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:10.334Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Skewer for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:11.493Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Ham for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:13.912Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Meat for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:20.721Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Ham for round #68ee360917e24ae742f7e8ee
+[2025-10-14T11:38:20.723Z] [33mwarn[39m: Warning: BETTING_CLOSED, Betting is closed for this round.
+[2025-10-14T11:38:33.184Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Meat for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:34.587Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Tomato for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:40.988Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:43.163Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:44.454Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Lettuce for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:46.019Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Carrot for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:47.247Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Skewer for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:47.864Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Ham for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:48.907Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Meat for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:49.434Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Tomato for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:50.562Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:51.780Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:52.978Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Lettuce for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:55.062Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Carrot for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:55.668Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Skewer for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:56.365Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Ham for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:56.991Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Meat for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:57.752Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Tomato for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:58.433Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Corn for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:38:59.267Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 2000 on Sausage for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:39:06.309Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 1000 on Skewer for round #68ee363617e24ae742f7eaa7
+[2025-10-14T11:39:06.310Z] [33mwarn[39m: Warning: BETTING_CLOSED, Betting is closed for this round.
+[2025-10-14T11:40:03.254Z] [32minfo[39m: User 68ee31b0783f85be19641143 placed a bet of 500 on Meat for round #68ee369217e24ae742f7ed22

@@ -1,13 +1,15 @@
 import mongoose, { Schema, Types, HydratedDocument, Model } from "mongoose";
+import { ROUND_STATUS } from "./round.types";
 
 /** Status enum (reusable in services) */
-export const ROUND_STATUS = {
-  OPEN: "open",
-  BETTING: "betting",
-  CLOSED: "closed",
-  REVEAL: "reveal",
-  COMPLETED: "completed",
-} as const;
+// export const ROUND_STATUS = {
+//   OPEN: "open",
+//   BETTING: "betting",
+//   CLOSED: "closed",
+//   REVEAL: "reveal",
+//   PREPARE: "prepare",
+//   COMPLETED: "completed",
+// } as const;
 
 export type RoundStatus = (typeof ROUND_STATUS)[keyof typeof ROUND_STATUS];
 

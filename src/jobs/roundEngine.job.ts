@@ -2,7 +2,7 @@ import { Namespace } from "socket.io";
 import { SettingsService } from "../modules/settings/settings.service";
 import { MetService } from "../modules/met/met.service";
 import { UserService } from "../modules/user/user.service";
-import Round, { ROUND_STATUS } from "../modules/round/round.model";
+import Round from "../modules/round/round.model";
 import { getBetsByRound } from "./../modules/bet/bet.service";
 import { Types } from "mongoose";
 import { env } from "../config/env";
@@ -14,13 +14,13 @@ import {
 import { IBet } from "../modules/bet/bet.model";
 import { phaseStatus } from "../utils/statics/statics";
 import { EMIT } from "../utils/statics/emitEvents";
+import { ROUND_STATUS } from "../modules/round/round.types";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Start the round and betting
 export const startNewRound = async (nsp: Namespace): Promise<void> => {
   try {
-
     // const settings = await SettingsService.getSettings();
     const [settings, roundNumber, boxes] = await Promise.all([
       SettingsService.getSettings(),
@@ -71,12 +71,10 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
 
     await MetService.setCurrentRound(round._id.toString());
 
-    // Emit the round started event
     // ==========================
-    // @desc    Register a new user
-    // @route   POST /api/v1/users/register
+    // Emit Round Start
     // ==========================
-    nsp.emit("roundStarted", {
+    nsp.emit(EMIT.ROUND_STARTED, {
       _id: round._id,
       roundNumber,
       startTime,
@@ -85,8 +83,15 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       roundStatus: ROUND_STATUS.BETTING,
     });
 
-    // Betting Phase
-    nsp.emit("phaseUpdate", { phase: ROUND_STATUS.BETTING, phaseStartTime: now, phaseEndTime: now + bettingDuration });
+    // TODO: Have to delete
+    // ==========================
+    // Emit Betting Phase
+    // ==========================
+    nsp.emit(EMIT.PHASE_UPDATED, { 
+      phase: ROUND_STATUS.BETTING, 
+      phaseStartTime: now, 
+      phaseEndTime: now + bettingDuration
+     });
     await sleep(bettingDuration);
 
     // End the round and prepare for the next phase
