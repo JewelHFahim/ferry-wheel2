@@ -1,3 +1,4 @@
+// Round Boxes
 export const boxDatas = [
   { title: "Meat", icon: "🥩", group: "Pizza", multiplier: 45 },
   { title: "Tomato", icon: "🍅", group: "Salad", multiplier: 5 },
@@ -11,6 +12,7 @@ export const boxDatas = [
   { title: "Salad", icon: "🥗", multiplier: 1.25 },
 ];
 
+// Game Custom Codes
 export enum gameCodes {
   AUTH_REQUIRED = "AUTH_REQUIRED",
   BETTING_CLOSED = "BETTING_CLOSED",
@@ -25,6 +27,7 @@ export enum gameCodes {
   NOT_FOUND = "NOT_FOUND",
 }
 
+//Cors Origins
 export const origins = [
   "http://192.168.1.100:3000",
   "http://192.168.68.121:3000",
@@ -37,12 +40,14 @@ export const origins = [
   "https://ferry-wheel-game.vercel.app"
 ];
 
+// Roles
 export enum Roles {
   BOT = "bot",
   USER = "user",
   ADMIN = "admin",
 }
 
+// Phase Status
 export enum phaseStatus {
   "BETTING" = "betting",
   "REVEAL" = "reveal",

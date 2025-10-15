@@ -271,8 +271,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     round.winningBox = winnerBox;
     round.distributedAmount = totalPayout;
 
-    console.log("round.topWinners: ", round.topWinners)
-
     await round.save();
 
     // Add company cut and any leftover distributable
