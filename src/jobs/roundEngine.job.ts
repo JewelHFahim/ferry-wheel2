@@ -157,7 +157,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
           .filter(b => round.boxStats.find(bs => bs.box === b.box)?.group === box.group)
           .reduce((sum, b) => sum + b.amount, 0);
         requiredPayout = groupBets * (Number(box.multiplier) || 1);
-        console.log("groupBets: ", groupBets)
+        console.log("groupBets: ", groupBets);
       }
 
       if (requiredPayout <= availableFunds) eligibleBoxes.push(box);
