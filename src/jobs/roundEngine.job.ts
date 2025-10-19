@@ -51,11 +51,6 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       endTime: endPrepareTime,
       revealTime: endRevealTime,
       prepareTime: endPrepareTime,
-      phaseEndTimes: {
-        betting: endBettingTime,
-        reveal: endRevealTime,
-        prepare: endPrepareTime,
-      },
       boxes,
       totalPool: 0,
       companyCut: 0,
@@ -82,19 +77,14 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       roundNumber,
       startTime,
       endTime,
+      boxes,
+      winningBox: null,
+      topWinners: [],
       revealTime: round.revealTime,
       prepareTime: round.prepareTime,
-      boxes,
       roundStatus: ROUND_STATUS.BETTING,
     });
 
-    // ==========================
-    // Emit the Betting Phase
-    // ==========================
-    nsp.emit(EMIT.PHASE_UPDATED, { 
-      phase: ROUND_STATUS.BETTING, 
-      phaseStartTime: now, 
-      phaseEndTime: now + bettingDuration });
     await sleep(bettingDuration);
 
     // End the round and prepare for the next phase
@@ -254,7 +244,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         amountWon: p.amount
        });
 
-       
     // ==========================
     // @status: Private @descri: Emit the Balance update 
     // ==========================
@@ -270,7 +259,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     round.topWinners = topWinners.sort((a, b) => b.amountWon - a.amountWon).slice(0, 3);
     round.winningBox = winnerBox;
     round.distributedAmount = totalPayout;
-
     await round.save();
 
     // Add company cut and any leftover distributable
@@ -285,7 +273,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       _id: round._id,
       roundNumber: round.roundNumber,
       boxStats: round.boxStats,
-      roundStatus: ROUND_STATUS.REVEALING,
+      roundStatus: ROUND_STATUS.REVEALED,
     });
 
     // ==========================
@@ -300,15 +288,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: ROUND_STATUS.REVEALED
     });
 
-    //TODO: Have to delete
-    // Reveal Phase
-    nsp.emit(EMIT.PHASE_UPDATED, {
-      phase: phaseStatus.REVEAL,
-      phaseStartTime: now,
-      phaseEndTime: round.phaseEndTime.getTime(),
-    });
-
-    await sleep(revealDuration);
+    await sleep(5000);
 
     // ==========================
     // @status: Public @descri: Emit the Round End 
@@ -321,14 +301,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       distributedAmount: round.distributedAmount,
       reserveWallet: companyWallet.reserveWallet,
       roundStatus: ROUND_STATUS.COMPLETED
-    });
-
-    //TODO: Have to delete
-    // Emit prepare for next
-    nsp.emit(EMIT.PHASE_UPDATED, {
-      phase: phaseStatus.PREPARE,
-      phaseStartTime: Date.now(),
-      phaseEndTime: Date.now() + prepareDuration,
     });
 
     // ==========================

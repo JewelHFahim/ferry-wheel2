@@ -3,7 +3,12 @@ import { Server } from "socket.io";
 import { EMIT } from "../utils/statics/emitEvents";
 import { origins } from "../utils/statics/statics";
 import { socketAuthMiddleware } from "../middlewares/socket.auth.middleware";
-import { handleGetBalance, handleGetCompanyWallet, handleJoinRoom, handlePlaceBet } from "./socket.service";
+import {
+  handleGetBalance,
+  handleGetCompanyWallet,
+  handleJoinRoom,
+  handlePlaceBet,
+} from "./socket.service";
 
 // Function to handle user disconnect
 export const handleDisconnect = (socket: any) => {
@@ -18,7 +23,6 @@ export const handleDisconnect = (socket: any) => {
 
 // Main function to initialize the socket
 export const initSocket = (server: http.Server) => {
-  
   const io = new Server(server, {
     cors: { origin: origins, methods: ["GET", "POST"], credentials: false },
   });
@@ -31,7 +35,7 @@ export const initSocket = (server: http.Server) => {
 
   // Socket connections and events
   game.on("connection", (socket) => {
-    console.log("🔌 [game]", socket.id, socket.data?.user  || "(guest)");
+    console.log("🔌 [game]", socket.id, socket.data?.user || "(guest)");
 
     //ping server
     socket.on(EMIT.PING_SERVER, (_data, callback) => {

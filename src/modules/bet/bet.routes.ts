@@ -4,8 +4,8 @@ import { authMiddleware } from "../../middlewares/auth.middleware";
 
 //Betting routes
 const router = express.Router();
-router.use("/bet-history", authMiddleware, handleGetBettingHistory);
-router.use("/top-winners/:roundId", authMiddleware, handleGetTopWinners);
-router.use("/current-history", authMiddleware, handleGetBettingHistoryTenData);
+router.use("/bet-history", handleGetBettingHistory);
+router.use("/top-winners/:roundId", handleGetTopWinners);
+router.use("/current-history", handleGetBettingHistoryTenData);
 
 export default router;
