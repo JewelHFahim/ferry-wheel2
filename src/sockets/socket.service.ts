@@ -160,7 +160,7 @@ export const handlePlaceBet = (socket: any, nsp: Namespace) => {
       const totalUserBet = userBets.reduce((sum, b) => sum + b.amount, 0);
 
       // User round total bet
-      socket.emit("user_bet_total", { roundId, totalUserBet });
+      socket.emit(EMIT.USER_BET_TOTAL, { roundId, totalUserBet });
 
       reply({ success: true, bet });
     } catch (e: any) {

@@ -51,8 +51,8 @@ export interface IRound {
   bets: Types.ObjectId[];
   boxStats: IBoxStat[];
   topWinners: { userId: Types.ObjectId; amountWon: number }[];
-  phase: string;
-  phaseEndTime: Date
+  // phase: string;
+  // phaseEndTime: Date
   createdAt: Date;
   updatedAt: Date;
 }
@@ -121,8 +121,8 @@ const roundSchema = new Schema<IRound>(
       default: [],
     },
 
-    phase: { type: String },
-    phaseEndTime: { type: Date }
+    // phase: { type: String },
+    // phaseEndTime: { type: Date }
   },
   { timestamps: true }
 );

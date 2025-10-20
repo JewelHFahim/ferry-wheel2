@@ -30,6 +30,7 @@ export enum gameCodes {
 //Cors Origins
 export const origins = [
   "http://192.168.1.100:3000",
+  "http://192.168.68.131:3000",
   "http://192.168.68.121:3000",
   "http://192.168.1.122:3000",
   "http://192.168.68.125:5174",

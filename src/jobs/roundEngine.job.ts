@@ -12,7 +12,6 @@ import {
   logTransaction,
 } from "../modules/company/company.service";
 import { IBet } from "../modules/bet/bet.model";
-import { phaseStatus } from "../utils/statics/statics";
 import { EMIT } from "../utils/statics/emitEvents";
 import { ROUND_STATUS } from "../modules/round/round.types";
 
@@ -64,13 +63,14 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
         totalAmount: 0,
         bettorsCount: 0,
       })),
+      bets: [],
       roundStatus: ROUND_STATUS.BETTING,
     });
 
     await MetService.setCurrentRound(round._id.toString());
 
     // ==========================
-    // Emit the round started event
+    // @status: Public, @Desc: Emit the round started event
     // ==========================
     nsp.emit(EMIT.ROUND_STARTED, {
       _id: round._id,
@@ -79,6 +79,7 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       endTime,
       boxes,
       winningBox: null,
+      bets: [],
       topWinners: [],
       revealTime: round.revealTime,
       prepareTime: round.prepareTime,
@@ -115,11 +116,10 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
 
     // Close round for betting
     round.roundStatus = ROUND_STATUS.REVEALING;
-    round.phaseEndTime = new Date(Date.now() + revealDuration);
     await round.save();
 
     // ==========================
-    // Emit the Close Round
+    // @Status: Public, @Desc: Emit the Close Round
     // ==========================
     nsp.emit(EMIT.ROUND_CLOSED, { 
       _id: round._id, 
@@ -132,7 +132,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     const totalPool = bets.reduce((sum, b) => sum + b.amount, 0);
     round.totalPool = totalPool;
     
-    
+
     // Company cut (10% of total pool)
     const companyCut = Math.floor(totalPool * (settings.commissionRate ?? 0.1));
     round.companyCut = companyCut;
@@ -230,7 +230,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       const updated = await UserService.updateBalance(p.userId, p.amount);
       
     // ==========================
-    // @status: Private @descri: Emit the Payouts
+    // @status: Private, @descri: Emit the Payouts
     // ==========================
       nsp.to(`user:${p.userId}`).emit(EMIT.PAYOUT, {
         roundId: round._id,
@@ -245,7 +245,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
        });
 
     // ==========================
-    // @status: Private @descri: Emit the Balance update 
+    // @status: Private, @descr: Emit the Balance update 
     // ==========================
       nsp.to(`user:${p.userId}`).emit(EMIT.BALANCE_UPDATE, {
         balance: updated.balance,
@@ -266,8 +266,10 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     await addRoundFunds(companyCut, remainingDistributable);
     await logTransaction("companyCut", companyCut, "Company cut from pool");
 
+    await sleep(5000);
+
     // ==========================
-    // @status: Public @descri: Emit Final Round Result 
+    // @status: Public, @descri: Emit Final Round Result 
     // ==========================
     nsp.emit(EMIT.ROUND_UPDATED, {
       _id: round._id,
@@ -277,7 +279,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     });
 
     // ==========================
-    // @status: Public @descri: Emit Winner Reveal 
+    // @status: Public, @descri: Emit Winner Reveal 
     // ==========================
     nsp.emit(EMIT.WINNER_REVEALED, {
       _id: round._id,
@@ -288,10 +290,10 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: ROUND_STATUS.REVEALED
     });
 
-    await sleep(5000);
+    await sleep(7000);
 
     // ==========================
-    // @status: Public @descri: Emit the Round End 
+    // @status: Public, @desc: Emit the Round End 
     // ==========================
     nsp.emit(EMIT.ROUND_ENDED, {
       _id: round._id,
@@ -304,11 +306,18 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     });
 
     // ==========================
-    // @status: Public @descri: Emit the Reset Round 
+    // @status: Public, @desc: Emit the Reset Round 
     // ==========================
-    nsp.emit(EMIT.ROUND_RESET, {});
-
-    // await sleep(prepareDuration);
+    nsp.emit(EMIT.ROUND_RESET, {
+      _id: "",
+      roundNumber: 0,
+      totalPool: 0,
+      companyCut: 0,
+      distributedAmount: 0,
+      reserveWallet: 0,
+      roundStatus: ROUND_STATUS.PREPARE
+    });
+    nsp.emit(EMIT.USER_BET_TOTAL, { roundId: "", totalUserBet: 0 });
 
     // Start next round
     setTimeout(() => startNewRound(nsp), prepareDuration);
