@@ -3,6 +3,7 @@ import Bet from "./bet.model";
 import Round from "../round/round.model";
 import mongoose from "mongoose";
 import { UserModel } from "../user/user.model";
+import { match } from "assert";
 
 // ==========================
 // @desc    Betting History Winners
@@ -382,6 +383,7 @@ export const handleGetUserLast10Data = async (req: Request, res: Response) => {
       history,
       config: { groupMultiplierMode }, // echo back config to help UI
     });
+
   } catch (error) {
     console.error("handleGetUserBetHistory error:", error);
     return res.status(500).json({
@@ -391,3 +393,76 @@ export const handleGetUserLast10Data = async (req: Request, res: Response) => {
     });
   }
 };
+
+// 6. Personal 10 Bets Records- Time-bet, Bet Amount-bet, Winebox-round, Win/Lose Amount-round, Result +-
+
+// export const handleGetUserLAst10Datas = async (req: Request, res: Response) => {
+
+//   try {
+//     const {userId} = req.params;
+//     if(!userId || !mongoose.isValidObjectId(userId)){
+//       return res.status(400).json({status: false, message: "Invalid userId"})
+//     }
+
+//     const history = await Bet.aggregate([
+//       { $match: {userId: new mongoose.Types.ObjectId(userId) } },
+
+//       { $sort: { createdAt: -1 } },
+
+//       {
+//         $group: {
+//           _id: { roundId: "$roundId", box: "$box" },
+//           totalAmount: { $sum : "$amount" },
+//           lastBetAt: { $first: "$createdAt" }
+//         }
+//       },
+
+//       { $sort: { lastBetAt: -1 } },
+//       { $limit: 3 },
+
+//       {
+//         $lookup: {
+//           from: Round.collection.name,
+//           foreignField: "_id.roundId",
+//           localField: "_id",
+//           as: "round"
+//         }
+//       },
+//       { $unwind: { path: "$round", preserveNullAndEmptyArrays: true} },
+
+//       {
+//         $addFields: {
+//           myBet: {
+//             $let:{
+//               vars: {
+//                 matched:{
+//                   $filters:{
+//                     input: "$round.boxStats",
+//                     as: "bs",
+//                     cond: { $eq: ["$$bs.box", "$_id.box"] },
+//                   }
+//                 }
+//                 }
+//               },
+//               in: { $arrayElemAt: ["$$matched", 0] },
+//             }
+//           }
+//         }
+      
+
+
+//     ]);
+
+
+//     console.log("history: ", history)
+
+
+
+//     return res.status(200).json({ status: true, message: "Success" })
+    
+//   } catch (error) {
+//     console.log("handleGetUserLAst10Datas error: ", error);
+//     return res.status(500).json({ status: false, message: "Server error, try again later", error: error instanceof Error ? error.message : error })
+//   }
+
+// } 
