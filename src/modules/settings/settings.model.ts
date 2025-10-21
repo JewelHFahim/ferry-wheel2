@@ -1,10 +1,19 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { boxDatas } from "../../utils/statics/statics";
+import { IRoundBox } from "../round/round.model";
 
-export interface IRoundBox {
+// export interface IRoundBox {
+//   title: string;
+//   icon: string;
+//   group: string,
+//   multiplier: number;
+// }
+
+export interface IBoxConfig {
   title: string;
   icon: string;
   multiplier: number;
+  group?: string | null; // e.g. "Pizza" | "Salad" | undefined
 }
 
 export interface ISettings extends Document {
@@ -17,7 +26,8 @@ export interface ISettings extends Document {
   prepareDuration: number;
   revealDuration: number;
   commissionRate: number;
-  boxes: IRoundBox[];
+  // boxes: IRoundBox[];
+  boxes: IBoxConfig[]; 
   chips: number[];
   maintenanceMode: boolean;
   supportedLanguages: ["en", "bn"];
@@ -25,6 +35,16 @@ export interface ISettings extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+const BoxConfigSchema = new Schema<IBoxConfig>(
+  {
+    title: { type: String, required: true },
+    icon: { type: String, required: true },
+    multiplier: { type: Number, required: true },
+    group: { type: String, default: null }, // optional
+  },
+  { _id: false }
+);
 
 const SettingsSchema = new Schema<ISettings>(
   {
@@ -37,16 +57,7 @@ const SettingsSchema = new Schema<ISettings>(
     prepareDuration: { type: Number, default: 5, min: 3},
     revealDuration: { type: Number, default: 5, min: 3},
     commissionRate: { type: Number, default: 0.1, min: 0, max: 1 },
-    boxes: {
-      type: [
-        {
-          title: { type: String, required: true },
-          icon: { type: String, required: true },
-          multiplier: { type: Number, required: true },
-        },
-      ],
-      default: boxDatas,
-    },
+    boxes: { type: [BoxConfigSchema], default: boxDatas, },
     chips: { type: [Number], default: [500, 1000, 2000, 5000, 10000] },
     maintenanceMode: { type: Boolean, default: false },
     supportedLanguages: { type: [String] },

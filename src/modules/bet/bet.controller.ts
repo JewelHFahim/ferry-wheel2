@@ -1,9 +1,8 @@
+import { UserModel } from "../user/user.model";
 import { Request, Response } from "express";
-import Bet from "./bet.model";
 import Round from "../round/round.model";
 import mongoose from "mongoose";
-import { UserModel } from "../user/user.model";
-import { match } from "assert";
+import Bet from "./bet.model";
 
 // ==========================
 // @desc    Betting History Winners
@@ -70,8 +69,6 @@ export const handleGetBettingHistory = async (req: Request, res: Response) => {
     }
 };
 
-
-
 // ==========================
 // @desc    Betting History Last 10 Data
 // @route   GET /api/v1/bettings/current-history
@@ -105,8 +102,6 @@ export const handleGetBettingHistoryTenData = async (req: Request, res: Response
     });
   }
 };
-
-
 
 // ==========================
 // @desc    Round Top Three Winners
@@ -177,6 +172,7 @@ export const handleGetTopWinners = async (req: Request, res: Response) => {
       status: true,
       message: "Top winners retrieved",
       _id: round._id,
+      userId: req.user?.userId,
       roundNumber: round.roundNumber,
       count: merged.length,
       topWinners: merged,
@@ -192,277 +188,351 @@ export const handleGetTopWinners = async (req: Request, res: Response) => {
   }
 };
 
-
-
 // ==========================
 // @desc    30 Days Round Top 10 Winners
-// @route   GET /api/v1/bettings/top-winners/:roundId
+// @route   GET /api/v1/bettings/user-bet-history
 // ==========================
-
-/**
- * GET /api/v1/bets/history/:userId?groupMultiplier=special|own
- * - Last 10 entries for a user
- * - Grouped by (roundId, box), summing amounts
- * - Includes outcome and win/lose amounts
- * - Handles Pizza/Salad group-win logic
- */
-export const handleGetUserLast10Data = async (req: Request, res: Response) => {
+export const handleGetUserLast10Records = async (req: Request, res: Response) => {
+  
   try {
-    const { userId } = req.params;
-    const groupMultiplierMode = String(req.query.groupMultiplier || "own"); // "special" | "own"
+    const userId = req.user?.userId;
 
     if (!userId || !mongoose.isValidObjectId(userId)) {
       return res.status(400).json({ status: false, message: "Invalid userId" });
     }
 
-    // Toggle for multiplier rule on Pizza/Salad group wins
-    const useSpecialMultiplier = groupMultiplierMode === "special";
+    const uid = new mongoose.Types.ObjectId(userId);
 
-    const history = await Bet.aggregate([
-      // 1) Only this user
-      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+    const records = await Bet.aggregate([
+      // 1) Match by ObjectId
+      { $match: { userId: uid } },
 
-      // 2) Sort newest first so $first gives us the latest time for this (round, box)
-      { $sort: { createdAt: -1 } },
-
-      // 3) Group by (roundId, box): sum amounts, keep last bet timestamp
-      {
-        $group: {
-          _id: { roundId: "$roundId", box: "$box" },
-          totalAmount: { $sum: "$amount" },
-          lastBetAt: { $first: "$createdAt" },
-        },
-      },
-
-      // 4) Sort groups by most recent activity and take 10
-      { $sort: { lastBetAt: -1 } },
-      { $limit: 10 },
-
-      // 5) Join round to know winnerBox + boxStats (with multipliers/groups)
+      // 2) Join Round (to get winningBox, roundNumber, boxStats, createdAt)
       {
         $lookup: {
-          from: Round.collection.name,
-          localField: "_id.roundId",
+          from: "rounds",               // default collection name for Round model
+          localField: "roundId",
           foreignField: "_id",
           as: "round",
         },
       },
-      { $unwind: { path: "$round", preserveNullAndEmptyArrays: true } },
+      { $unwind: "$round" },
 
-      // 6) Compute outcome & amounts using round data
+      // 3) Normalize for robust comparisons (case/whitespace)
       {
         $addFields: {
-          // my bet box data from round.boxStats
-          myBox: {
-            $let: {
-              vars: {
-                matched: {
-                  $filter: {
-                    input: "$round.boxStats",
-                    as: "bs",
-                    cond: { $eq: ["$$bs.box", "$_id.box"] },
-                  },
-                },
-              },
-              in: { $arrayElemAt: ["$$matched", 0] },
-            },
-          },
-          // winning box data
-          winBox: {
-            $let: {
-              vars: {
-                matched: {
-                  $filter: {
-                    input: "$round.boxStats",
-                    as: "bs",
-                    cond: { $eq: ["$$bs.box", "$round.winningBox"] },
-                  },
-                },
-              },
-              in: { $arrayElemAt: ["$$matched", 0] },
+          _boxNorm: { $toLower: { $trim: { input: "$box" } } },
+          _winBoxNorm: { $toLower: { $trim: { input: "$round.winningBox" } } },
+        },
+      },
+
+      // 4) Find THIS bet’s box in round.boxStats to fetch its multiplier
+      {
+        $addFields: {
+          boxStatsMatch: {
+            $filter: {
+              input: "$round.boxStats",
+              as: "bs",
+              cond: { $eq: [{ $toLower: "$$bs.box" }, "$_boxNorm"] },
             },
           },
         },
       },
-
       {
         $addFields: {
-          // Derived fields
-          myGroup: { $ifNull: ["$myBox.group", null] },
-          myMult: { $ifNull: ["$myBox.multiplier", 1] },
-
-          winBoxGroup: { $ifNull: ["$winBox.group", null] },
-          winBoxMult: { $ifNull: ["$winBox.multiplier", 1] },
-
-          // direct win if my exact box equals winnerBox
-          isDirectWin: { $eq: ["$_id.box", "$round.winningBox"] },
-
-          // group win if winner is a special group and my group equals that group
-          isGroupWin: {
-            $and: [
-              { $in: ["$winBoxGroup", ["Pizza", "Salad"]] },
-              { $eq: ["$myGroup", "$winBoxGroup"] },
-            ],
+          // use array operator to grab first item; then fallback to 1
+          multiplier: {
+            $ifNull: [{ $arrayElemAt: ["$boxStatsMatch.multiplier", 0] }, 1],
           },
+        },
+      },
 
-          // which multiplier to use when it's a win?
-          multiplierUsed: {
-            $cond: [
-              { $or: ["$isDirectWin", "$isGroupWin"] },
-              {
-                $cond: [
-                  // if group win and you chose "special", use winning box multiplier
-                  { $and: ["$isGroupWin", { $eq: [useSpecialMultiplier, true] }] },
-                  "$winBoxMult",
-                  // otherwise use your own box multiplier
-                  "$myMult",
-                ],
-              },
-              0,
-            ],
-          },
+      // 5) Tag each bet row as winner / loser (own-box mode)
+      {
+        $addFields: {
+          isWinner: { $eq: ["$_boxNorm", "$_winBoxNorm"] },
+        },
+      },
 
-          isWin: { $or: ["$isDirectWin", "$isGroupWin"] },
+      // 6) Group to one line per (roundId, normalized box)
+      {
+        $group: {
+          _id: { roundId: "$roundId", box: "$_boxNorm" },
+          roundId: { $first: "$roundId" },
+          boxNorm: { $first: "$_boxNorm" },
+          box: { $first: "$box" }, // keep original label for display
 
-          // amounts
+          // sums
+          totalAmount: { $sum: "$amount" },
+          betCount: { $sum: 1 },
+
+          // latest timestamps
+          lastBetAt: { $max: "$createdAt" },
+
+          // preserve win if any bet in this (round, box) won
+          isWinner: { $max: "$isWinner" },
+
+          // multiplier for this box (same across group)
+          multiplier: { $max: "$multiplier" },
+
+          // pass-through round info
+          roundNumber: { $first: "$round.roundNumber" },
+          roundCreatedAt: { $first: "$round.createdAt" },
+          winningBox: { $first: "$round.winningBox" },
+        },
+      },
+
+      // 7) Compute win/lose amounts
+      {
+        $addFields: {
           winAmount: {
-            $cond: [
-              { $or: ["$isDirectWin", "$isGroupWin"] },
-              { $multiply: ["$totalAmount", "$multiplierUsed"] },
-              0,
-            ],
+            $cond: [{ $eq: ["$isWinner", true] }, { $multiply: ["$totalAmount", "$multiplier"] }, 0],
           },
           loseAmount: {
-            $cond: [{ $or: ["$isDirectWin", "$isGroupWin"] }, 0, "$totalAmount"],
+            $cond: [{ $eq: ["$isWinner", true] }, 0, "$totalAmount"],
           },
-
-          // reason string for clarity
-          reason: {
-            $cond: [
-              "$isDirectWin",
-              "direct",
-              {
-                $cond: [
-                  "$isGroupWin",
-                  { $concat: ["group:", { $ifNull: ["$winBoxGroup", ""] }] },
-                  "lose",
-                ],
-              },
-            ],
-          },
+          multiplierUsed: "$multiplier",
+          outcome: { $cond: [{ $eq: ["$isWinner", true] }, "win", "lose"] },
+          reason: { $cond: [{ $eq: ["$isWinner", true] }, "win", "lose"] },
         },
       },
 
-      // 7) Final shape
+      // 8) Sort and limit
+      { $sort: { roundCreatedAt: -1, lastBetAt: -1 } },
+      { $limit: 10 },
+
+      // 9) Final shape
       {
         $project: {
           _id: 0,
-          roundId: "$_id.roundId",
-          box: "$_id.box",
-          totalAmount: 1,
-          lastBetAt: 1,
-          roundNumber: "$round.roundNumber",
-          roundCreatedAt: "$round.createdAt",
-          winningBox: "$round.winningBox",
+          roundId: 1,
+          box: 1,
+          roundNumber: 1,
+          roundCreatedAt: 1,
+          winningBox: 1,
 
-          outcome: {
-            $cond: ["$isWin", "win", "lose"],
-          },
+          totalAmount: 1,
+          betCount: 1,
+          lastBetAt: 1,
+
           multiplierUsed: 1,
           winAmount: 1,
           loseAmount: 1,
+          outcome: 1,
           reason: 1,
         },
       },
     ]);
 
-    return res.status(200).json({
+    return res.json({
       status: true,
       message: "User bet history retrieved",
-      count: history.length,
-      history,
-      config: { groupMultiplierMode }, // echo back config to help UI
+      count: records.length,
+      records,
+      config: { groupMultiplierMode: "own" },
     });
-
-  } catch (error) {
-    console.error("handleGetUserBetHistory error:", error);
-    return res.status(500).json({
-      status: false,
-      message: "Server error, try again later",
-      error: error instanceof Error ? error.message : String(error),
-    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ status: false, message: "Server error" });
   }
 };
 
-// 6. Personal 10 Bets Records- Time-bet, Bet Amount-bet, Winebox-round, Win/Lose Amount-round, Result +-
 
-// export const handleGetUserLAst10Datas = async (req: Request, res: Response) => {
+// ==========================
+// @desc    Monthly Leaderboard
+// @route   GET /api/v1/bettings/leaderboard
+// ==========================
 
-//   try {
-//     const {userId} = req.params;
-//     if(!userId || !mongoose.isValidObjectId(userId)){
-//       return res.status(400).json({status: false, message: "Invalid userId"})
-//     }
+/**
+ * Defaults: current month (from 1st 00:00 to now).
+ * Optional query: ?year=2025&month=10  (1..12)
+ */
 
-//     const history = await Bet.aggregate([
-//       { $match: {userId: new mongoose.Types.ObjectId(userId) } },
+export const handleGetMonthlyTopWinners = async (req: Request, res: Response) => {
 
-//       { $sort: { createdAt: -1 } },
+  try {
+    // ---- Resolve month window ----
+    const now = new Date();
+    const qYear = Number(req.query.year);
+    const qMonth = Number(req.query.month); // 1..12
 
-//       {
-//         $group: {
-//           _id: { roundId: "$roundId", box: "$box" },
-//           totalAmount: { $sum : "$amount" },
-//           lastBetAt: { $first: "$createdAt" }
-//         }
-//       },
+    const year = Number.isInteger(qYear) ? qYear : now.getUTCFullYear();
+    const monthIndex = Number.isInteger(qMonth) ? qMonth - 1 : now.getUTCMonth(); // 0..11
 
-//       { $sort: { lastBetAt: -1 } },
-//       { $limit: 3 },
+    // Start = first day 00:00:00 UTC of the chosen month
+    const start = new Date(Date.UTC(year, monthIndex, 1, 0, 0, 0, 0));
+    // End   = first day of next month 00:00:00 UTC
+    const endExclusive = new Date(Date.UTC(year, monthIndex + 1, 1, 0, 0, 0, 0));
 
-//       {
-//         $lookup: {
-//           from: Round.collection.name,
-//           foreignField: "_id.roundId",
-//           localField: "_id",
-//           as: "round"
-//         }
-//       },
-//       { $unwind: { path: "$round", preserveNullAndEmptyArrays: true} },
+    // If querying the current month, you may choose to cap by "now"
+    const end = (year === now.getUTCFullYear() && monthIndex === now.getUTCMonth())
+      ? now
+      : endExclusive;
 
-//       {
-//         $addFields: {
-//           myBet: {
-//             $let:{
-//               vars: {
-//                 matched:{
-//                   $filters:{
-//                     input: "$round.boxStats",
-//                     as: "bs",
-//                     cond: { $eq: ["$$bs.box", "$_id.box"] },
-//                   }
-//                 }
-//                 }
-//               },
-//               in: { $arrayElemAt: ["$$matched", 0] },
-//             }
-//           }
-//         }
-      
+    const leaders = await Round.aggregate([
+      // Only rounds within the month window that have winners
+      {
+        $match: {
+          createdAt: { $gte: start, $lt: end },
+          topWinners: { $exists: true, $ne: [] },
+        },
+      },
+      // Flatten winners per round
+      { $unwind: "$topWinners" },
+
+      // Sum per user across the month
+      {
+        $group: {
+          _id: "$topWinners.userId",
+          totalWon: { $sum: "$topWinners.amountWon" },
+          winsCount: { $sum: 1 },
+          biggestWin: { $max: "$topWinners.amountWon" },
+          lastWinAt: { $max: "$updatedAt" }, // or $createdAt
+        },
+      },
 
 
-//     ]);
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+
+      // Sort by month performance
+      { $sort: { totalWon: -1, biggestWin: -1, lastWinAt: -1 } },
+
+      // Top 10
+      { $limit: 10 },
+
+      // Output
+      {
+        $project: {
+          _id: 0,
+          userId: "$_id",
+          totalWon: 1,
+          winsCount: 1,
+          biggestWin: 1,
+          lastWinAt: 1,
+          user: {
+            _id: "$user._id",
+            username: "$user.username",
+            email: "$user.email",
+            role: "$user.role",
+            balance: "$user.balance",
+            createdAt: "$user.createdAt",
+          },
+        },
+      },
+    ]).exec();
+
+    return res.status(200).json({
+      status: true,
+      message: "Top winners monthly",
+      // window: { from: start, to: end },/
+      userId: req.user?.userId,
+      count: leaders.length,
+      leaders,
+    });
+  } catch (err: any) {
+    console.error("handleGetMonthlyTopWinners error:", err);
+    return res.status(500).json({ status: false, message: err?.message || "Server error" });
+  }
+};
 
 
-//     console.log("history: ", history)
+// ==========================
+// @desc    Daily Leaderboad
+// @route   GET /api/v1/bettings/leaderboard
+// ==========================
 
+// Helper: start-of-today and now in a given IANA timezone (fallback to UTC)
+function getTodayWindow(tz?: string) {
+  try {
+    if (tz) {
+      const now = new Date();
+      const fmt = new Intl.DateTimeFormat("en-CA", {
+        timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
+      });
+      const [y, m, d] = fmt.format(now).split("-");
+      const localMidnight = new Date(`${y}-${m}-${d}T00:00:00`);
+      const start = new Date(
+        localMidnight.toLocaleString("en-US", { timeZone: "UTC" })
+      );
+      return { start, end: now };
+    }
+  } catch {}
+  // Fallback: UTC day
+  const now = new Date();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+  return { start, end: now };
+}
 
+/**
+ * GET /api/v1/leaderboard/top-winners-today
+ * Optional: ?tz=Asia/Dhaka  (IANA timezone for “today” window)
+ */
+export const handleGetTodaysTopWinners = async (req: Request, res: Response) => {
+  try {
+    const tz = typeof req.query.tz === "string" ? req.query.tz : undefined;
+    const { start, end } = getTodayWindow(tz);
 
-//     return res.status(200).json({ status: true, message: "Success" })
-    
-//   } catch (error) {
-//     console.log("handleGetUserLAst10Datas error: ", error);
-//     return res.status(500).json({ status: false, message: "Server error, try again later", error: error instanceof Error ? error.message : error })
-//   }
+    const leaders = await Round.aggregate([
+      { $match: { createdAt: { $gte: start, $lt: end }, topWinners: { $exists: true, $ne: [] } } },
+      { $unwind: "$topWinners" },
+      {
+        $group: {
+          _id: "$topWinners.userId",
+          totalWon: { $sum: "$topWinners.amountWon" },
+          winsCount: { $sum: 1 },
+          biggestWin: { $max: "$topWinners.amountWon" },
+          lastWinAt: { $max: "$updatedAt" },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      { $sort: { totalWon: -1, biggestWin: -1, lastWinAt: -1 } },
+      { $limit: 10 },
+      {
+        $project: {
+          _id: 0,
+          userId: "$_id",
+          totalWon: 1,
+          winsCount: 1,
+          biggestWin: 1,
+          lastWinAt: 1,
+          user: {
+            _id: "$user._id",
+            username: "$user.username",
+            email: "$user.email",
+            role: "$user.role",
+            balance: "$user.balance",
+            createdAt: "$user.createdAt",
+          },
+        },
+      },
+    ]).exec();
 
-// } 
+    res.status(200).json({
+      status: true,
+      message: "Top winners (today)",
+      // window: { from: start, to: end, tz: tz ?? "UTC" },
+      userId: req.user?.userId,
+      count: leaders.length,
+      leaders,
+    });
+  } catch (err: any) {
+    console.error("handleGetTodaysTopWinners error:", err);
+    res.status(500).json({ status: false, message: err?.message || "Server error" });
+  }
+};

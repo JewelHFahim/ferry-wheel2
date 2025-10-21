@@ -171,4 +171,33 @@ export const handlePlaceBet = (socket: any, nsp: Namespace) => {
       });
     }
   });
+
+
+//   socket.on("place_bet", async (payload: any, ack?: (res: any) => void) => {
+//   const reply = typeof ack === "function" ? ack : (res: any) => socket.emit("bet_error", res);
+//   try {
+//     if (!socket.data?.user) {
+//       return reply({ success: false, code: gameCodes.AUTH_REQUIRED, message: "Authentication required" });
+//     }
+//     const { roundId, box, amount } = payload || {};
+//     if (!roundId || !box || typeof amount !== "number") {
+//       return reply({ success: false, code: gameCodes.INVALID_PAYLOAD, message: "Invalid payload" });
+//     }
+
+//     const result = await placeBetTransactional({
+//       userId: String(socket.data.user._id),
+//       roundId: String(roundId),
+//       box: String(box),
+//       amount: Number(amount),
+//       nsp,
+//     });
+
+//     // Optionally echo user’s new balance in the ack
+//     return reply(result);
+
+//   } catch (e: any) {
+//     return reply({ success: false, code: gameCodes.INTERNAL, message: e?.message || "Failed to place bet" });
+//   }
+// });
+
 };

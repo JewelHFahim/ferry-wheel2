@@ -1,13 +1,14 @@
 import express from "express";
-import {  handleGetBettingHistory, handleGetBettingHistoryTenData, handleGetTopWinners, handleGetUserLast10Data } from "./bet.controller";
+import {  handleGetBettingHistory, handleGetBettingHistoryTenData, handleGetMonthlyTopWinners, handleGetTodaysTopWinners, handleGetTopWinners, handleGetUserLast10Records } from "./bet.controller";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 
 //Betting routes
 const router = express.Router();
-router.use("/bet-history", handleGetBettingHistory);
-router.use("/top-winners/:roundId", handleGetTopWinners);
-router.use("/current-history", handleGetBettingHistoryTenData); // top 10 da
-router.use("/user-bet-history/:userId", handleGetUserLast10Data); 
-// router.use("/user-bet-history/:userId", handleGetUserLAst10Datas); 
+router.use("/bet-history", authMiddleware, handleGetBettingHistory);
+router.use("/top-winners/:roundId", authMiddleware, handleGetTopWinners);
+router.use("/current-history", authMiddleware, handleGetBettingHistoryTenData);
+router.use("/user-bet-history", authMiddleware, handleGetUserLast10Records); 
+router.use("/leaderboard/top-winners-today",authMiddleware, handleGetTodaysTopWinners);
+router.use("/leaderboard", authMiddleware, handleGetMonthlyTopWinners);
 
 export default router;

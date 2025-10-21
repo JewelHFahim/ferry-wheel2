@@ -1,16 +1,6 @@
 import mongoose, { Schema, Types, HydratedDocument, Model } from "mongoose";
 import { ROUND_STATUS } from "./round.types";
 
-/** Status enum (reusable in services) */
-// export const ROUND_STATUS = {
-//   OPEN: "open",
-//   BETTING: "betting",
-//   CLOSED: "closed",
-//   REVEAL: "reveal",
-//   PREPARE: "prepare",
-//   COMPLETED: "completed",
-// } as const;
-
 export type RoundStatus = (typeof ROUND_STATUS)[keyof typeof ROUND_STATUS];
 
 /** Individual box stats for a round */
@@ -18,19 +8,28 @@ export interface IRoundBox {
   title: string;
   icon: string;
   multiplier?: number;
+  group: string,
   totalBet: number;
   userCount: number;
 }
 
 /** Stats for bonus calculation and payout */
 export interface IBoxStat {
-  box: string | null;
-  title: string | null;
-  group: string | null,
-  icon: string | null;
-  multiplier: string | null;
-  totalAmount: number;
-  bettorsCount: number;
+  // box: string | null;
+  // title: string | null;
+  // group: string | null,
+  // icon: string | null;
+  // multiplier: string | null;
+  // totalAmount: number;
+  // bettorsCount: number;
+
+ box: string;          // same as settings.title
+  title: string;
+  icon: string;
+  multiplier: number;
+  group?: string | null;
+  totalAmount: number;  // per-round
+  bettorsCount: number; // per-round
 }
 
 /** Main round shape (do NOT extend Document; keep it plain) */
