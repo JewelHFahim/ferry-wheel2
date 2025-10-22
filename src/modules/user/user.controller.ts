@@ -4,13 +4,14 @@ import { Request, Response } from "express";
 import { UserService } from "./user.service";
 import { env } from "../../config/env";
 import { UserModel } from "./user.model";
+import mongoose from "mongoose";
+import Bet from "../bet/bet.model";
 
 const generateToken = (userId: string, role: string) => {
   return jwt.sign({ userId, role }, env.JWT_SECRET, { expiresIn: "7d" });
 };
 
 export const UserController = {
-  // Get user profile
   getProfile: async (req: Request, res: Response) => {
     try {
       if (!req.user) {
@@ -131,5 +132,164 @@ export const handleLogin = async (req: Request, res: Response) => {
     console.error(error);
 
     return res.status(500).json({ message: error.message || "Server error" });
+  }
+};
+
+
+// ==========================
+// @desc    Get User Daily Wins Amount
+// @route   POST /api/v1/users/profile
+// ==========================
+
+// Utility: compute UTC day window
+function dayWindowUTC(isoDate?: string) {
+  // isoDate expected as "YYYY-MM-DD" (UTC). If missing, use today's UTC date.
+  const base = isoDate ? new Date(`${isoDate}T00:00:00.000Z`) : new Date();
+  const start = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), 0, 0, 0, 0));
+  const end   = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate() + 1, 0, 0, 0, 0));
+  return { start, end };
+}
+
+/**
+ * GET /api/v1/bets/daily-winnings/:userId?date=YYYY-MM-DD
+ * - userId: Mongo ObjectId
+ * - date (optional): UTC day; default = today (UTC)
+ * Response:
+ * {
+ *   status: true,
+ *   userId: string,
+ *   date: "YYYY-MM-DD",
+ *   totalWin: number,
+ *   countWinningBets: number
+ * }
+ */
+export const handleGetUserDailyWinnings = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    console.log("req.user: ", req.user);
+    const { date } = req.query as { date?: string };
+
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ status: false, message: "Invalid userId" });
+    }
+
+    // Build day window (UTC)
+    const { start, end } = dayWindowUTC(date);
+    const dateLabel = new Date(start).toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+    // Aggregate winnings
+    const result = await Bet.aggregate([
+      // limit to this user & bets placed within this day window
+      { $match: { userId: new mongoose.Types.ObjectId(userId), createdAt: { $gte: start, $lt: end } } },
+
+      // pull in the round (to know winningBox and boxStats/multipliers)
+      {
+        $lookup: {
+          from: "rounds",
+          localField: "roundId",
+          foreignField: "_id",
+          as: "round",
+        },
+      },
+      { $unwind: "$round" },
+
+      // normalize names (lower/trim)
+      {
+        $addFields: {
+          _betBox:   { $toLower: { $trim: { input: "$box" } } },
+          _winBox:   { $toLower: { $trim: { input: "$round.winningBox" } } },
+        },
+      },
+
+      // find the stat row for the bet's box
+      {
+        $addFields: {
+          _statBet: {
+            $first: {
+              $filter: {
+                input: "$round.boxStats",
+                as: "bs",
+                cond: { $eq: [ { $toLower: "$$bs.box" }, "$_betBox" ] }
+              }
+            }
+          },
+          _statWin: {
+            $first: {
+              $filter: {
+                input: "$round.boxStats",
+                as: "bs",
+                cond: { $eq: [ { $toLower: "$$bs.box" }, "$_winBox" ] }
+              }
+            }
+          },
+        }
+      },
+
+      // compute whether winner is group rep, and the group of the bet box
+      {
+        $addFields: {
+          _betGroup: {
+            $cond: [
+              { $in: [ { $toLower: "$_statBet.group" }, ["pizza","salad"] ] },
+              { $toLower: "$_statBet.group" },
+              null
+            ]
+          },
+          _winIsGroup: { $in: [ "$_winBox", ["pizza","salad"] ] },
+        }
+      },
+
+      // decide winner + pay multiplier
+      {
+        $addFields: {
+          _isWinner: {
+            $cond: [
+              "$_winIsGroup",
+              { $eq: [ "$_betGroup", "$_winBox" ] }, // group rep wins → any bet in that group wins
+              { $eq: [ "$_betBox", "$_winBox" ] }     // normal winner → exact box must match
+            ]
+          },
+          _payMultiplier: {
+            $cond: [
+              "$_winIsGroup",
+              { $ifNull: [ "$_statWin.multiplier", 1 ] },  // group rep pays at rep's multiplier
+              { $ifNull: [ "$_statBet.multiplier", 1 ] }   // normal winner pays at bet box multiplier
+            ]
+          }
+        }
+      },
+
+      // compute win amount per bet
+      {
+        $addFields: {
+          _winAmount: {
+            $cond: [ "$_isWinner", { $multiply: [ "$amount", "$_payMultiplier" ] }, 0 ]
+          }
+        }
+      },
+
+      // sum up
+      {
+        $group: {
+          _id: null,
+          totalWin: { $sum: "$_winAmount" },
+          countWinningBets: { $sum: { $cond: [ "$_isWinner", 1, 0 ] } }
+        }
+      }
+    ]);
+
+    const totals = result?.[0] ?? { totalWin: 0, countWinningBets: 0 };
+
+    return res.status(200).json({
+      status: true,
+      userId,
+      date: dateLabel,
+      totalWin: totals.totalWin || 0,
+      countWinningBets: totals.countWinningBets || 0,
+    });
+
+  } catch (err: any) {
+    console.error("handleGetUserDailyWinnings error:", err);
+    return res.status(500).json({ status: false, message: "Server error", error: err?.message || String(err) });
   }
 };

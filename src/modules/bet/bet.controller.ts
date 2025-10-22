@@ -130,6 +130,7 @@ export const handleGetTopWinners = async (req: Request, res: Response) => {
         roundNumber: round.roundNumber,
         count: 0,
         topWinners: [],
+        winningBox: round.winningBox
       });
     }
 

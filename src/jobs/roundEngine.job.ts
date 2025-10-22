@@ -1,102 +1,100 @@
-import { Namespace } from "socket.io";
-import { SettingsService } from "../modules/settings/settings.service";
-import { MetService } from "../modules/met/met.service";
-import { UserService } from "../modules/user/user.service";
-import Round from "../modules/round/round.model";
-import { getBetsByRound } from "./../modules/bet/bet.service";
-import { Types } from "mongoose";
-import { env } from "../config/env";
-import {
-  addRoundFunds,
-  getCompanyWallet,
-  logTransaction,
-} from "../modules/company/company.service";
-import { IBet } from "../modules/bet/bet.model";
-import { EMIT } from "../utils/statics/emitEvents";
-import { ROUND_STATUS } from "../modules/round/round.types";
+// import { Namespace } from "socket.io";
+// import { SettingsService } from "../modules/settings/settings.service";
+// import { MetService } from "../modules/met/met.service";
+// import { UserService } from "../modules/user/user.service";
+// import Round from "../modules/round/round.model";
+// import { getBetsByRound } from "./../modules/bet/bet.service";
+// import { Types } from "mongoose";
+// import { env } from "../config/env";
+// import {
+//   addRoundFunds,
+//   getCompanyWallet,
+//   logTransaction,
+// } from "../modules/company/company.service";
+// import { IBet } from "../modules/bet/bet.model";
+// import { EMIT } from "../utils/statics/emitEvents";
+// import { ROUND_STATUS } from "../modules/round/round.types";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Start the round and betting
-export const startNewRound = async (nsp: Namespace): Promise<void> => {
-  try {
+// export const startNewRound = async (nsp: Namespace): Promise<void> => {
+//   try {
 
-    const [settings, roundNumber, boxes] = await Promise.all([
-      SettingsService.getSettings(),
-      MetService.incrementRoundCounter(),
-      SettingsService.getInitialBoxes(),
-    ]);
+//     const [settings, roundNumber, boxes] = await Promise.all([
+//       SettingsService.getSettings(),
+//       MetService.incrementRoundCounter(),
+//       SettingsService.getInitialBoxes(),
+//     ]);
 
-    console.log("Boxes: ", boxes)
+//     const raw = settings.roundDuration ?? env.BETTING_DURATION;
+//     const bettingDuration = raw > 1000 ? raw : raw * 1000;
+//     const rawRevealDuration = settings.revealDuration ?? env.REVEAL_DURATION;
+//     const revealDuration = rawRevealDuration > 1000 ? rawRevealDuration : rawRevealDuration * 1000;
+//     const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
+//     const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
 
-    const raw = settings.roundDuration ?? env.BETTING_DURATION;
-    const bettingDuration = raw > 1000 ? raw : raw * 1000;
-    const rawRevealDuration = settings.revealDuration ?? env.REVEAL_DURATION;
-    const revealDuration = rawRevealDuration > 1000 ? rawRevealDuration : rawRevealDuration * 1000;
-    const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
-    const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
+//     const startTime = new Date();
+//     const endTime = new Date(startTime.getTime() + bettingDuration);
+//     const now = Date.now();
 
-    const startTime = new Date();
-    const endTime = new Date(startTime.getTime() + bettingDuration);
-    const now = Date.now();
+//     //Event times
+//     const endBettingTime = new Date(startTime.getTime() + bettingDuration);
+//     const endRevealTime = new Date(endBettingTime.getTime() + revealDuration);
+//     const endPrepareTime = new Date(endRevealTime.getTime() + prepareDuration);
 
-    //Event times
-    const endBettingTime = new Date(startTime.getTime() + bettingDuration);
-    const endRevealTime = new Date(endBettingTime.getTime() + revealDuration);
-    const endPrepareTime = new Date(endRevealTime.getTime() + prepareDuration);
+//     // Create the initial round
+//     const round = await Round.create({
+//       roundNumber,
+//       startTime,
+//       endTime: endPrepareTime,
+//       revealTime: endRevealTime,
+//       prepareTime: endPrepareTime,
+//       boxes,
+//       totalPool: 0,
+//       companyCut: 0,
+//       distributedAmount: 0,
+//       reserveWallet: 0,
+//       boxStats: boxes.map((b) => ({
+//         box: b.title,
+//         title: b.title,
+//         icon: b.icon,
+//         multiplier: b.multiplier,
+//         group: b.group,
+//         totalAmount: 0,
+//         bettorsCount: 0,
+//       })),
+//       bets: [],
+//       roundStatus: ROUND_STATUS.BETTING,
+//     });
 
-    // Create the initial round
-    const round = await Round.create({
-      roundNumber,
-      startTime,
-      endTime: endPrepareTime,
-      revealTime: endRevealTime,
-      prepareTime: endPrepareTime,
-      boxes,
-      totalPool: 0,
-      companyCut: 0,
-      distributedAmount: 0,
-      reserveWallet: 0,
-      boxStats: boxes.map((b) => ({
-        box: b.title,
-        title: b.title,
-        icon: b.icon,
-        multiplier: b.multiplier,
-        group: b.group,
-        totalAmount: 0,
-        bettorsCount: 0,
-      })),
-      bets: [],
-      roundStatus: ROUND_STATUS.BETTING,
-    });
+//     await MetService.setCurrentRound(round._id.toString());
 
-    await MetService.setCurrentRound(round._id.toString());
+//     // ==========================
+//     // @status: Public, @Desc: Emit the round started event
+//     // ==========================
+//     nsp.emit(EMIT.ROUND_STARTED, {
+//       _id: round._id,
+//       roundNumber,
+//       startTime,
+//       endTime,
+//       boxes,
+//       winningBox: null,
+//       bets: [],
+//       topWinners: [],
+//       revealTime: round.revealTime,
+//       prepareTime: round.prepareTime,
+//       roundStatus: ROUND_STATUS.BETTING,
+//     });
 
-    // ==========================
-    // @status: Public, @Desc: Emit the round started event
-    // ==========================
-    nsp.emit(EMIT.ROUND_STARTED, {
-      _id: round._id,
-      roundNumber,
-      startTime,
-      endTime,
-      boxes,
-      winningBox: null,
-      bets: [],
-      topWinners: [],
-      revealTime: round.revealTime,
-      prepareTime: round.prepareTime,
-      roundStatus: ROUND_STATUS.BETTING,
-    });
+//     await sleep(bettingDuration);
 
-    await sleep(bettingDuration);
-
-    // End the round and prepare for the next phase
-    await endRound(round._id.toString(), nsp);
-  } catch (err) {
-    console.error("❌ Failed to start new round:", err);
-  }
-};
+//     // End the round and prepare for the next phase
+//     await endRound(round._id.toString(), nsp);
+//   } catch (err) {
+//     console.error("❌ Failed to start new round:", err);
+//   }
+// };
 
 // End the rund, gather pool, calculate, choose winner, distribute apyouts
 // export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
@@ -328,274 +326,243 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
 //   }
 // };
 
-export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
-  try {
-    // Fetch round, settings, and company wallet
-    const [round, settings, companyWallet] = await Promise.all([
-    Round.findById(roundId),
-    SettingsService.getSettings(),
-    getCompanyWallet(),
-    ]);
-
-    const rawRevealDuration = settings.revealDuration ?? env.REVEAL_DURATION;
-    const revealDuration = rawRevealDuration > 1000 ? rawRevealDuration : rawRevealDuration * 1000;
-    const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
-    const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
-    const now = Date.now();
-
-    if (!round) return console.warn("Round not found:", roundId);
-    if (!settings) return console.warn("Settings not found");
-
-    // Close round for betting
-    round.roundStatus = ROUND_STATUS.REVEALING;
-    await round.save();
-
-    // ==========================
-    // @Status: Public, @Desc: Emit the Close Round
-    // ==========================
-    nsp.emit(EMIT.ROUND_CLOSED, { 
-      _id: round._id, 
-      roundNumber: round.roundNumber,
-      roundStatus: ROUND_STATUS.REVEALING,
-     });
-
-    // Fetch all bets
-    const bets = await getBetsByRound(round._id);
-    const totalPool = bets.reduce((sum, b) => sum + b.amount, 0);
-    round.totalPool = totalPool;
 
 
-    // New Code-01-start
-    // 1) Index helpers
-    const statByBox = new Map(round.boxStats.map(s => [s.box, s]));
-    console.log("statByBox: ", statByBox);
-    const groupByBox = new Map(round.boxStats.map(s => [s.box, s.group || null]));
-    console.log("groupByBox: ", groupByBox);
-    const isGroupRep = (boxName: string) => boxName === "Pizza" || boxName === "Salad";
+// export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
+//   try {
+//     // 1) Load state
+//     const [round, settings, companyWallet] = await Promise.all([
+//       Round.findById(roundId),
+//       SettingsService.getSettings(),
+//       getCompanyWallet(),
+//     ]);
 
-    // 2) Aggregate raw per-box totals
-    const perBoxTotal = new Map<string, number>();
-    const perBoxCount = new Map<string, number>();
-    for (const b of bets) {
-      perBoxTotal.set(b.box, (perBoxTotal.get(b.box) || 0) + b.amount);
-      perBoxCount.set(b.box, (perBoxCount.get(b.box) || 0) + 1);
-    }
+//     if (!round) { console.warn("Round not found:", roundId); return; }
+//     if (!settings) { console.warn("Settings not found"); return; }
 
-    // 3) Aggregate per-group totals (sum all sub-boxes that share the group)
-    const perGroupTotal = new Map<string, number>([["Pizza", 0], ["Salad", 0]]);
-    const perGroupCount = new Map<string, number>([["Pizza", 0], ["Salad", 0]]);
-    for (const b of bets) {
-      const g = groupByBox.get(b.box);
-      if (g === "Pizza" || g === "Salad") {
-        perGroupTotal.set(g, (perGroupTotal.get(g) || 0) + b.amount);
-        perGroupCount.set(g, (perGroupCount.get(g) || 0) + 1);
-      }
-    }
+//     // Optional delays for animation pacing
+//     const rawRevealDuration  = settings.revealDuration  ?? env.REVEAL_DURATION;
+//     const revealDuration     = rawRevealDuration  > 1000 ? rawRevealDuration  : rawRevealDuration  * 1000;
+//     const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
+//     const prepareDuration    = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
 
-    // 4) Update boxStats.totals:
-    //    - Representative rows "Pizza"/"Salad" get group totals
-    //    - All normal rows keep their own per-box totals
-    for (const s of round.boxStats) {
-      if (isGroupRep(s.box)) {
-        s.totalAmount  = perGroupTotal.get(s.box) || 0;
-        s.bettorsCount = perGroupCount.get(s.box) || 0;
-      } else {
-        s.totalAmount  = perBoxTotal.get(s.box) || 0;
-        s.bettorsCount = perBoxCount.get(s.box) || 0;
-      }
-    }
-    await round.save();
-    // New Code-01-end
-    
-    // Company cut (10% of total pool)
-    const companyCut = Math.floor(totalPool * (settings.commissionRate ?? 0.1));
-    round.companyCut = companyCut;
-    
-    // Distributable funds for winners
-    let distributableAmount = totalPool - companyCut;
-    const availableFunds = distributableAmount + companyWallet.reserveWallet;
-    
-    // Determine eligible and ineligible boxes
-    const eligibleBoxes: any[] = [];
-    const ineligibleBoxes: any[] = [];
+//     // 2) Close betting
+//     round.roundStatus = ROUND_STATUS.REVEALING;
+//     await round.save();
 
-    // Round Statistics
-    round.boxStats.forEach(box => {
-      const totalBoxBet = bets.filter(bet => bet.box === box.box).reduce((sum, b) => sum + b.amount, 0);
-      console.log("totalBoxBet", totalBoxBet);
+//     nsp.emit(EMIT.ROUND_CLOSED, {
+//       _id: round._id,
+//       roundNumber: round.roundNumber,
+//       roundStatus: ROUND_STATUS.REVEALING,
+//     });
 
-      // Special box group handling (Pizza/Salad)
-      let requiredPayout = totalBoxBet * (Number(box.multiplier) || 1);
-      if (box.group === "Pizza" || box.group === "Salad") {
-        const groupBets = bets
-          .filter(b => round.boxStats.find(bs => bs.box === b.box)?.group === box.group)
-          .reduce((sum, b) => sum + b.amount, 0);
-        requiredPayout = groupBets * (Number(box.multiplier) || 1);
-        console.log("groupBets: ", groupBets);
-      }
+//     // 3) Load bets & compute pool
+//     const bets = await getBetsByRound(round._id);
+//     const totalPool = bets.reduce((s, b) => s + b.amount, 0);
+//     round.totalPool = totalPool;
+//     console.log("round.totalPool:", round.totalPool);
 
-      if (requiredPayout <= availableFunds) eligibleBoxes.push(box);
-      else ineligibleBoxes.push(box);
-    });
+//     // 4) Build helper indexes
+//     const statByBox = new Map(round.boxStats.map((s) => [s.box, s]));
 
-    // Select winner randomly from eligible boxes
-    let winnerBox: string | null = null;
-    if (eligibleBoxes.length > 0) {
-      winnerBox = eligibleBoxes[Math.floor(Math.random() * eligibleBoxes.length)].box;
-    };
+//     // Build group membership from round.boxStats (single source of truth)
+//     const pizzaMembers = new Set(
+//       round.boxStats.filter(s => s.group === "Pizza" && s.box !== "Pizza").map(s => s.box)
+//     );
+//     const saladMembers = new Set(
+//       round.boxStats.filter(s => s.group === "Salad" && s.box !== "Salad").map(s => s.box)
+//     );
+//     const isGroupRep = (name: string) => name === "Pizza" || name === "Salad";
 
-    // All Logs
-    console.log("totalPool: ", round.totalPool);
-    console.log("companyCut: ", companyCut);
-    console.log("companyWallet: ", companyWallet.reserveWallet);
-    console.log("availableFunds: ", availableFunds);
-    console.log("Eligible Boxes:", eligibleBoxes.map(b => b.box));
-    console.log("Ineligible Boxes:", ineligibleBoxes.map(b => b.box));
-    console.log("winnerBox: ", winnerBox);
+//     // 5) Per-box aggregates
+//     const perBoxTotal = new Map<string, number>();
+//     const perBoxCount = new Map<string, number>();
+//     for (const b of bets) {
+//       perBoxTotal.set(b.box, (perBoxTotal.get(b.box) || 0) + b.amount);
+//       perBoxCount.set(b.box, (perBoxCount.get(b.box) || 0) + 1);
+//     }
 
-    // If no eligible winner, move distributable to reserve wallet
-    if (!winnerBox) {
-      companyWallet.reserveWallet += distributableAmount;
-      await companyWallet.save();
-      await logTransaction("reserveDeposit", distributableAmount, "No eligible winner, moved to reserve wallet");
-      return;
-    }
+//     // 6) Per-group aggregates (sum only sub-boxes, plus any direct rep bets)
+//     let pizzaTotal = 0, pizzaCount = 0;
+//     let saladTotal = 0, saladCount = 0;
 
-    // Calculate payouts
-    let winningBets: IBet[] = [];
-    if (["Pizza", "Salad"].includes(round.boxStats.find(b => b.box === winnerBox)?.group || "")) {
-      const group = round.boxStats.find(b => b.box === winnerBox)?.group;
-      winningBets = bets.filter(b => round.boxStats.find(bs => bs.box === b.box)?.group === group);
-    } else {
-      winningBets = bets.filter(b => b.box === winnerBox);
-    }
+//     for (const b of bets) {
+//       if (pizzaMembers.has(b.box)) { pizzaTotal += b.amount; pizzaCount += 1; }
+//       if (saladMembers.has(b.box)) { saladTotal += b.amount; saladCount += 1; }
+//     }
+//     // include direct rep bets if ever present
+//     pizzaTotal += perBoxTotal.get("Pizza") || 0;
+//     pizzaCount += perBoxCount.get("Pizza") || 0;
+//     saladTotal += perBoxTotal.get("Salad") || 0;
+//     saladCount += perBoxCount.get("Salad") || 0;
 
-    const payouts = winningBets.map(b => {
-      const multiplier = round.boxStats.find(box => box.box === b.box)?.multiplier || 1;
-      return {
-        userId: String(b.userId),
-        box: b.box,
-        amount: b.amount * Number(multiplier),
-      };
-    });
+//     // 7) Write totals back into round.boxStats (reps show group totals)
+//     for (const s of round.boxStats) {
+//       if (s.box === "Pizza") {
+//         s.totalAmount  = pizzaTotal;
+//         s.bettorsCount = pizzaCount;
+//       } else if (s.box === "Salad") {
+//         s.totalAmount  = saladTotal;
+//         s.bettorsCount = saladCount;
+//       } else {
+//         s.totalAmount  = perBoxTotal.get(s.box) || 0;
+//         s.bettorsCount = perBoxCount.get(s.box) || 0;
+//       }
+//     }
+//     await round.save();
 
-    //Total payble amount
-    const totalPayout = payouts.reduce((sum, p) => sum + p.amount, 0);
+//     console.log("Pizza group:", { members: [...pizzaMembers], total: pizzaTotal });
+//     console.log("Salad group:", { members: [...saladMembers], total: saladTotal });
 
-    // Check if available funds cover total payout
-    if (totalPayout > availableFunds) {
-      companyWallet.reserveWallet += distributableAmount;
-      await companyWallet.save();
-      await logTransaction("reserveDeposit", distributableAmount, "Insufficient funds for payout, moved to reserve wallet");
-      return;
-    }
+//     // 8) Company cut & available funds
+//     const companyCut = Math.floor(totalPool * (settings.commissionRate ?? 0.1));
+//     round.companyCut = companyCut;
 
-    // Deduct reserve wallet if needed
-    let reserveUsed = 0;
-    if (totalPayout > distributableAmount) {
-      reserveUsed = totalPayout - distributableAmount;
-      companyWallet.reserveWallet -= reserveUsed;
-      await logTransaction("reserveWithdraw", reserveUsed, "Used reserve wallet to cover payout");
-    }
+//     const distributableAmount = totalPool - companyCut;
+//     const availableFunds = distributableAmount + companyWallet.reserveWallet;
 
-    // Pay winners
-    const topWinners: { userId: Types.ObjectId; amountWon: number }[] = [];
-    for (const p of payouts) {
-      const updated = await UserService.updateBalance(p.userId, p.amount);
-      
-    // ==========================
-    // @status: Private, @descri: Emit the Payouts
-    // ==========================
-      nsp.to(`user:${p.userId}`).emit(EMIT.PAYOUT, {
-        roundId: round._id,
-        winnerBox,
-        amount: p.amount,
-        newBalance: updated.balance,
-      });
+//     // 9) Eligibility: use the same totals the UI sees (s.totalAmount * s.multiplier)
+//     const eligibleStats = round.boxStats.filter((s) => {
+//       const mult = Number(s.multiplier) || 1;
+//       const required = (s.totalAmount || 0) * mult;
+//       return required <= availableFunds;
+//     });
 
-      topWinners.push({ 
-        userId: new Types.ObjectId(p.userId), 
-        amountWon: p.amount
-       });
+//     // 10) Choose winner
+//     let winnerBox: string | null = null;
+//     if (eligibleStats.length > 0) {
+//       winnerBox = eligibleStats[Math.floor(Math.random() * eligibleStats.length)].box;
+//     }
+//     console.log("winnerBox:", winnerBox);
 
-    // ==========================
-    // @status: Private, @descr: Emit the Balance update 
-    // ==========================
-      nsp.to(`user:${p.userId}`).emit(EMIT.BALANCE_UPDATE, {
-        balance: updated.balance,
-        delta: p.amount,
-        reason: "payout",
-        roundId: round._id,
-      });
-    }
+//     if (!winnerBox) {
+//       // roll all distributable into reserve and finish the round silently
+//       companyWallet.reserveWallet += distributableAmount;
+//       await companyWallet.save();
+//       await logTransaction("reserveDeposit", distributableAmount, "No eligible winner, moved to reserve wallet");
+//       return;
+//     }
 
-    // Update round stats
-    round.topWinners = topWinners.sort((a, b) => b.amountWon - a.amountWon).slice(0, 3);
-    round.winningBox = winnerBox;
-    round.distributedAmount = totalPayout;
-    await round.save();
+//     // 11) Compute payouts consistent with eligibility math
+//     let winningBets: IBet[] = [];
+//     let payMultiplier = 1;
 
-    // Add company cut and any leftover distributable
-    const remainingDistributable = distributableAmount - (totalPayout - reserveUsed);
-    await addRoundFunds(companyCut, remainingDistributable);
-    await logTransaction("companyCut", companyCut, "Company cut from pool");
+//     if (winnerBox === "Pizza") {
+//       winningBets = bets.filter(b => pizzaMembers.has(b.box) || b.box === "Pizza");
+//       payMultiplier = statByBox.get("Pizza")?.multiplier ?? 1;
+//     } else if (winnerBox === "Salad") {
+//       winningBets = bets.filter(b => saladMembers.has(b.box) || b.box === "Salad");
+//       payMultiplier = statByBox.get("Salad")?.multiplier ?? 1;
+//     } else {
+//       winningBets = bets.filter(b => b.box === winnerBox);
+//       payMultiplier = statByBox.get(winnerBox)?.multiplier ?? 1;
+//     }
 
-    await sleep(5000);
+//     const payouts = winningBets.map((b) => ({
+//       userId: String(b.userId),
+//       box: b.box,
+//       amount: b.amount * payMultiplier,
+//     }));
 
-    // ==========================
-    // @status: Public, @descri: Emit Final Round Result 
-    // ==========================
-    nsp.emit(EMIT.ROUND_UPDATED, {
-      _id: round._id,
-      roundNumber: round.roundNumber,
-      boxStats: round.boxStats,
-      roundStatus: ROUND_STATUS.REVEALED,
-    });
+//     const totalPayout = payouts.reduce((s, p) => s + p.amount, 0);
 
-    // ==========================
-    // @status: Public, @descri: Emit Winner Reveal 
-    // ==========================
-    nsp.emit(EMIT.WINNER_REVEALED, {
-      _id: round._id,
-      roundNumber: round.roundNumber,
-      winnerBox,
-      payouts,
-      topWinners: round.topWinners,
-      roundStatus: ROUND_STATUS.REVEALED
-    });
+//     if (totalPayout > availableFunds) {
+//       companyWallet.reserveWallet += distributableAmount;
+//       await companyWallet.save();
+//       await logTransaction("reserveDeposit", distributableAmount, "Insufficient funds for payout, moved to reserve wallet");
+//       return;
+//     }
 
-    await sleep(7000);
+//     // 12) Cover from reserve if needed
+//     let reserveUsed = 0;
+//     if (totalPayout > distributableAmount) {
+//       reserveUsed = totalPayout - distributableAmount;
+//       companyWallet.reserveWallet -= reserveUsed;
+//       await companyWallet.save();
+//       await logTransaction("reserveWithdraw", reserveUsed, "Used reserve wallet to cover payout");
+//     }
 
-    // ==========================
-    // @status: Public, @desc: Emit the Round End 
-    // ==========================
-    nsp.emit(EMIT.ROUND_ENDED, {
-      _id: round._id,
-      roundNumber: round.roundNumber,
-      totalPool,
-      companyCut,
-      distributedAmount: round.distributedAmount,
-      reserveWallet: companyWallet.reserveWallet,
-      roundStatus: ROUND_STATUS.COMPLETED
-    });
+//     // 13) Pay winners (private emits)
+//     const topWinners: { userId: Types.ObjectId; amountWon: number }[] = [];
+//     for (const p of payouts) {
+//       const updated = await UserService.updateBalance(p.userId, p.amount);
 
-    // ==========================
-    // @status: Public, @desc: Emit the Reset Round 
-    // ==========================
-    nsp.emit(EMIT.ROUND_RESET, {
-      _id: "",
-      roundNumber: 0,
-      totalPool: 0,
-      companyCut: 0,
-      distributedAmount: 0,
-      reserveWallet: 0,
-      roundStatus: ROUND_STATUS.PREPARE
-    });
-    nsp.emit(EMIT.USER_BET_TOTAL, { roundId: "", totalUserBet: 0 });
+//       nsp.to(`user:${p.userId}`).emit(EMIT.PAYOUT, {
+//         roundId: round._id,
+//         winnerBox,
+//         amount: p.amount,
+//         newBalance: updated.balance,
+//       });
 
-    // Start next round
-    setTimeout(() => startNewRound(nsp), prepareDuration);
-  } catch (err) {
-    console.error("❌ Failed to end round:", err);
-  }
-};
+//       topWinners.push({ userId: new Types.ObjectId(p.userId), amountWon: p.amount });
+
+//       nsp.to(`user:${p.userId}`).emit(EMIT.BALANCE_UPDATE, {
+//         balance: updated.balance,
+//         delta: p.amount,
+//         reason: "payout",
+//         roundId: round._id,
+//       });
+//     }
+
+//     // 14) Persist round result
+//     round.topWinners = topWinners.sort((a, b) => b.amountWon - a.amountWon).slice(0, 3);
+//     round.winningBox = winnerBox;
+//     round.distributedAmount = totalPayout;
+//     await round.save();
+
+//     // 15) Company cut + leftover distributable to treasury
+//     const remainingDistributable = distributableAmount - (totalPayout - reserveUsed);
+//     await addRoundFunds(companyCut, remainingDistributable);
+//     await logTransaction("companyCut", companyCut, "Company cut from pool");
+
+//     // 16) Public emits (with group totals now embedded in boxStats for Pizza/Salad)
+//     console.log("round.boxStats: ", round.boxStats)
+//     await sleep(revealDuration);
+
+//     nsp.emit(EMIT.ROUND_UPDATED, {
+//       _id: round._id,
+//       roundNumber: round.roundNumber,
+//       boxStats: round.boxStats,
+//       roundStatus: ROUND_STATUS.REVEALED,
+//     });
+
+//     nsp.emit(EMIT.WINNER_REVEALED, {
+//       _id: round._id,
+//       roundNumber: round.roundNumber,
+//       winnerBox,
+//       payouts,
+//       topWinners: round.topWinners,
+//       roundStatus: ROUND_STATUS.REVEALED,
+//     });
+
+//     await sleep(7000);
+
+//     nsp.emit(EMIT.ROUND_ENDED, {
+//       _id: round._id,
+//       roundNumber: round.roundNumber,
+//       totalPool,
+//       companyCut,
+//       distributedAmount: round.distributedAmount,
+//       reserveWallet: companyWallet.reserveWallet,
+//       roundStatus: ROUND_STATUS.COMPLETED,
+//     });
+
+//     // Reset UI summaries and start next round after prepareDuration
+//     nsp.emit(EMIT.ROUND_RESET, {
+//       _id: "",
+//       roundNumber: 0,
+//       totalPool: 0,
+//       companyCut: 0,
+//       distributedAmount: 0,
+//       reserveWallet: 0,
+//       roundStatus: ROUND_STATUS.PREPARE,
+//     });
+//     nsp.emit(EMIT.USER_BET_TOTAL, { roundId: "", totalUserBet: 0 });
+
+//     setTimeout(() => startNewRound(nsp), prepareDuration);
+//   } catch (err) {
+//     console.error("❌ Failed to end round:", err);
+//   }
+// };
+
+

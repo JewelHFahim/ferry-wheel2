@@ -4,6 +4,7 @@ export enum EMIT {
   ROUND_CLOSED = "roundClosed",
   ROUND_ENDED = "roundEnded",
   ROUND_UPDATED = "roundUpdated",
+  ROUND_TOTAL_BET= "roundTotalBet",
   ROUND_RESET = "resetRound",
   PAYOUT = "payout",
   BALANCE_UPDATE = "balanceUpdate",
@@ -14,4 +15,5 @@ export enum EMIT {
   BET_ACCEPTED = "bet_accepted",
   USER_BET_TOTAL = "user_bet_total",
   PING_SERVER = "ping_server",
+
 }

@@ -8,8 +8,8 @@ export const boxDatas = [
   { title: "Carrot", icon: "🥕", group: "Salad", multiplier: 5 },
   { title: "Skewer", icon: "🍢", group: "Pizza", multiplier: 15 },
   { title: "Ham", icon: "🍗", group: "Pizza", multiplier: 5 },
-  { title: "Pizza", icon: "🍕", multiplier: 4.37 },
-  { title: "Salad", icon: "🥗", multiplier: 1.25 },
+  { title: "Pizza", icon: "🍕", group: "Pizza", multiplier: 4.37 },
+  { title: "Salad", icon: "🥗", group: "Salad", multiplier: 1.25 },
 ];
 
 // Game Custom Codes
@@ -29,7 +29,7 @@ export enum gameCodes {
 
 //Cors Origins
 export const origins = [
-  "http://192.168.1.100:3000",
+  "http://192.168.68.120:3000",
   "http://192.168.68.131:3000",
   "http://192.168.68.121:3000",
   "http://192.168.1.122:3000",

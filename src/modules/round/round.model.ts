@@ -15,21 +15,13 @@ export interface IRoundBox {
 
 /** Stats for bonus calculation and payout */
 export interface IBoxStat {
-  // box: string | null;
-  // title: string | null;
-  // group: string | null,
-  // icon: string | null;
-  // multiplier: string | null;
-  // totalAmount: number;
-  // bettorsCount: number;
-
- box: string;          // same as settings.title
+  box: string;
   title: string;
   icon: string;
   multiplier: number;
-  group?: string | null;
-  totalAmount: number;  // per-round
-  bettorsCount: number; // per-round
+  group: string | null;
+  totalAmount: number;
+  bettorsCount: number;
 }
 
 /** Main round shape (do NOT extend Document; keep it plain) */
@@ -50,8 +42,6 @@ export interface IRound {
   bets: Types.ObjectId[];
   boxStats: IBoxStat[];
   topWinners: { userId: Types.ObjectId; amountWon: number }[];
-  // phase: string;
-  // phaseEndTime: Date
   createdAt: Date;
   updatedAt: Date;
 }
@@ -70,12 +60,12 @@ const RoundBoxSchema = new Schema<IRoundBox>(
 
 const BoxStatSchema = new Schema<IBoxStat>(
   {
-    box: { type: String, default: null }, // allow null to match interface
-    title: { type: String, default: null },
-    icon: { type: String, default: null },
-    multiplier: { type: Number },
-    totalAmount: { type: Number, default: 0 },
-    bettorsCount: { type: Number, default: 0 },
+  box: { type: String, required: true },
+  icon: { type: String, required: true },
+  multiplier: { type: Number, default: 1 },
+  group: { type: String, default: null },
+  totalAmount: { type: Number, default: 0 },
+  bettorsCount: { type: Number, default: 0 },
   },
   { _id: false }
 );
@@ -119,9 +109,6 @@ const roundSchema = new Schema<IRound>(
       ],
       default: [],
     },
-
-    // phase: { type: String },
-    // phaseEndTime: { type: Date }
   },
   { timestamps: true }
 );

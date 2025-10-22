@@ -24,7 +24,7 @@ async function seedSettings() {
       maintenanceMode: false,
       minBet: 500,
       maxBet: 50000,
-      roundDuration: 30000,
+      roundDuration: 15000,
       commissionRate: 0.1,
       currency: "BDT",
       supportedLanguages: ["en", "bn"],

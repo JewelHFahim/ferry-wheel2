@@ -3,7 +3,7 @@ import http from "http";
 import app from "./app";
 import { connectDB } from "./config/db";
 import { initSocket } from "./sockets/socket";
-import { startNewRound } from "./jobs/roundEngine.job";
+import { startNewRound } from "./jobs/startNewRound.job";
 
 const PORT = Number(process.env.PORT || 5000);
 
