@@ -32,9 +32,11 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
 
     // Optional delays for animation pacing
     const rawRevealDuration  = settings.revealDuration  ?? env.REVEAL_DURATION;
-    const revealDuration     = rawRevealDuration  > 1000 ? rawRevealDuration  : rawRevealDuration  * 1000;
+    // const revealDuration     = rawRevealDuration  > 1000 ? rawRevealDuration  : rawRevealDuration  * 1000;
+    const revealDuration     = 5000;
     const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
-    const prepareDuration    = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
+    // const prepareDuration    = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
+    const prepareDuration    = 5000;
 
     // 2) Close betting
     round.roundStatus = ROUND_STATUS.REVEALING;
@@ -206,8 +208,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     await logTransaction("companyCut", companyCut, "Company cut from pool");
 
     // 16) Public emits (with group totals now embedded in boxStats for Pizza/Salad)
-    console.log("round.boxStats: ", round.boxStats);
-
     nsp.emit(EMIT.ROUND_TOTAL_BET, {
       message: "Round total amount",
       roundTotal: 0,
@@ -253,6 +253,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       reserveWallet: 0,
       roundStatus: ROUND_STATUS.PREPARE,
     });
+
     nsp.emit(EMIT.USER_BET_TOTAL, { roundId: "", totalUserBet: 0 });
 
     setTimeout(() => startNewRound(nsp), prepareDuration);

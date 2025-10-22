@@ -26,18 +26,19 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
     const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
 
     const startTime = new Date();
-    const endTime = new Date(startTime.getTime() + bettingDuration);
+    // const endTime = new Date(startTime.getTime() + bettingDuration);
+    const endTime = new Date(startTime.getTime() + 15000);
 
     //Event times
-    const endBettingTime = new Date(startTime.getTime() + bettingDuration);
-    const endRevealTime = new Date(endBettingTime.getTime() + revealDuration);
-    const endPrepareTime = new Date(endRevealTime.getTime() + prepareDuration);
+    const endBettingTime = new Date(startTime.getTime() + 15000);
+    const endRevealTime = new Date(endBettingTime.getTime() + 5000);
+    const endPrepareTime = new Date(endRevealTime.getTime() + 5000);
 
     // Create the initial round
     const round = await Round.create({
       roundNumber,
       startTime,
-      endTime: endPrepareTime,
+      endTime: endBettingTime,
       revealTime: endRevealTime,
       prepareTime: endPrepareTime,
       boxes,
