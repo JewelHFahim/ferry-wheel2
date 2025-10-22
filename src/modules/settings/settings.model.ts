@@ -2,18 +2,11 @@ import mongoose, { Document, Schema } from "mongoose";
 import { boxDatas } from "../../utils/statics/statics";
 import { IRoundBox } from "../round/round.model";
 
-// export interface IRoundBox {
-//   title: string;
-//   icon: string;
-//   group: string,
-//   multiplier: number;
-// }
-
 export interface IBoxConfig {
   title: string;
   icon: string;
   multiplier: number;
-  group?: string | null; // e.g. "Pizza" | "Salad" | undefined
+  group?: string | null;
 }
 
 export interface ISettings extends Document {
@@ -51,8 +44,7 @@ const SettingsSchema = new Schema<ISettings>(
     currency: { type: String, default: "BD" },
     minBet: { type: Number, default: 50, min: 1 },
     maxBet: { type: Number, default: 10000 },
-    roundDuration: { type: Number, default: 30, min: 5 },
-    bettingDuration: { type: Number, default: 30, min: 15},
+    bettingDuration: { type: Number, default: 15, min: 5},
     prepareDuration: { type: Number, default: 5, min: 3},
     revealDuration: { type: Number, default: 5, min: 3},
     commissionRate: { type: Number, default: 0.1, min: 0, max: 1 },
