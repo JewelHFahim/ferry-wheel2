@@ -143,30 +143,15 @@ export const handleLogin = async (req: Request, res: Response) => {
 
 // Utility: compute UTC day window
 function dayWindowUTC(isoDate?: string) {
-  // isoDate expected as "YYYY-MM-DD" (UTC). If missing, use today's UTC date.
   const base = isoDate ? new Date(`${isoDate}T00:00:00.000Z`) : new Date();
   const start = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), 0, 0, 0, 0));
   const end   = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate() + 1, 0, 0, 0, 0));
   return { start, end };
 }
 
-/**
- * GET /api/v1/bets/daily-winnings/:userId?date=YYYY-MM-DD
- * - userId: Mongo ObjectId
- * - date (optional): UTC day; default = today (UTC)
- * Response:
- * {
- *   status: true,
- *   userId: string,
- *   date: "YYYY-MM-DD",
- *   totalWin: number,
- *   countWinningBets: number
- * }
- */
 export const handleGetUserDailyWinnings = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.userId;
-    console.log("req.user: ", req.user);
     const { date } = req.query as { date?: string };
 
     if (!userId || !mongoose.isValidObjectId(userId)) {

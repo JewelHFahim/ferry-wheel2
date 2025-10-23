@@ -3,12 +3,28 @@ import { ROUND_STATUS } from "./round.types";
 
 export type RoundStatus = (typeof ROUND_STATUS)[keyof typeof ROUND_STATUS];
 
+export interface RoundPayout {
+  userId: Types.ObjectId;
+  box: string;
+  amount: number;
+}
+
+// (optional) make a schema for payouts to keep validation consistent
+const RoundPayoutSchema = new Schema<RoundPayout>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    box: { type: String, required: true },
+    amount: { type: Number, required: true, min: 0 },
+  },
+  { _id: false }
+);
+
 /** Individual box stats for a round */
 export interface IRoundBox {
   title: string;
   icon: string;
   multiplier?: number;
-  group: string,
+  group: string;
   totalBet: number;
   userCount: number;
 }
@@ -31,8 +47,8 @@ export interface IRound {
   roundStatus: RoundStatus;
   startTime: Date;
   endTime: Date;
-  revealTime: Date,
-  prepareTime: Date,
+  revealTime: Date;
+  prepareTime: Date;
   boxes: IRoundBox[];
   winningBox?: string | null;
   totalPool: number;
@@ -42,6 +58,8 @@ export interface IRound {
   bets: Types.ObjectId[];
   boxStats: IBoxStat[];
   topWinners: { userId: Types.ObjectId; amountWon: number }[];
+  pendingPayouts?: RoundPayout[];
+  payoutsApplied?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,12 +78,12 @@ const RoundBoxSchema = new Schema<IRoundBox>(
 
 const BoxStatSchema = new Schema<IBoxStat>(
   {
-  box: { type: String, required: true },
-  icon: { type: String, required: true },
-  multiplier: { type: Number, default: 1 },
-  group: { type: String, default: null },
-  totalAmount: { type: Number, default: 0 },
-  bettorsCount: { type: Number, default: 0 },
+    box: { type: String, required: true },
+    icon: { type: String, required: true },
+    multiplier: { type: Number, default: 1 },
+    group: { type: String, default: null },
+    totalAmount: { type: Number, default: 0 },
+    bettorsCount: { type: Number, default: 0 },
   },
   { _id: false }
 );
@@ -92,6 +110,11 @@ const roundSchema = new Schema<IRound>(
     reserveWallet: { type: Number, default: 0 },
     bets: [{ type: Schema.Types.ObjectId, ref: "Bet", default: [] }],
     boxStats: { type: [BoxStatSchema], default: [] },
+    pendingPayouts: {
+      type: [RoundPayoutSchema],
+      default: [], // <— important
+    },
+    payoutsApplied: { type: Boolean, default: false },
 
     topWinners: {
       type: [

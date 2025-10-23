@@ -38,6 +38,7 @@ const retryConnectDB = async (retries = 5, delay = 5000) => {
       console.log(`🚀 Server running on port ${PORT}`);
 
       startNewRound(game);
+      // startRoundLoop(game); 
     });
 
     // Graceful shutdown

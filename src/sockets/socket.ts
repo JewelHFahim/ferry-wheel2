@@ -42,6 +42,14 @@ export const initSocket = (server: http.Server) => {
       callback({ ok: true });
     });
 
+    // in initSocket connection handler
+    // socket.on("sync_round", async (_payload, ack) => {
+    //   const r = await Round.findOne().sort({ createdAt: -1 })
+    //     .select("_id roundNumber roundStatus endTime revealTime prepareTime boxStats winningBox")
+    //     .lean();
+    //   ack?.({ success: true, round: r });
+    // });
+
     // Socket event listeners
     handleJoinRoom(socket);
     handleGetBalance(socket);

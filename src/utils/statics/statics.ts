@@ -29,20 +29,14 @@ export enum gameCodes {
 
 //Cors Origins
 export const origins = [
-  "http://192.168.68.120:3000",
-  "http://192.168.68.131:3000",
-  "http://192.168.68.121:3000",
-  "http://192.168.1.122:3000",
-  "http://192.168.68.125:5174",
+  "http://localhost:4173",
   "http://localhost:3000",
   "http://localhost:5174",
-  "http://192.168.68.130:3000",
-  "http://192.168.68.119:3000",
   "https://ferry-wheel-game.vercel.app"
 ];
 
 // Roles
-export enum Roles {
+export enum Roles { 
   BOT = "bot",
   USER = "user",
   ADMIN = "admin",
