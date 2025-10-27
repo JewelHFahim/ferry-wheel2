@@ -14,6 +14,7 @@ export enum EMIT {
   BET_ERROR = "bet_error",
   BET_ACCEPTED = "bet_accepted",
   USER_BET_TOTAL = "user_bet_total",
+  USER_PERBOX_TOTAL = "user_perbox_total",
   PING_SERVER = "ping_server",
   GET_CURRENT_ROUND = "getCurrentRound",
 

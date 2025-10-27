@@ -43,22 +43,14 @@ export const initSocket = (server: http.Server) => {
       callback({ ok: true });
     });
 
-    // in initSocket connection handler
-    // socket.on("sync_round", async (_payload, ack) => {
-    //   const r = await Round.findOne().sort({ createdAt: -1 })
-    //     .select("_id roundNumber roundStatus endTime revealTime prepareTime boxStats winningBox")
-    //     .lean();
-    //   ack?.({ success: true, round: r });
-    // });
-
-  socket.on(EMIT.GET_CURRENT_ROUND, async (_payload, ack) => {
-    try {
-      const snap = await MetService.getCurrentRoundSnapshot();
-      ack?.({ success: !!snap, round: snap });
-    } catch (e: any) {
-      ack?.({ success: false, message: e?.message || "server error" });
-    }
-  });
+    socket.on(EMIT.GET_CURRENT_ROUND, async (_payload, ack) => {
+      try {
+        const snap = await MetService.getCurrentRoundSnapshot();
+        ack?.({ success: !!snap, round: snap });
+      } catch (e: any) {
+        ack?.({ success: false, message: e?.message || "server error" });
+      }
+    });
 
     // Socket event listeners
     handleJoinRoom(socket);

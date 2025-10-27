@@ -49,6 +49,9 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     const totalPool = bets.reduce((s, b) => s + b.amount, 0);
     round.totalPool = totalPool;
 
+    // ---- User bet per box totals
+
+
     // ---- 4) Compute group totals (Pizza/Salad)
     const statByBox = new Map(round.boxStats.map((s) => [s.box, s]));
     const pizzaMembers = new Set(
@@ -114,7 +117,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       return;
     }
 
-    // ---- 8) Compute payouts ONLY => NOT credit yet
+    // ---- 8) 
+    // ---- Compute payouts ONLY => NOT credit yet
     const isPizza = winnerBox === "Pizza";
     const isSalad = winnerBox === "Salad";
     const payMultiplier = statByBox.get(winnerBox)?.multiplier ?? 1;
@@ -139,8 +143,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       return;
     }
 
-    // ---- 9) Persist the result & mark payouts as pending
-        // Compute podium
+    // ---- 9)
+    // ---- Persist the result & mark payouts as pending
         const winByUser = new Map<string, number>();
         for (const p of payouts) {
           const key = String(p.userId);
@@ -151,7 +155,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
           .sort((a, b) => b.amountWon - a.amountWon)
           .slice(0, 3);
     
-        // 9) Snapshot result (still no balance changes)
         round.winningBox        = winnerBox;
         round.distributedAmount = totalPayout;
         round.companyCut        = companyCut;
@@ -266,6 +269,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: ROUND_STATUS.PREPARE,
     });
     nsp.emit(EMIT.USER_BET_TOTAL, { roundId: "", totalUserBet: 0 });
+    nsp.emit(EMIT.USER_PERBOX_TOTAL, { roundId: "", userId: "",  userPerBoxTotal: [] });
 
     // await sleep(5000);
 
