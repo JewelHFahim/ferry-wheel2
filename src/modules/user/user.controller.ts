@@ -278,3 +278,30 @@ export const handleGetUserDailyWinnings = async (req: Request, res: Response) =>
     return res.status(500).json({ status: false, message: "Server error", error: err?.message || String(err) });
   }
 };
+
+
+// ==========================
+// @desc    Get User Transaction ledger
+// @route   POST /api/v1/users/transaction-ledger
+// ==========================
+export const handleGetUserWalletHistory = async (req: Request, res: Response) => {
+
+  try {
+    const userId = req.user?.userId;
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ status: false, message: "Invalid userId" });
+    }
+
+    const transactions = await UserService.getUserWalletHistory(userId);
+      return res.status(200).json({
+      status: true,
+      message: "User wallet history retrive",
+      transactions
+    });
+    
+  }catch (err: any) {
+    console.error("handleGetUserWalletHistory error:", err);
+    return res.status(500).json({ status: false, message: "Server error", error: err?.message || String(err) });
+  }
+
+};

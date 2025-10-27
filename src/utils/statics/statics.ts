@@ -31,12 +31,14 @@ export enum gameCodes {
 export const origins = [
   "http://localhost:4173",
   "http://localhost:3000",
+  "http://192.168.68.111:3000",
+  "http://192.168.68.146:3000",
   "http://localhost:5174",
-  "https://ferry-wheel-game.vercel.app"
+  "https://ferry-wheel-game.vercel.app",
 ];
 
 // Roles
-export enum Roles { 
+export enum Roles {
   BOT = "bot",
   USER = "user",
   ADMIN = "admin",
@@ -47,4 +49,14 @@ export enum phaseStatus {
   "BETTING" = "betting",
   "REVEAL" = "reveal",
   "PREPARE" = "prepare",
+}
+
+export enum transactionType {
+  "BET" = "bet",
+  "PAYOUT" = "payout",
+  "DEPOSITE" = "deposite",
+  "WITHDRAW" = "withdraw",
+  "RESERVE_DEPOSIT" = "reserveDeposit",
+  "RESERVE_WITHDRAW" = "reserveWithdraw",
+  "COMPANY_WALLET" = "companyCut",
 }

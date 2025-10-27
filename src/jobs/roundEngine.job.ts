@@ -5,7 +5,6 @@ import { startNewRound } from "./startNewRound.job";
 import { endRound } from "./endRound.job";
 import { ROUND_STATUS } from "../modules/round/round.types";
 
-/** Single global loop guard (process-local). Use a Mongo lease if you run >1 instance. */
 let loopRunning = false;
 
 export async function startRoundLoop(nsp: import("socket.io").Namespace) {

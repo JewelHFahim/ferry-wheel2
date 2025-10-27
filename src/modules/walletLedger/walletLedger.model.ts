@@ -7,7 +7,7 @@ export interface IWalletLedger{
     roundId?: Types.ObjectId;
     betId: Types.ObjectId;
     type: "bet" | "payout" | "deposite" | "withdraw" | "reserveDeposit" | "reserveWithdraw" | "companyCut";
-    delta: number;       // positive or negative (smallest unit)
+    delta: number;
     balanceAfter?: number;
     metaData?:  any;
     createdAt: Date

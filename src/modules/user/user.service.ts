@@ -2,26 +2,28 @@ import { UserModel, IUser } from "./user.model";
 import bcrypt from "bcryptjs";
 import { SettingsService } from "../settings/settings.service";
 import { MetService } from "../met/met.service";
+import WalletLedger from "../walletLedger/walletLedger.model";
 
 export const UserService = {
   
-
-
-  async getById(userId: string): Promise<IUser | null> {
-    return UserModel.findById(userId);
+  //get by user id
+  async getById(userId: string, session?: any): Promise<IUser | null> {
+    return UserModel.findById(userId).session(session);
   },
 
+  // get by user name
   async getByUsername(username: string): Promise<IUser | null> {
     return UserModel.findOne({ username });
   },
 
   // update user balance
-  async updateBalance(userId: string, amount: number): Promise<IUser> {
+  async updateBalance(userId: string, amount: number, session?:any): Promise<IUser> {
     const updated = await UserModel.findByIdAndUpdate(
       userId,
       { $inc: { balance: amount } },
       { new: true, projection: { balance: 1 } } // return new balance quickly
-    );
+    ).session(session);
+    
     if (!updated) throw new Error("User not found");
     return updated;
   },
@@ -39,5 +41,12 @@ export const UserService = {
       throw new Error("Error verifying password.");
     }
   },
+
+  async getUserWalletHistory(userId: string){
+    const transactions = await WalletLedger.find({ entityId: userId })
+        .sort({ createdAt: -1 })
+        .limit(10);
+    return transactions;
+}
 
 };

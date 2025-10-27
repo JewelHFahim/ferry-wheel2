@@ -30,8 +30,8 @@ export const getReserveWallet = async () => {
 
 
 // transaction log
-export const logTransaction = async (type: string, amount: number, description: string) => {
-  const wallet = await CompanyWallet.findOne();
+export const logTransaction = async (type: string, amount: number, description: string, session?:any) => {
+  const wallet = await CompanyWallet.findOne().session(session);
   if (!wallet) {
     console.error("Company wallet not found!");
     return;

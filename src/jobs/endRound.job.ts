@@ -158,7 +158,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     });
 
     // Pause for result reveal
-    await sleep(revealDuration);
+    await sleep(5000);
 
     // ====================================
     // @status: Public,  @desc: Winner revealed
@@ -172,7 +172,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     });
 
     // ---- 11) Pause for animation
-    await sleep(revealDuration);
+    await sleep(5000);
 
     // ---- 12) APPLY payouts once (idempotent check)
     const fresh = await Round.findOneAndUpdate(
@@ -238,7 +238,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     round.roundStatus = ROUND_STATUS.COMPLETED;
     await round.save();
 
-    await sleep(prepareDuration);
 
     // ====================================
     // @status: PUBLIC,  @desc: Reset round
@@ -253,6 +252,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: ROUND_STATUS.PREPARE,
     });
     nsp.emit(EMIT.USER_BET_TOTAL, { roundId: "", totalUserBet: 0 });
+
+    await sleep(5000);
 
     setTimeout(() => startNewRound(nsp), prepareDuration);
   } catch (err) {
