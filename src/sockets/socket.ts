@@ -9,6 +9,7 @@ import {
   handleJoinRoom,
   handlePlaceBet,
 } from "./socket.service";
+import { MetService } from "../modules/met/met.service";
 
 // Function to handle user disconnect
 export const handleDisconnect = (socket: any) => {
@@ -49,6 +50,15 @@ export const initSocket = (server: http.Server) => {
     //     .lean();
     //   ack?.({ success: true, round: r });
     // });
+
+  socket.on(EMIT.GET_CURRENT_ROUND, async (_payload, ack) => {
+    try {
+      const snap = await MetService.getCurrentRoundSnapshot();
+      ack?.({ success: !!snap, round: snap });
+    } catch (e: any) {
+      ack?.({ success: false, message: e?.message || "server error" });
+    }
+  });
 
     // Socket event listeners
     handleJoinRoom(socket);

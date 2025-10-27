@@ -40,7 +40,7 @@ export const handleGetBettingHistory = async (req: Request, res: Response) => {
         const bettingHistory = await Bet.find(filters)
             .skip(skip)
             .limit(limit)
-            .sort({ createdAt: -1 }); // latest first
+            .sort({ createdAt: -1 });
 
         const count = await Bet.countDocuments(filters);
 
@@ -104,10 +104,10 @@ export const handleGetBettingHistoryTenData = async (req: Request, res: Response
 };
 
 // ==========================
-// @desc    Round Top Three Winners
+// @desc    Round Top Winners
 // @route   GET /api/v1/bettings/top-winners/:roundId
 // ==========================
-export const handleGetTopWinners = async (req: Request, res: Response) => {
+export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
   try {
     const { roundId } = req.params;
     if (!roundId || !mongoose.isValidObjectId(roundId)) {
@@ -115,8 +115,9 @@ export const handleGetTopWinners = async (req: Request, res: Response) => {
     }
 
     const round = await Round.findById(roundId)
-      .select("_id roundNumber topWinners winningBox createdAt updatedAt")
-      .lean();
+    .select("_id roundNumber topWinners winningBox createdAt updatedAt")
+    .lean();
+
     if (!round) {
       return res.status(404).json({ status: false, message: "Round not found" });
     }
@@ -330,7 +331,7 @@ export const handleGetUserLast10Records = async (req: Request, res: Response) =>
       message: "User bet history retrieved",
       count: records.length,
       records,
-      config: { groupMultiplierMode: "own" },
+      // config: { groupMultiplierMode: "own" },
     });
   } catch (e) {
     console.error(e);
@@ -338,18 +339,11 @@ export const handleGetUserLast10Records = async (req: Request, res: Response) =>
   }
 };
 
-
 // ==========================
 // @desc    Monthly Leaderboard
 // @route   GET /api/v1/bettings/leaderboard
 // ==========================
-
-/**
- * Defaults: current month (from 1st 00:00 to now).
- * Optional query: ?year=2025&month=10  (1..12)
- */
-
-export const handleGetMonthlyTopWinners = async (req: Request, res: Response) => {
+export const handleGetMonthlyLeaderboard = async (req: Request, res: Response) => {
 
   try {
     // ---- Resolve month window ----
@@ -444,82 +438,45 @@ export const handleGetMonthlyTopWinners = async (req: Request, res: Response) =>
   }
 };
 
-
 // ==========================
 // @desc    Daily Leaderboad
 // @route   GET /api/v1/bettings/leaderboard
 // ==========================
-
-// Helper: start-of-today and now in a given IANA timezone (fallback to UTC)
-function getTodayWindow(tz?: string) {
-  try {
-    if (tz) {
-      const now = new Date();
-      const fmt = new Intl.DateTimeFormat("en-CA", {
-        timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
-      });
-      const [y, m, d] = fmt.format(now).split("-");
-      const localMidnight = new Date(`${y}-${m}-${d}T00:00:00`);
-      const start = new Date(
-        localMidnight.toLocaleString("en-US", { timeZone: "UTC" })
-      );
-      const end = now;  // Ensure that 'now' is in UTC time zone
-      console.log(`Timezone: ${tz}, Start of day (UTC): ${start}, End of day (UTC): ${end}`);
-      return { start, end };
-    }
-  } catch (err) {
-    console.error("Error while determining today’s window", err);
-  }
-  
-  // Fallback to UTC
-  const now = new Date();
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
-  const end = now;  // Current time (UTC)
-  console.log(`Using UTC Start: ${start}, End: ${end}`);
-  return { start, end };
-}
-
-
-/**
- * GET /api/v1/leaderboard/top-winners-today
- * Optional: ?tz=Asia/Dhaka  (IANA timezone for “today” window)
- */
-
-export const handleGetTodaysTopWinners = async (req: Request, res: Response) => {
+export const handleGetDailyLeaderboard = async (req: Request, res: Response) => {
   try {
     const tz = typeof req.query.tz === "string" ? req.query.tz : undefined;
-    const { start, end } = getTodayWindow(tz);  // Get today's time window
+    const { start, end } = getTodayWindow(tz);
 
     const leaders = await Round.aggregate([
-      { 
-        $unwind: "$topWinners" 
-      },
-      { 
-        $match: { 
-          // Filter based on the 'lastWinAt' of the winners, instead of 'createdAt'
-          createdAt: { $gte: start, $lt: end } 
-        } 
-      },
+      { $match: { updatedAt: { $gte: start, $lt: end }, topWinners: { $exists: true, $ne: [] } } },
+      { $unwind: "$topWinners" },
+
       {
         $group: {
-          _id: "$topWinners.userId",  // Group by user ID
-          totalWon: { $sum: "$topWinners.amountWon" },
-          winsCount: { $sum: 1 },
+          _id: "$topWinners.userId",
+          totalWon:   { $sum: "$topWinners.amountWon" },
+          winsCount:  { $sum: 1 },
           biggestWin: { $max: "$topWinners.amountWon" },
-          lastWinAt: { $max: "$topWinners.lastWinAt" },
+          lastWinAt:  { $max: "$updatedAt" },
         },
       },
+
+      // Join user info
       {
         $lookup: {
-          from: "users",  // Look up user data
+          from: "users",
           localField: "_id",
           foreignField: "_id",
           as: "user",
         },
       },
-      { $unwind: "$user" },  // Unwind the user array for the result
+      { $unwind: "$user" },
+
+      // Sort winners of the day
       { $sort: { totalWon: -1, biggestWin: -1, lastWinAt: -1 } },
       { $limit: 10 },
+
+      // Shape output
       {
         $project: {
           _id: 0,
@@ -540,88 +497,34 @@ export const handleGetTodaysTopWinners = async (req: Request, res: Response) => 
       },
     ]).exec();
 
-    console.log("leaders: ", leaders)
-
-    res.status(200).json({
+    return res.status(200).json({
       status: true,
       message: "Top winners (today)",
+      window: { from: start, to: end, tz: tz ?? "UTC" },
       userId: req.user?.userId,
       count: leaders.length,
       leaders,
     });
   } catch (err: any) {
     console.error("handleGetTodaysTopWinners error:", err);
-    res.status(500).json({ status: false, message: err?.message || "Server error" });
+    return res.status(500).json({ status: false, message: err?.message || "Server error" });
   }
 };
 
-
-
-// export const handleGetTodaysTopWinners = async (req: Request, res: Response) => {
-//   try {
-//     const tz = typeof req.query.tz === "string" ? req.query.tz : undefined;
-//     const { start, end } = getTodayWindow(tz);
-
-//     const leaders = await Round.aggregate([
-//       { 
-//         $match: { 
-//           // createdAt: { $gte: start, $lt: end }, 
-//           topWinners: { $exists: true, $ne: [] } 
-//         } 
-//       },
-//       { $unwind: "$topWinners" },
-//       {
-//         $group: {
-//           _id: "$topWinners.userId",
-//           totalWon: { $sum: "$topWinners.amountWon" },
-//           winsCount: { $sum: 1 },
-//           biggestWin: { $max: "$topWinners.amountWon" },
-//           lastWinAt: { $max: "$updatedAt" },
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "users",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "user",
-//         },
-//       },
-//       { $unwind: "$user" },
-//       { $sort: { totalWon: -1, biggestWin: -1, lastWinAt: -1 } },
-//       { $limit: 10 },
-//       {
-//         $project: {
-//           _id: 0,
-//           userId: "$_id",
-//           totalWon: 1,
-//           winsCount: 1,
-//           biggestWin: 1,
-//           lastWinAt: 1,
-//           user: {
-//             _id: "$user._id",
-//             username: "$user.username",
-//             email: "$user.email",
-//             role: "$user.role",
-//             balance: "$user.balance",
-//             createdAt: "$user.createdAt",
-//           },
-//         },
-//       },
-//     ]).exec();
-
-//     console.log("leaders: ", leaders)
-
-//     res.status(200).json({
-//       status: true,
-//       message: "Top winners (today)",
-//       // window: { from: start, to: end, tz: tz ?? "UTC" },
-//       userId: req.user?.userId,
-//       count: leaders.length,
-//       leaders,
-//     });
-//   } catch (err: any) {
-//     console.error("handleGetTodaysTopWinners error:", err);
-//     res.status(500).json({ status: false, message: err?.message || "Server error" });
-//   }
-// };
+function getTodayWindow(tz?: string) {
+  try {
+    if (tz) {
+      const now = new Date();
+      const fmt = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" });
+      const [y, m, d] = fmt.format(now).split("-");
+      // local midnight in that tz, converted to a real Date in UTC
+      const startLocal = new Date(`${y}-${m}-${d}T00:00:00`);
+      const start = new Date(startLocal.toLocaleString("en-US", { timeZone: "UTC" }));
+      return { start, end: now };
+    }
+  } catch {}
+  // Fallback: UTC midnight → now
+  const now = new Date();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+  return { start, end: now };
+}
