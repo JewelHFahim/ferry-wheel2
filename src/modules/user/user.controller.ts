@@ -279,7 +279,6 @@ export const handleGetUserDailyWinnings = async (req: Request, res: Response) =>
   }
 };
 
-
 // ==========================
 // @desc    Get User Transaction ledger
 // @route   POST /api/v1/users/transaction-ledger

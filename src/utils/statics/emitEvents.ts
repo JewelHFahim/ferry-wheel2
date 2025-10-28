@@ -17,5 +17,4 @@ export enum EMIT {
   USER_PERBOX_TOTAL = "user_perbox_total",
   PING_SERVER = "ping_server",
   GET_CURRENT_ROUND = "getCurrentRound",
-
 }

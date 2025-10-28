@@ -12,7 +12,7 @@ const router = express.Router();
 router.use("/users", userRoutes);
 router.use("/company", compnayRoutes);
 router.use("/settings", settingRoutes);
-router.use("/bettings", betRoutes);
+router.use("/bet", betRoutes);
 router.use("/met-services", metRoutes);
 
 

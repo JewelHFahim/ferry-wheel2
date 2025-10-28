@@ -9,6 +9,7 @@ import { logPlaceBet, logWarning } from "../../utils/gameEventLogger";
 import { gameCodes, transactionType } from "../../utils/statics/statics";
 import { ROUND_STATUS } from "../round/round.types";
 import WalletLedger from "../walletLedger/walletLedger.model";
+import { getUserPerboxTotal } from "./userTotals.service";
 
 class BetError extends Error {
   constructor(public code: string, msg: string) {
@@ -159,8 +160,6 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
       "Betting is closed for this round."
     );
   }
-  // Safety fallback if something odd happened
-  const roundTotal = Number(updatedRound?.totalPool ?? 0);
 
   // =======================================
   // @status: PUBLIC,   @desc: Live round total
@@ -173,7 +172,7 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
   });
 
   // =======================================
-  // @status: PUBLIC,   @desc: Updated round data with live group totals reflected
+  // @status: PUBLIC,   @desc: Updated round data with live group totals
   // =======================================
   nsp.emit(EMIT.ROUND_UPDATED, {
     _id: roundId,
@@ -191,16 +190,16 @@ export const getBetsByRound = async (roundId: string | Types.ObjectId) => {
 
 
 // -------------------> New function to get per-box total for a user in a round
-export const getUserPerboxTotal = async (userId: string | Types.ObjectId, roundId: string | Types.ObjectId) => {
+// export const getUserPerboxTotal = async (userId: string | Types.ObjectId, roundId: string | Types.ObjectId) => {
 
-  const perBox  = await Bet.aggregate([
-    { $match: { userId: new Types.ObjectId(userId), roundId: new Types.ObjectId(roundId) } },
-    { $group: { _id: "$box", totalAmount: { $sum: "$amount" }, count: { $sum : 1 } } },
-    { $project: { _id: 0, box: "$_id", totalAmount: 1, count: 1 } },
-    { $sort: { box: 1 } },
-  ]);
+//   const perBox  = await Bet.aggregate([
+//     { $match: { userId: new Types.ObjectId(userId), roundId: new Types.ObjectId(roundId) } },
+//     { $group: { _id: "$box", totalAmount: { $sum: "$amount" }, count: { $sum : 1 } } },
+//     { $project: { _id: 0, box: "$_id", totalAmount: 1, count: 1 } },
+//     { $sort: { box: 1 } },
+//   ]);
 
-  const totalUserBet = perBox .reduce((s, x) => s + (x.totalAmount || 0), 0); 
+//   const totalUserBet = perBox .reduce((s, x) => s + (x.totalAmount || 0), 0); 
   
-  return perBox;
-}
+//   return perBox;
+// }

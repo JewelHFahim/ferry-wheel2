@@ -6,7 +6,6 @@ import { env } from "../config/env";
 import { EMIT } from "../utils/statics/emitEvents";
 import { ROUND_STATUS } from "../modules/round/round.types";
 import { endRound } from "./endRound.job";
-import { endRound1 } from "./endRoundTest";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -19,21 +18,20 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       SettingsService.getInitialBoxes(),
     ]);
 
-    // const raw = settings.bettingDuration ?? env.BETTING_DURATION;
-    // const bettingDuration = raw > 1000 ? raw : raw * 1000;
-    // const rawRevealDuration = settings.revealDuration ?? env.REVEAL_DURATION;
-    // const revealDuration = rawRevealDuration > 1000 ? rawRevealDuration : rawRevealDuration * 1000;
-    // const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
-    // const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
+    const raw = settings.bettingDuration ?? env.BETTING_DURATION;
+    const bettingDuration = raw > 1000 ? raw : raw * 1000;
+    const rawRevealDuration = settings.revealDuration ?? env.REVEAL_DURATION;
+    const revealDuration = rawRevealDuration > 1000 ? rawRevealDuration : rawRevealDuration * 1000;
+    const rawPrepareDuration = settings.prepareDuration ?? env.PREPARE_DURATION;
+    const prepareDuration = rawPrepareDuration > 1000 ? rawPrepareDuration : rawPrepareDuration * 1000;
 
     const startTime = new Date();
-    // const endTime = new Date(startTime.getTime() + bettingDuration);
-    const endTime = new Date(startTime.getTime() + 15000);
+    const endTime = new Date(startTime.getTime() + bettingDuration);
 
     //Event times
-    const endBettingTime = new Date(startTime.getTime() + 15000);
-    const endRevealTime = new Date(endBettingTime.getTime() + 5000);
-    const endPrepareTime = new Date(endRevealTime.getTime() + 5000);
+    const endBettingTime = new Date(startTime.getTime() + bettingDuration);
+    const endRevealTime = new Date(endBettingTime.getTime() + revealDuration);
+    const endPrepareTime = new Date(endRevealTime.getTime() + prepareDuration);
 
     // Create the initial round
     const round = await Round.create({
@@ -79,7 +77,7 @@ export const startNewRound = async (nsp: Namespace): Promise<void> => {
       roundStatus: ROUND_STATUS.BETTING,
     });
 
-    await sleep(15000);
+    await sleep(bettingDuration);
 
     // End the round and prepare for the next phase
     await endRound(round._id.toString(), nsp);

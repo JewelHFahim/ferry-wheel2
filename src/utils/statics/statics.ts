@@ -2,12 +2,12 @@
 export const boxDatas = [
   { title: "Meat", icon: "🥩", group: "Pizza", multiplier: 45 },
   { title: "Tomato", icon: "🍅", group: "Salad", multiplier: 5 },
-  { title: "Corn", icon: "🌽", group: "Salad", multiplier: 5 },
-  { title: "Sausage", icon: "🌭", group: "Pizza", multiplier: 10 },
-  { title: "Lettuce", icon: "🥬", group: "Salad", multiplier: 5 },
-  { title: "Carrot", icon: "🥕", group: "Salad", multiplier: 5 },
   { title: "Skewer", icon: "🍢", group: "Pizza", multiplier: 15 },
-  { title: "Ham", icon: "🍗", group: "Pizza", multiplier: 5 },
+  { title: "Carrot", icon: "🥕", group: "Salad", multiplier: 5 },
+  { title: "Ham", icon: "🍗", group: "Pizza", multiplier: 25 },
+  { title: "Lettuce", icon: "🥬", group: "Salad", multiplier: 5 },
+  { title: "Sausage", icon: "🌭", group: "Pizza", multiplier: 10 },
+  { title: "Corn", icon: "🌽", group: "Salad", multiplier: 5 },
   { title: "Pizza", icon: "🍕", group: "Pizza", multiplier: 4.37 },
   { title: "Salad", icon: "🥗", group: "Salad", multiplier: 1.25 },
 ];
@@ -31,7 +31,7 @@ export enum gameCodes {
 export const origins = [
   "http://localhost:4173",
   "http://localhost:3000",
-  "http://192.168.68.111:3000",
+  "http://192.168.68.126:3000",
   "http://192.168.68.146:3000",
   "http://localhost:5174",
   "https://ferry-wheel-game.vercel.app",

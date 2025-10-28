@@ -28,8 +28,11 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     if (!round) { console.warn("Round not found:", roundId); return; }
     if (!settings) { console.warn("Settings not found"); return; }
 
-    const revealDuration  = settings.revealDuration ?? env.REVEAL_DURATION;
-    const prepareDuration  = settings.prepareDuration ?? env.PREPARE_DURATION;
+    const rawRevealDuration = settings.revealDuration ? settings.revealDuration : env.REVEAL_DURATION;
+    const revealDuration = Number(rawRevealDuration) > 1000 ? Number(rawRevealDuration) : (Number(rawRevealDuration) * 1000);
+    const rawPrepareDuration = settings.prepareDuration ? settings.prepareDuration : env.PREPARE_DURATION;
+    const prepareDuration = Number(rawPrepareDuration) > 1000 ? Number(rawPrepareDuration) : (Number(rawPrepareDuration) * 1000);
+    
 
     // ---- 2) Close betting
     round.roundStatus = ROUND_STATUS.REVEALING;
@@ -48,11 +51,10 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     const bets = await getBetsByRound(round._id);
     const totalPool = bets.reduce((s, b) => s + b.amount, 0);
     round.totalPool = totalPool;
+    await round.save();
 
-    // ---- User bet per box totals
-
-
-    // ---- 4) Compute group totals (Pizza/Salad)
+    // ---- 4) 
+    // ---- Compute group totals (Pizza/Salad)
     const statByBox = new Map(round.boxStats.map((s) => [s.box, s]));
     const pizzaMembers = new Set(
       round.boxStats.filter(s => s.group === "Pizza" && s.box !== "Pizza").map(s => s.box)
@@ -72,6 +74,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       if (pizzaMembers.has(b.box)) { pizzaTotal += b.amount; pizzaCount += 1; }
       if (saladMembers.has(b.box)) { saladTotal += b.amount; saladCount += 1; }
     }
+
     // include any direct rep bets
     pizzaTotal += perBoxTotal.get("Pizza") || 0; pizzaCount += perBoxCount.get("Pizza") || 0;
     saladTotal += perBoxTotal.get("Salad") || 0; saladCount += perBoxCount.get("Salad") || 0;
@@ -90,21 +93,24 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     }
     await round.save();
 
-    // ---- 5) Company cut & funds
+    // ---- 5) 
+    // ---- Company cut & funds
     const companyCut = Math.floor(totalPool * (settings.commissionRate ?? 0.1));
     round.companyCut = companyCut;
 
     const distributableAmount = totalPool - companyCut;
     const availableFunds = distributableAmount + companyWallet.reserveWallet;
 
-    // ---- 6) Eligibility using UI totals
+    // ---- 6) 
+    // ---- Eligibility using UI totals
     const eligibleStats = round.boxStats.filter((s) => {
       const mult = Number(s.multiplier) || 1;
       const required = (s.totalAmount || 0) * mult;
       return required <= availableFunds;
     });
 
-    // ---- 7) Choose winner
+    // ---- 7) 
+    // ---- Choose winner
     let winnerBox: string | null = null;
     if (eligibleStats.length > 0) {
       winnerBox = eligibleStats[Math.floor(Math.random() * eligibleStats.length)].box;
@@ -175,7 +181,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     });
 
     // Pause for result reveal
-    await sleep(5000);
+    await sleep(prepareDuration);
 
     // ====================================
     // @status: Public,  @desc: Winner revealed
@@ -188,8 +194,9 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: ROUND_STATUS.REVEALED,
     });
 
-    // ---- 11) Pause for animation
-    await sleep(5000);
+    // ---- 11)
+    // ---- Pause for animation
+    await sleep(revealDuration);
 
     // ---- 12) APPLY payouts once (idempotent check)
     const fresh = await Round.findOneAndUpdate(
@@ -270,8 +277,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     });
     nsp.emit(EMIT.USER_BET_TOTAL, { roundId: "", totalUserBet: 0 });
     nsp.emit(EMIT.USER_PERBOX_TOTAL, { roundId: "", userId: "",  userPerBoxTotal: [] });
-
-    // await sleep(5000);
 
     setTimeout(() => startNewRound(nsp), 5000);
   } catch (err) {
