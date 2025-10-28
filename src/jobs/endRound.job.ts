@@ -18,7 +18,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
   try {
-    // ---- 1) Load state
+    // ---- Load state ------//
     const [round, settings, companyWallet] = await Promise.all([
       Round.findById(roundId),
       SettingsService.getSettings(),
@@ -34,12 +34,12 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     const prepareDuration = Number(rawPrepareDuration) > 1000 ? Number(rawPrepareDuration) : (Number(rawPrepareDuration) * 1000);
     
 
-    // ---- 2) Close betting
+     // ---- Close betting ------//
     round.roundStatus = ROUND_STATUS.REVEALING;
     await round.save();
 
     // ====================================
-    // @status: Public,  @desc: Betting close
+    // @status: PUBLIC,  @desc: Betting close
     // ====================================
     nsp.emit(EMIT.ROUND_CLOSED, {
       _id: round._id,
@@ -47,14 +47,13 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: ROUND_STATUS.REVEALING,
     });
 
-    // ---- 3) Load bets & compute pool
+     // ---- Load bets & compute pool ------//
     const bets = await getBetsByRound(round._id);
     const totalPool = bets.reduce((s, b) => s + b.amount, 0);
     round.totalPool = totalPool;
     await round.save();
 
-    // ---- 4) 
-    // ---- Compute group totals (Pizza/Salad)
+    // ---- Compute group totals (Pizza/Salad) -------
     const statByBox = new Map(round.boxStats.map((s) => [s.box, s]));
     const pizzaMembers = new Set(
       round.boxStats.filter(s => s.group === "Pizza" && s.box !== "Pizza").map(s => s.box)
@@ -93,29 +92,27 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     }
     await round.save();
 
-    // ---- 5) 
-    // ---- Company cut & funds
+    // ---- Company cut & funds -----
     const companyCut = Math.floor(totalPool * (settings.commissionRate ?? 0.1));
     round.companyCut = companyCut;
 
     const distributableAmount = totalPool - companyCut;
     const availableFunds = distributableAmount + companyWallet.reserveWallet;
 
-    // ---- 6) 
-    // ---- Eligibility using UI totals
+    // ---- Eligibility using UI totals ------
     const eligibleStats = round.boxStats.filter((s) => {
       const mult = Number(s.multiplier) || 1;
       const required = (s.totalAmount || 0) * mult;
       return required <= availableFunds;
     });
 
-    // ---- 7) 
-    // ---- Choose winner
+    // ---- Choose winner -----
     let winnerBox: string | null = null;
     if (eligibleStats.length > 0) {
       winnerBox = eligibleStats[Math.floor(Math.random() * eligibleStats.length)].box;
     }
-    // if move distributable to reserve and stop
+
+    // move to reserve and stop
     if (!winnerBox) {
       companyWallet.reserveWallet += distributableAmount;
       await companyWallet.save();
@@ -123,8 +120,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       return;
     }
 
-    // ---- 8) 
-    // ---- Compute payouts ONLY => NOT credit yet
+    // ---- Compute payouts ONLY => NOT credit yet -----
     const isPizza = winnerBox === "Pizza";
     const isSalad = winnerBox === "Salad";
     const payMultiplier = statByBox.get(winnerBox)?.multiplier ?? 1;
@@ -149,8 +145,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       return;
     }
 
-    // ---- 9)
-    // ---- Persist the result & mark payouts as pending
+    // ---- Persist the result & mark payouts as pending -----
         const winByUser = new Map<string, number>();
         for (const p of payouts) {
           const key = String(p.userId);
@@ -169,7 +164,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         round.payoutsApplied    = false;
         await round.save();
         
-    // ---- 10)
     // ====================================
     // @status: Public,  @desc: Emit reveal FIRST, no balance changes yet
     // ====================================
@@ -194,18 +188,17 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       roundStatus: ROUND_STATUS.REVEALED,
     });
 
-    // ---- 11)
-    // ---- Pause for animation
+    // ---- Pause for animation -----
     await sleep(revealDuration);
 
-    // ---- 12) APPLY payouts once (idempotent check)
+    // ---- APPLY payouts once (idempotent check) ----
     const fresh = await Round.findOneAndUpdate(
       { _id: round._id, payoutsApplied: { $ne: true } },
       { $set: { payoutsApplied: true } },               
       { new: true, projection: { pendingPayouts: 1 } }
     ).lean();
 
-    //Apply credits now.
+    // Credits now
     if (fresh) {
       let reserveUsed = 0;
       if (totalPayout > distributableAmount) {
@@ -216,7 +209,7 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       }
 
       // ====================================
-      // @status: PRIVATE,  @desc: Credit wiiners & Balance update
+      // @status: PRIVATE,  @desc: Credit winers & Balance update
       // ====================================
       for (const p of payouts) {
         const updated = await UserService.updateBalance(String(p.userId), p.amount);
@@ -244,7 +237,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       await logTransaction("companyCut", companyCut, "Company cut from pool");
     }
 
-    // ---- 13)
     // ====================================
     // @status: PUBLIC,  @desc: End round
     // ====================================
