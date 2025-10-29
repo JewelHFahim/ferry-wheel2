@@ -118,8 +118,8 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
     }
 
     const round = await Round.findById(roundId)
-    .select("_id roundNumber topWinners winningBox createdAt updatedAt")
-    .lean();
+      .select("_id roundNumber topWinners winningBox createdAt updatedAt")
+      .lean();
 
     if (!round) {
       return res.status(404).json({ status: false, message: "Round not found" });
@@ -134,7 +134,7 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
         roundNumber: round.roundNumber,
         count: 0,
         topWinners: [],
-        winningBox: round.winningBox
+        winningBox: round.winningBox,
       });
     }
 
@@ -144,15 +144,28 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       const uid = String(w.userId);
       winMap.set(uid, (winMap.get(uid) ?? 0) + (w.amountWon ?? 0));
     }
+
     const userIds = [...winMap.keys()];
-    const userObjIds = userIds.map(id => new mongoose.Types.ObjectId(id));
+    if (userIds.length === 0) {
+      return res.status(200).json({
+        status: true,
+        message: "Top winners empty",
+        _id: round._id,
+        roundNumber: round.roundNumber,
+        count: 0,
+        topWinners: [],
+        winningBox: round.winningBox,
+      });
+    }
+
+    const userObjIds = userIds.map((id) => new mongoose.Types.ObjectId(id));
 
     // 2) Fetch user info
     const users = await UserModel.find(
       { _id: { $in: userObjIds } },
       { username: 1, email: 1, role: 1, balance: 1, createdAt: 1 }
     ).lean();
-    const userMap = new Map(users.map(u => [String(u._id), u]));
+    const userMap = new Map(users.map((u) => [String(u._id), u]));
 
     // 3) Aggregate each user’s total bet in this round
     const totals = await Bet.aggregate([
@@ -160,16 +173,33 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       { $group: { _id: "$userId", totalBet: { $sum: "$amount" }, betCount: { $sum: 1 } } },
     ]);
     const totalsMap = new Map(
-      totals.map(t => [String(t._id), { totalBet: t.totalBet, betCount: t.betCount }])
+      totals.map((t) => [String(t._id), { totalBet: t.totalBet, betCount: t.betCount }])
     );
 
-    // 4) Build unique array
+    // (Optional) biggestWin/lastWinAt if you want:
+    // const winEvents = await Bet.aggregate([
+    //   { $match: { roundId: new mongoose.Types.ObjectId(roundId), userId: { $in: userObjIds } } },
+    //   { $group: { _id: "$userId", biggestWin: { $max: "$amount" }, lastWinAt: { $max: "$createdAt" } } },
+    // ]);
+    // const winEventsMap = new Map(winEvents.map(w => [String(w._id), { biggestWin: w.biggestWin, lastWinAt: w.lastWinAt }]));
+
+    // 4) Build unique array (keep user nested)
     const merged = userIds
-      .map(uid => ({
-        userId: uid,
+      .map((uid) => ({
+        userId: uid,                                  // string
         amountWon: winMap.get(uid) ?? 0,
         ...(totalsMap.get(uid) ?? { totalBet: 0, betCount: 0 }),
-        ... userMap.get(uid) || null,
+        // ...(winEventsMap.get(uid) ?? { biggestWin: 0, lastWinAt: null }),
+        user: userMap.get(uid)
+          ? {
+              _id: userMap.get(uid)!._id,
+              username: userMap.get(uid)!.username,
+              email: userMap.get(uid)!.email,
+              role: userMap.get(uid)!.role,
+              balance: userMap.get(uid)!.balance,
+              createdAt: userMap.get(uid)!.createdAt,
+            }
+          : null,
       }))
       .sort((a, b) => b.amountWon - a.amountWon);
 
@@ -181,10 +211,10 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       roundNumber: round.roundNumber,
       count: merged.length,
       topWinners: merged,
-      winningBox: round.winningBox
+      winningBox: round.winningBox,
     });
   } catch (error) {
-    console.error("handleGetTopWinners error:", error);
+    console.error("handleGetRoundTopWinners error:", error);
     return res.status(500).json({
       status: false,
       message: "Server error, try again later",
@@ -192,6 +222,7 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 // ==========================
 // @role    USER

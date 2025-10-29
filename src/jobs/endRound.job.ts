@@ -13,6 +13,7 @@ import { EMIT } from "../utils/statics/emitEvents";
 import { ROUND_STATUS } from "../modules/round/round.types";
 import { startNewRound } from "./startNewRound.job";
 import { env } from "../config/env";
+import { groupName, transactionType } from "../utils/statics/statics";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,12 +29,14 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     if (!round) { console.warn("Round not found:", roundId); return; }
     if (!settings) { console.warn("Settings not found"); return; }
 
-    const rawRevealDuration = settings.revealDuration ? settings.revealDuration : env.REVEAL_DURATION;
-    const revealDuration = Number(rawRevealDuration) > 1000 ? Number(rawRevealDuration) : (Number(rawRevealDuration) * 1000);
-    const rawPrepareDuration = settings.prepareDuration ? settings.prepareDuration : env.PREPARE_DURATION;
-    const prepareDuration = Number(rawPrepareDuration) > 1000 ? Number(rawPrepareDuration) : (Number(rawPrepareDuration) * 1000);
-    
+    const revealDuration = typeof settings.revealDuration === "number"
+      ? (settings.revealDuration < 1000 ? settings.revealDuration * 1000 : settings.revealDuration)
+      : env.REVEAL_DURATION_MS;
 
+    const prepareDuration = typeof settings.prepareDuration === "number"
+      ? (settings.prepareDuration < 1000 ? settings.prepareDuration * 1000 : settings.prepareDuration)
+      : env.PREPARE_DURATION_MS;
+    
      // ---- Close betting ------//
     round.roundStatus = ROUND_STATUS.REVEALING;
     await round.save();
@@ -55,12 +58,8 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
 
     // ---- Compute group totals (Pizza/Salad) -------
     const statByBox = new Map(round.boxStats.map((s) => [s.box, s]));
-    const pizzaMembers = new Set(
-      round.boxStats.filter(s => s.group === "Pizza" && s.box !== "Pizza").map(s => s.box)
-    );
-    const saladMembers = new Set(
-      round.boxStats.filter(s => s.group === "Salad" && s.box !== "Salad").map(s => s.box)
-    );
+    const pizzaMembers = new Set( round.boxStats.filter(s => s.group === groupName.PIZZA && s.box !== groupName.PIZZA).map(s => s.box));
+    const saladMembers = new Set( round.boxStats.filter(s => s.group === groupName.SALAD && s.box !== groupName.SALAD).map(s => s.box));
     const perBoxTotal = new Map<string, number>();
     const perBoxCount = new Map<string, number>();
     for (const b of bets) {
@@ -75,14 +74,14 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     }
 
     // include any direct rep bets
-    pizzaTotal += perBoxTotal.get("Pizza") || 0; pizzaCount += perBoxCount.get("Pizza") || 0;
-    saladTotal += perBoxTotal.get("Salad") || 0; saladCount += perBoxCount.get("Salad") || 0;
+    pizzaTotal += perBoxTotal.get(groupName.PIZZA) || 0; pizzaCount += perBoxCount.get(groupName.PIZZA) || 0;
+    saladTotal += perBoxTotal.get(groupName.SALAD) || 0; saladCount += perBoxCount.get(groupName.SALAD) || 0;
 
     for (const s of round.boxStats) {
-      if (s.box === "Pizza") {
+      if (s.box === groupName.PIZZA) {
         s.totalAmount  = pizzaTotal;
         s.bettorsCount = pizzaCount;
-      } else if (s.box === "Salad") {
+      } else if (s.box === groupName.SALAD) {
         s.totalAmount  = saladTotal;
         s.bettorsCount = saladCount;
       } else {
@@ -121,14 +120,14 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     }
 
     // ---- Compute payouts ONLY => NOT credit yet -----
-    const isPizza = winnerBox === "Pizza";
-    const isSalad = winnerBox === "Salad";
+    const isPizza = winnerBox === groupName.PIZZA;
+    const isSalad = winnerBox === groupName.SALAD;
     const payMultiplier = statByBox.get(winnerBox)?.multiplier ?? 1;
 
     const winningBets = isPizza
-      ? bets.filter(b => pizzaMembers.has(b.box) || b.box === "Pizza")
+      ? bets.filter(b => pizzaMembers.has(b.box) || b.box === groupName.PIZZA)
       : isSalad
-      ? bets.filter(b => saladMembers.has(b.box) || b.box === "Salad")
+      ? bets.filter(b => saladMembers.has(b.box) || b.box === groupName.SALAD)
       : bets.filter(b => b.box === winnerBox);
 
     const payouts = winningBets.map(b => ({
@@ -141,7 +140,9 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     if (totalPayout > availableFunds) {
       companyWallet.reserveWallet += distributableAmount;
       await companyWallet.save();
-      await logTransaction("reserveDeposit", distributableAmount, "Insufficient funds for payout, moved to reserve wallet");
+      await logTransaction(
+        transactionType.RESERVE_DEPOSIT, 
+        distributableAmount, "Insufficient funds for payout, moved to reserve wallet");
       return;
     }
 

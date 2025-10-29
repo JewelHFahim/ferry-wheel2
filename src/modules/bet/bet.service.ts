@@ -6,7 +6,7 @@ import { UserService } from "../user/user.service";
 import { Namespace } from "socket.io";
 import { EMIT } from "../../utils/statics/emitEvents";
 import { logPlaceBet, logWarning } from "../../utils/gameEventLogger";
-import { gameCodes, transactionType } from "../../utils/statics/statics";
+import { gameCodes, groupName, transactionType } from "../../utils/statics/statics";
 import { ROUND_STATUS } from "../round/round.types";
 import WalletLedger from "../walletLedger/walletLedger.model";
 import { getUserPerboxTotal } from "./userTotals.service";
@@ -79,7 +79,7 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
   }
 
   // --------------> Guard: prevent direct bets on Pizza/Salad
-  if (box === "Pizza" || box === "Salad") {
+  if (box === groupName.PIZZA || box === groupName.SALAD) {
     throw new BetError(
       gameCodes.INVALID_BOX,
       "Direct bets on Pizza/Salad are not allowed"
@@ -93,7 +93,7 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
     throw new BetError(gameCodes.INVALID_BOX, "Box does not exist.");
   }
   const groupRep =
-    statRow.group === "Pizza" || statRow.group === "Salad"
+    statRow.group === groupName.PIZZA || statRow.group === groupName.SALAD
       ? statRow.group
       : null;
 
