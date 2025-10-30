@@ -187,19 +187,3 @@ export const placeBet = async ({ userId, roundId, box, amount, nsp }: PlaceBetAr
 export const getBetsByRound = async (roundId: string | Types.ObjectId) => {
   return await Bet.find({ roundId }).lean().exec();
 };
-
-
-// -------------------> New function to get per-box total for a user in a round
-// export const getUserPerboxTotal = async (userId: string | Types.ObjectId, roundId: string | Types.ObjectId) => {
-
-//   const perBox  = await Bet.aggregate([
-//     { $match: { userId: new Types.ObjectId(userId), roundId: new Types.ObjectId(roundId) } },
-//     { $group: { _id: "$box", totalAmount: { $sum: "$amount" }, count: { $sum : 1 } } },
-//     { $project: { _id: 0, box: "$_id", totalAmount: 1, count: 1 } },
-//     { $sort: { box: 1 } },
-//   ]);
-
-//   const totalUserBet = perBox .reduce((s, x) => s + (x.totalAmount || 0), 0); 
-  
-//   return perBox;
-// }

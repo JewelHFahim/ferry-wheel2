@@ -31,7 +31,7 @@ export enum gameCodes {
 export const origins = [
   "http://localhost:4173",
   "http://localhost:3000",
-  "http://192.168.68.127:3000",
+  "http://192.168.68.132:3000",
   "http://192.168.68.146:3000",
   "http://localhost:5174",
   "https://ferry-wheel-game.vercel.app",
@@ -44,7 +44,7 @@ export enum Roles {
   ADMIN = "admin",
 }
 
-// Phase Status
+// Gropu Names
 export enum groupName {
   "PIZZA" = "Pizza",
   "SALAD" = "Salad",
@@ -57,5 +57,5 @@ export enum transactionType {
   "WITHDRAW" = "withdraw",
   "RESERVE_DEPOSIT" = "reserveDeposit",
   "RESERVE_WITHDRAW" = "reserveWithdraw",
-  "COMPANY_WALLET" = "companyCut",
+  "COMPANY_CUT" = "companyCut",
 }

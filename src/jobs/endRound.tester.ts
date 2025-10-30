@@ -1,14 +1,19 @@
 import { Namespace } from "socket.io";
+import { Types } from "mongoose";
+
 import { SettingsService } from "../modules/settings/settings.service";
 import { UserService } from "../modules/user/user.service";
 import Round from "../modules/round/round.model";
-import { getBetsByRound } from "./../modules/bet/bet.service";
-import { Types } from "mongoose";
+import { getBetsByRound } from "../modules/bet/bet.service";
+
 import {
   addRoundFunds,
   getCompanyWallet,
   logTransaction,
 } from "../modules/company/company.service";
+
+import WalletLedger from "../modules/walletLedger/walletLedger.model";
+
 import { EMIT } from "../utils/statics/emitEvents";
 import { ROUND_STATUS } from "../modules/round/round.types";
 import { startNewRound } from "./startNewRound.job";
@@ -17,23 +22,29 @@ import { groupName, transactionType } from "../utils/statics/statics";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Local payout row type — box is REQUIRED to satisfy Round.pendingPayouts
+// Local payout row type — box is REQUIRED to satisfy Round.pendingPayouts typing
 type PayoutRow = { userId: Types.ObjectId; box: string; amount: number };
 
-// ---------- helpers for pretty logs ----------
-// const mapToObjectArray = <K extends string | number, V extends object | number>(
-//   m: Map<K, V>,
-//   keyName = "key"
-// ) => {
-//   const rows: any[] = [];
-//   for (const [k, v] of m.entries()) {
-//     if (typeof v === "object" && v !== null) rows.push({ [keyName]: k, ...v });
-//     else rows.push({ [keyName]: k, value: v });
-//   }
-//   return rows;
-// };
+// small helper to write a company ledger row
+async function writeCompanyLedger(opts: {
+  type: string;
+  roundId: string;
+  delta: number;
+  balanceAfter: number;
+  meta?: any;
+}) {
+  await WalletLedger.create({
+    entityTypes: "company",
+    entityId: "company",
+    roundId: opts.roundId,
+    type: opts.type,
+    delta: opts.delta,
+    balanceAfter: opts.balanceAfter,
+    metaData: opts.meta ?? new Date(),
+  });
+}
 
-export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<void> => {
+export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<void> => {
   try {
     // ---- Load state ------//
     const [round, settings, companyWallet] = await Promise.all([
@@ -99,7 +110,7 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
       group: statByBox.get(box)?.group || "-",
     }));
     console.log("Per-Box Totals / Counts / Multipliers");
-    // console.table(perBoxRows);
+    console.table(perBoxRows);
 
     // per-group aggregates (only member boxes)
     let pizzaTotal = 0, pizzaCount = 0;
@@ -119,10 +130,10 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
     const pizzaMult = Number(statByBox.get(groupName.PIZZA)?.multiplier) || 1;
     const saladMult = Number(statByBox.get(groupName.SALAD)?.multiplier) || 1;
     console.log("Group Totals / Multipliers");
-    // console.table([
-    //   { group: groupName.PIZZA, totalAmount: pizzaTotal, bettorsCount: pizzaCount, multiplier: pizzaMult },
-    //   { group: groupName.SALAD, totalAmount: saladTotal, bettorsCount: saladCount, multiplier: saladMult },
-    // ]);
+    console.table([
+      { group: groupName.PIZZA, totalAmount: pizzaTotal, bettorsCount: pizzaCount, multiplier: pizzaMult },
+      { group: groupName.SALAD, totalAmount: saladTotal, bettorsCount: saladCount, multiplier: saladMult },
+    ]);
 
     for (const s of round.boxStats) {
       if (s.box === groupName.PIZZA) {
@@ -145,7 +156,7 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
     const availableFunds = distributableAmount + companyWallet.reserveWallet;
 
     console.log("Funds Snapshot");
-    // console.table([{ totalPool, companyCut, distributableAmount, reserveWallet: companyWallet.reserveWallet, availableFunds }]);
+    console.table([{ totalPool, companyCut, distributableAmount, reserveWallet: companyWallet.reserveWallet, availableFunds }]);
 
     // ---- Eligibility (GROUP-AWARE) ------ //
     const groupRequiredPayout = (members: Set<string>, groupMult: number) => {
@@ -170,17 +181,17 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
       normalRequiredRows.push({ box: s.box, boxTotal, multiplier: mult, required: boxTotal * mult });
     }
     console.log("Required Payout (Normal Boxes)");
-    // console.table(normalRequiredRows);
+    console.table(normalRequiredRows);
 
     // group required payout breakdowns
     const pizzaReq = groupRequiredPayout(pizzaMembers, pizzaMult);
     const saladReq = groupRequiredPayout(saladMembers, saladMult);
 
     console.log("Required Payout (Groups)");
-    // console.table([
-    //   { group: groupName.PIZZA, groupSum: pizzaReq.groupSum, subBoxComponent: pizzaReq.subBoxComponent, groupMult: pizzaMult, required: pizzaReq.required },
-    //   { group: groupName.SALAD, groupSum: saladReq.groupSum, subBoxComponent: saladReq.subBoxComponent, groupMult: saladMult, required: saladReq.required },
-    // ]);
+    console.table([
+      { group: groupName.PIZZA, groupSum: pizzaReq.groupSum, subBoxComponent: pizzaReq.subBoxComponent, groupMult: pizzaMult, required: pizzaReq.required },
+      { group: groupName.SALAD, groupSum: saladReq.groupSum, subBoxComponent: saladReq.subBoxComponent, groupMult: saladMult, required: saladReq.required },
+    ]);
 
     // Collect candidates with exact required payout
     const candidates: { box: string; required: number }[] = [];
@@ -199,8 +210,8 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
     }
 
     console.log("Eligible Candidates vs Available Funds");
-    // console.table(candidates);
-    // console.log(`Available funds: ${availableFunds}`);
+    console.table(candidates);
+    console.log(`Available funds: ${availableFunds}`);
 
     // ---- Choose winner from eligible candidates ----- //
     let winnerBox: string | null = null;
@@ -218,6 +229,14 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
         distributableAmount,
         "No eligible winner, moved to reserve wallet"
       );
+
+      await writeCompanyLedger({
+        type: transactionType.RESERVE_DEPOSIT,
+        roundId: String(round._id),
+        delta: +distributableAmount,
+        balanceAfter: companyWallet.reserveWallet,
+        meta: { reason: "No eligible winner (move distributable to reserve)" }
+      });
 
       round.winningBox = null;
       round.distributedAmount = 0;
@@ -266,8 +285,8 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
 
     // For Pizza/Salad: sub-box payout (amount×subBoxMult) + group bonus (userGroupSum×groupMult)
     const payGroupBox = (members: Set<string>, groupMult: number, groupLabel: string) => {
-      const perUserGroupSum = new Map<string, number>();   // sum of amounts in group
-      const perUserSubPayout = new Map<string, number>();  // sum of (amount × subMult)
+      const perUserGroupSum = new Map<string, number>();
+      const perUserSubPayout = new Map<string, number>();
 
       for (const b of bets) {
         if (!members.has(b.box)) continue;
@@ -287,8 +306,8 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
         payouts.push({ userId: new Types.ObjectId(uid), box: groupLabel, amount: totalForUser });
         totalPayout += totalForUser;
       }
-    //   console.log(`Per-User Payout Breakdown for ${groupLabel}`);
-    //   console.table(dbgRows);
+      console.log(`Per-User Payout Breakdown for ${groupLabel}`);
+      console.table(dbgRows);
     };
 
     if (winnerBox === groupName.PIZZA) {
@@ -300,7 +319,6 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
     }
 
     // Double-check funds (should match eligibility)
-    // console.log("Computed totalPayout:", totalPayout, "Available funds:", availableFunds);
     if (totalPayout > availableFunds) {
       console.warn("Post-calc payout exceeded available funds. Moving distributable to reserve.");
       companyWallet.reserveWallet += distributableAmount;
@@ -310,6 +328,14 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
         distributableAmount,
         "Insufficient funds post-calc; moved to reserve"
       );
+
+      await writeCompanyLedger({
+        type: transactionType.RESERVE_DEPOSIT,
+        roundId: String(round._id),
+        delta: +distributableAmount,
+        balanceAfter: companyWallet.reserveWallet,
+        meta: { reason: "Insufficient funds after calc" }
+      });
 
       round.winningBox = null;
       round.distributedAmount = 0;
@@ -361,10 +387,10 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
     round.payoutsApplied    = false;
     await round.save();
 
-    // console.log("Snapshot Saved");
-    // console.table([{ winnerBox, distributedAmount: totalPayout, companyCut }]);
-    // console.log("Top Winners");
-    // console.table(topWinners.map(t => ({ userId: String(t.userId), amountWon: t.amountWon })));
+    console.log("Snapshot Saved");
+    console.table([{ winnerBox, distributedAmount: totalPayout, companyCut }]);
+    console.log("Top Winners");
+    console.table(topWinners.map(t => ({ userId: String(t.userId), amountWon: t.amountWon })));
 
     // ---- Reveal ---- //
     nsp.emit(EMIT.ROUND_UPDATED, {
@@ -400,11 +426,32 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
         companyWallet.reserveWallet -= reserveUsed;
         await companyWallet.save();
         await logTransaction("reserveWithdraw", reserveUsed, "Used reserve wallet to cover payout");
+
+        // company ledger: reserve withdraw
+        await writeCompanyLedger({
+          type: transactionType.RESERVE_WITHDRAW,
+          roundId: String(round._id),
+          delta: -reserveUsed,
+          balanceAfter: companyWallet.reserveWallet,
+          meta: { reason: "Cover payout from reserve" }
+        });
       }
 
-      // Credit winners (private emits)
+      // Credit winners (private emits) + user ledger
       for (const p of payouts) {
         const updated = await UserService.updateBalance(String(p.userId), p.amount);
+
+        // user ledger: payout
+        await WalletLedger.create({
+          entityTypes: "user",
+          entityId: String(p.userId),
+          roundId: String(round._id),
+          betId: undefined,
+          type: transactionType.PAYOUT,
+          delta: +p.amount,
+          balanceAfter: updated.balance,
+          metaData: { box: p.box, reason: "round payout" },
+        });
 
         nsp.to(`user:${String(p.userId)}`).emit(EMIT.PAYOUT, {
           roundId: round._id,
@@ -428,8 +475,29 @@ export const endRoundTester = async (roundId: string, nsp: Namespace): Promise<v
       await round.save();
       await logTransaction("companyCut", companyCut, "Company cut from pool");
 
-    //   console.log("Treasury Settlement");
-    //   console.table([{ reserveUsed, remainingDistributable, newReserveWallet: companyWallet.reserveWallet }]);
+      // refresh wallet snapshot if addRoundFunds changes balances
+      const freshCompany = await getCompanyWallet();
+
+      // company ledger: company cut
+      await writeCompanyLedger({
+        type: transactionType.COMPANY_CUT,
+        roundId: String(round._id),
+        delta: +companyCut,
+        balanceAfter: freshCompany.balance ?? 0, // if you don't track balance, keep 0 and rely on meta
+        meta: { reason: "Company cut from pool" }
+      });
+
+      // company ledger: leftover distributable -> reserve deposit
+      await writeCompanyLedger({
+        type: transactionType.RESERVE_DEPOSIT,
+        roundId: String(round._id),
+        delta: +remainingDistributable,
+        balanceAfter: freshCompany.reserveWallet,
+        meta: { reason: "Leftover distributable moved to reserve" }
+      });
+
+      console.log("Treasury Settlement");
+      console.table([{ reserveUsed, remainingDistributable, newReserveWallet: freshCompany.reserveWallet }]);
     }
 
     // ---- End round (public) ---- //
