@@ -117,44 +117,33 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       return res.status(400).json({ status: false, message: "roundId not valid" });
     }
 
-    const round = await Round.findById(roundId)
-      .select("_id roundNumber topWinners winningBox createdAt updatedAt")
-      .lean();
+    const round = await Round.findById(roundId).select("_id roundNumber topWinners winningBox createdAt").lean();
 
     if (!round) {
       return res.status(404).json({ status: false, message: "Round not found" });
     }
 
     const winners = Array.isArray(round.topWinners) ? round.topWinners : [];
-    if (winners.length === 0) {
-      return res.status(200).json({
-        status: true,
-        message: "Top winners empty",
-        _id: round._id,
-        roundNumber: round.roundNumber,
-        count: 0,
-        topWinners: [],
-        winningBox: round.winningBox,
-      });
-    }
 
     // 1) Collapse duplicates by userId (sum amountWon)
     const winMap = new Map<string, number>();
+
     for (const w of winners) {
       const uid = String(w.userId);
       winMap.set(uid, (winMap.get(uid) ?? 0) + (w.amountWon ?? 0));
     }
 
     const userIds = [...winMap.keys()];
-    if (userIds.length === 0) {
+    if (winners.length === 0 || userIds.length === 0) {
       return res.status(200).json({
         status: true,
         message: "Top winners empty",
         _id: round._id,
+        userId: req.user?.userId,
         roundNumber: round.roundNumber,
-        count: 0,
-        topWinners: [],
         winningBox: round.winningBox,
+        totalBet: 1200,
+        topWinners: [],
       });
     }
 
@@ -165,6 +154,7 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       { _id: { $in: userObjIds } },
       { username: 1, email: 1, role: 1, balance: 1, createdAt: 1 }
     ).lean();
+    
     const userMap = new Map(users.map((u) => [String(u._id), u]));
 
     // 3) Aggregate each user’s total bet in this round
@@ -172,34 +162,32 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       { $match: { roundId: new mongoose.Types.ObjectId(roundId), userId: { $in: userObjIds } } },
       { $group: { _id: "$userId", totalBet: { $sum: "$amount" }, betCount: { $sum: 1 } } },
     ]);
+
+    const totalBet = totals.reduce((acc, t) => acc + (t.totalBet || 0), 0);
+
     const totalsMap = new Map(
       totals.map((t) => [String(t._id), { totalBet: t.totalBet, betCount: t.betCount }])
     );
 
     // (Optional) biggestWin/lastWinAt if you want:
-    // const winEvents = await Bet.aggregate([
-    //   { $match: { roundId: new mongoose.Types.ObjectId(roundId), userId: { $in: userObjIds } } },
-    //   { $group: { _id: "$userId", biggestWin: { $max: "$amount" }, lastWinAt: { $max: "$createdAt" } } },
-    // ]);
-    // const winEventsMap = new Map(winEvents.map(w => [String(w._id), { biggestWin: w.biggestWin, lastWinAt: w.lastWinAt }]));
+    const winEvents = await Bet.aggregate([
+      { $match: { roundId: new mongoose.Types.ObjectId(roundId), userId: { $in: userObjIds } } },
+      { $group: { _id: "$userId", biggestWin: { $max: "$amount" }, lastWinAt: { $max: "$createdAt" } } },
+    ]);
+    const winEventsMap = new Map(winEvents.map(w => [String(w._id), { biggestWin: w.biggestWin, lastWinAt: w.lastWinAt }]));
 
     // 4) Build unique array (keep user nested)
     const merged = userIds
       .map((uid) => ({
-        userId: uid,                                  // string
+        userId: uid,
         amountWon: winMap.get(uid) ?? 0,
         ...(totalsMap.get(uid) ?? { totalBet: 0, betCount: 0 }),
         // ...(winEventsMap.get(uid) ?? { biggestWin: 0, lastWinAt: null }),
-        user: userMap.get(uid)
-          ? {
-              _id: userMap.get(uid)!._id,
-              username: userMap.get(uid)!.username,
+        username: userMap.get(uid)!.username,
               email: userMap.get(uid)!.email,
               role: userMap.get(uid)!.role,
               balance: userMap.get(uid)!.balance,
-              createdAt: userMap.get(uid)!.createdAt,
-            }
-          : null,
+
       }))
       .sort((a, b) => b.amountWon - a.amountWon);
 
@@ -207,6 +195,7 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       status: true,
       message: "Top winners retrieved",
       _id: round._id,
+      totalBet,
       userId: req.user?.userId,
       roundNumber: round.roundNumber,
       count: merged.length,
