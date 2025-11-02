@@ -31,7 +31,7 @@ export enum gameCodes {
 export const origins = [
   "http://localhost:4173",
   "http://localhost:3000",
-  "http://192.168.68.132:3000",
+  "http://192.168.68.135:3000",
   "http://192.168.68.146:3000",
   "http://localhost:5174",
   "https://ferry-wheel-game.vercel.app",

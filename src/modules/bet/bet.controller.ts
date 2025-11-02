@@ -113,11 +113,20 @@ export const handleGetRecentBetHistories = async (req: Request, res: Response) =
 export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
   try {
     const { roundId } = req.params;
+    const userId =  req.user?.userId;
+
     if (!roundId || !mongoose.isValidObjectId(roundId)) {
       return res.status(400).json({ status: false, message: "roundId not valid" });
     }
 
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ status: false, message: "userId not valid" });
+    }
+
     const round = await Round.findById(roundId).select("_id roundNumber topWinners winningBox createdAt").lean();
+    const usersBettingInRound = await Bet.find({ roundId: new mongoose.Types.ObjectId(roundId), userId: new mongoose.Types.ObjectId(userId) }).lean();
+
+    const userTotal = usersBettingInRound.reduce((acc, bet) => acc + bet.amount, 0);
 
     if (!round) {
       return res.status(404).json({ status: false, message: "Round not found" });
@@ -134,18 +143,6 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
     }
 
     const userIds = [...winMap.keys()];
-    if (winners.length === 0 || userIds.length === 0) {
-      return res.status(200).json({
-        status: true,
-        message: "Top winners empty",
-        _id: round._id,
-        userId: req.user?.userId,
-        roundNumber: round.roundNumber,
-        winningBox: round.winningBox,
-        totalBet: 1200,
-        topWinners: [],
-      });
-    }
 
     const userObjIds = userIds.map((id) => new mongoose.Types.ObjectId(id));
 
@@ -169,25 +166,13 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       totals.map((t) => [String(t._id), { totalBet: t.totalBet, betCount: t.betCount }])
     );
 
-    // (Optional) biggestWin/lastWinAt if you want:
-    const winEvents = await Bet.aggregate([
-      { $match: { roundId: new mongoose.Types.ObjectId(roundId), userId: { $in: userObjIds } } },
-      { $group: { _id: "$userId", biggestWin: { $max: "$amount" }, lastWinAt: { $max: "$createdAt" } } },
-    ]);
-    const winEventsMap = new Map(winEvents.map(w => [String(w._id), { biggestWin: w.biggestWin, lastWinAt: w.lastWinAt }]));
-
     // 4) Build unique array (keep user nested)
-    const merged = userIds
-      .map((uid) => ({
+    const merged = userIds.map((uid) => ({
         userId: uid,
         amountWon: winMap.get(uid) ?? 0,
         ...(totalsMap.get(uid) ?? { totalBet: 0, betCount: 0 }),
-        // ...(winEventsMap.get(uid) ?? { biggestWin: 0, lastWinAt: null }),
         username: userMap.get(uid)!.username,
-              email: userMap.get(uid)!.email,
-              role: userMap.get(uid)!.role,
-              balance: userMap.get(uid)!.balance,
-
+        balance: userMap.get(uid)!.balance,
       }))
       .sort((a, b) => b.amountWon - a.amountWon);
 
@@ -195,12 +180,12 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
       status: true,
       message: "Top winners retrieved",
       _id: round._id,
-      totalBet,
-      userId: req.user?.userId,
+      userId,
       roundNumber: round.roundNumber,
       count: merged.length,
-      topWinners: merged,
+      totalBet: userTotal,
       winningBox: round.winningBox,
+      topWinners: merged,
     });
   } catch (error) {
     console.error("handleGetRoundTopWinners error:", error);
@@ -218,237 +203,6 @@ export const handleGetRoundTopWinners = async (req: Request, res: Response) => {
 // @desc    User Bet History
 // @route   GET /api/v1/bettings/user-bet-history
 // ==========================
-export const handleGetUserBetHistory1 = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user?.userId;
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return res.status(400).json({ status: false, message: "Invalid userId" });
-    }
-    const uid = new mongoose.Types.ObjectId(userId);
-
-    const qLimit = Number(req.query.limit);
-    const limit = Number.isFinite(qLimit) ? Math.max(10, Math.min(50, qLimit)) : 10;
-
-    // 1) Find the latest distinct rounds this user has bet in (by last bet time)
-    const roundHeads = await Bet.aggregate([
-      { $match: { userId: uid } },
-      { $sort: { createdAt: -1 } },
-      { $group: { _id: "$roundId", lastBetAt: { $first: "$createdAt" } } },
-      { $sort: { lastBetAt: -1 } },
-      { $limit: limit },
-      { $project: { roundId: "$_id", lastBetAt: 1, _id: 0 } },
-    ]).exec();
-
-    if (roundHeads.length === 0) {
-      return res.json({
-        status: true,
-        message: "No recent rounds for user",
-        userId,
-        count: 0,
-        rounds: [],
-      });
-    }
-
-    // 2) For these rounds, compute per-box summaries with correct group logic
-    const ridSet = roundHeads.map(r => r.roundId);
-    const perRound = await Bet.aggregate([
-      { $match: { userId: uid, roundId: { $in: ridSet } } },
-
-      // Join the Round
-      {
-        $lookup: {
-          from: "rounds",
-          localField: "roundId",
-          foreignField: "_id",
-          as: "round",
-        },
-      },
-      { $unwind: "$round" },
-
-      // Normalize labels for robust comparisons
-      {
-        $addFields: {
-          _boxNorm: { $toLower: { $trim: { input: "$box" } } },
-          _winBoxNorm: { $toLower: { $trim: { input: "$round.winningBox" } } },
-        },
-      },
-
-      // Bet's box stat from round.boxStats
-      {
-        $addFields: {
-          _betBoxStats: {
-            $filter: {
-              input: "$round.boxStats",
-              as: "bs",
-              cond: { $eq: [{ $toLower: "$$bs.box" }, "$_boxNorm"] },
-            },
-          },
-        },
-      },
-      { $addFields: { betBoxStat: { $arrayElemAt: ["$_betBoxStats", 0] } } },
-
-      // Representative stat for the winning box (if group rep)
-      {
-        $addFields: {
-          _repBoxStats: {
-            $filter: {
-              input: "$round.boxStats",
-              as: "bs2",
-              cond: { $eq: [{ $toLower: "$$bs2.box" }, "$_winBoxNorm"] },
-            },
-          },
-        },
-      },
-      { $addFields: { repBoxStat: { $arrayElemAt: ["$_repBoxStats", 0] } } },
-
-      // Compute state flags
-      {
-        $addFields: {
-          _betGroupNorm: {
-            $cond: [
-              { $ifNull: ["$betBoxStat.group", false] },
-              { $toLower: { $trim: { input: "$betBoxStat.group" } } },
-              null,
-            ],
-          },
-          _isGroupWinner: { $in: ["$_winBoxNorm", ["pizza", "salad"]] },
-          _hasWinner: { $ne: ["$round.winningBox", null] },
-        },
-      },
-
-      // Determine isWinner & multiplierUsed (rep multiplier for group win)
-      {
-        $addFields: {
-          isWinner: {
-            $cond: [
-              "$_hasWinner",
-              {
-                $cond: [
-                  "$_isGroupWinner",
-                  { $eq: ["$_betGroupNorm", "$_winBoxNorm"] },
-                  { $eq: ["$_boxNorm", "$_winBoxNorm"] },
-                ],
-              },
-              false,
-            ],
-          },
-          multiplierUsed: {
-            $cond: [
-              "$_isGroupWinner",
-              { $ifNull: ["$repBoxStat.multiplier", 1] },
-              { $ifNull: ["$betBoxStat.multiplier", 1] },
-            ],
-          },
-        },
-      },
-
-      // Compute winAmount / loseAmount (pending rounds → both zero)
-      {
-        $addFields: {
-          winAmount: {
-            $cond: [
-              { $and: ["$_hasWinner", "$isWinner"] },
-              { $multiply: ["$amount", { $toDouble: "$multiplierUsed" }] },
-              0,
-            ],
-          },
-          loseAmount: {
-            $cond: [{ $and: ["$_hasWinner", { $not: ["$isWinner"] }] }, "$amount", 0],
-          },
-          outcome: {
-            $cond: [
-              { $not: ["$_hasWinner"] },
-              "pending",
-              { $cond: ["$isWinner", "win", "lose"] },
-            ],
-          },
-        },
-      },
-
-      // Group by (roundId, box)
-      {
-        $group: {
-          _id: { roundId: "$roundId", box: "$box" },
-          roundId: { $first: "$roundId" },
-          box: { $first: "$box" },
-          roundNumber: { $first: "$round.roundNumber" },
-          roundStatus: { $first: "$round.roundStatus" },
-          winningBox: { $first: "$round.winningBox" },
-          totalAmount: { $sum: "$amount" },
-          betCount: { $sum: 1 },
-          lastBetAt: { $max: "$createdAt" },
-
-          // computed aggregates
-          winAmount: { $sum: "$winAmount" },
-          loseAmount: { $sum: "$loseAmount" },
-          isWinner: { $max: "$isWinner" },
-          // max multiplier used (display)
-          multiplierUsed: { $max: "$multiplierUsed" },
-        },
-      },
-
-      // Group by roundId → pack perBox, compute per-round totals
-      {
-        $group: {
-          _id: "$roundId",
-          roundId: { $first: "$roundId" },
-          roundNumber: { $first: "$roundNumber" },
-          roundStatus: { $first: "$roundStatus" },
-          winningBox: { $first: "$winningBox" },
-          lastBetAt: { $max: "$createdAt" },
-          perBox: {
-            $push: {
-              box: "$box",
-              totalAmount: "$totalAmount",
-              betCount: "$betCount",
-              lastBetAt: "$lastBetAt",
-              multiplierUsed: "$multiplierUsed",
-              isWinner: "$isWinner",
-              winAmount: "$winAmount",
-              loseAmount: "$loseAmount",
-              outcome: {
-                $cond: [{ $eq: ["$isWinner", true] }, "win",
-                  { $cond: [{ $eq: ["$isWinner", false] }, "lose", "pending"] }
-                ],
-              },
-            },
-          },
-
-          totalBet: { $sum: "$totalAmount" },
-          totalWin: { $sum: "$winAmount" },
-          totalLose: { $sum: "$loseAmount" },
-        },
-      },
-
-      // Preserve order by the user's last bet time in that round
-      { $sort: { lastBetAt: -1 } },
-    ]).exec();
-
-    // 3) Merge the head list order (if any round had no results due to edge cases)
-    //    and annotate with the original lastBetAt for stable ordering.
-    const headMap = new Map<string, Date>(
-      roundHeads.map(h => [String(h.roundId), h.lastBetAt as Date])
-    );
-    const rounds = perRound
-      .map(r => ({
-        ...r,
-        lastBetAt: headMap.get(String(r.roundId)) ?? r.lastBetAt,
-      }))
-      .sort((a, b) => (b.lastBetAt as any) - (a.lastBetAt as any));
-
-    return res.json({
-      status: true,
-      message: "User recent round bet history",
-      userId,
-      count: rounds.length,
-      rounds,
-    });
-  } catch (e: any) {
-    console.error("handleGetUserRecentBetHistory error:", e);
-    return res.status(500).json({ status: false, message: e?.message || "Server error" });
-  }
-};
-
 export const handleGetUserBetHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.userId;

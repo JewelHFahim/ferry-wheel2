@@ -1,8 +1,9 @@
+// src/dashboard/game-log/RoundEvent.model.ts
 import mongoose, { Schema, Types } from "mongoose";
 
-export interface RoundLog {
+export interface IRoundEvent {
+  _id: Types.ObjectId;                 // = roundId (unique → idempotent)
   gameId: Types.ObjectId;
-  roundId: Types.ObjectId;
   gameName: string;
   identification: string;
   consumption: number;
@@ -12,36 +13,25 @@ export interface RoundLog {
   date: Date;
 }
 
-export interface IGameLog {
-  totalConsumption: number;
-  totalRewardAmount: number;
-  totalPlatformRevenue: number;
-  logs: RoundLog[];
-}
-
-const roundSchema = new Schema<RoundLog>({
-  gameId: { type: Schema.Types.ObjectId, required: true },
-  roundId: { type: Schema.Types.ObjectId, required: true },
-  gameName: { type: String, required: true },
-  identification: { type: String, required: true },
-  consumption: { type: Number, required: true },
-  rewardAmount: { type: Number, required: true },
-  platformRevenue: { type: Number, required: true },
-  gameVictoryResult: { type: String, required: true },
-  date: { type: Date, required: true },
-});
-
-const gameLogSchema = new Schema<IGameLog>(
+const RoundEventSchema = new Schema<IRoundEvent>(
   {
-    totalConsumption: { type: Number, required: true },
-    totalRewardAmount: { type: Number, required: true },
-    totalPlatformRevenue: { type: Number, required: true },
-    logs: { type: [roundSchema], required: true },
+    _id: { type: Schema.Types.ObjectId, required: true },           // roundId
+    gameId: { type: Schema.Types.ObjectId, required: true, index: true },
+    gameName: { type: String, required: true },
+    identification: { type: String, required: true },
+    consumption: { type: Number, required: true, default: 0 },
+    rewardAmount: { type: Number, required: true, default: 0 },
+    platformRevenue: { type: Number, required: true, default: 0 },
+    gameVictoryResult: { type: String, default: "" },
+    date: { type: Date, required: true, index: true },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true, versionKey: false, collection: "round_events" }
 );
 
-const GameLog = mongoose.model<IGameLog>("GameLog", gameLogSchema);
-export default GameLog;
+// fast queries by (gameId, date)
+RoundEventSchema.index({ gameId: 1, date: -1 });
+// optional: if you often query *all games* by date
+RoundEventSchema.index({ date: -1 });
+
+export const RoundEvent =
+  mongoose.models.RoundEvent || mongoose.model<IRoundEvent>("RoundEvent", RoundEventSchema);

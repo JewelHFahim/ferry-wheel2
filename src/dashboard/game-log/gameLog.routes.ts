@@ -1,10 +1,14 @@
 import express from 'express'
-import { handleGetGameLogs } from './gameLog.controller';
+import { getDaily } from './gameLog.controller';
+import { getRoundLogs } from './RoundEvent.controller';
 
 
 const router = express.Router();
 
-router.use("/game-logs", handleGetGameLogs);
+router.use("/game-logs", getRoundLogs);
+router.get("/game-logs/daily", getDaily);
+
+
 
 
 export default router;

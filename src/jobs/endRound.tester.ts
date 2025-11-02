@@ -19,6 +19,8 @@ import { ROUND_STATUS } from "../modules/round/round.types";
 import { startNewRound } from "./startNewRound.job";
 import { env } from "../config/env";
 import { groupName, transactionType } from "../utils/statics/statics";
+import { requiredDatas } from "../dashboard/game-log/gameLog.controller";
+import { logRoundEvent } from "../dashboard/game-log/logRoundEvent";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -391,6 +393,24 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
     console.table([{ winnerBox, distributedAmount: totalPayout, companyCut }]);
     console.log("Top Winners");
     console.table(topWinners.map(t => ({ userId: String(t.userId), amountWon: t.amountWon })));
+
+    try {
+
+    const gameId = "66f3b5c2e5f8f2d456789012";
+      await logRoundEvent({
+      gameId: gameId,         
+      roundId: String(round._id),
+      gameName: "Ferry Wheel",
+      identification: `Round #${round.roundNumber}`,
+      consumption: totalPool,
+      rewardAmount: totalPayout,
+      platformRevenue: companyCut,
+      gameVictoryResult: winnerBox ?? "",
+      date: new Date(),
+    });
+    } catch (error) {
+      console.log("Smothing wrong..")
+    }
 
     // ---- Reveal ---- //
     nsp.emit(EMIT.ROUND_UPDATED, {

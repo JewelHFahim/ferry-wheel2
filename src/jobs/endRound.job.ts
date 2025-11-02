@@ -14,6 +14,7 @@ import { ROUND_STATUS } from "../modules/round/round.types";
 import { startNewRound } from "./startNewRound.job";
 import { env } from "../config/env";
 import { groupName, transactionType } from "../utils/statics/statics";
+import { addRoundToGameLog, requiredDatas } from "../dashboard/game-log/gameLog.controller";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -413,11 +414,12 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       await addRoundFunds(companyCut, remainingDistributable);
       round.reserveWallet = remainingDistributable;
       await round.save();
-      await logTransaction("companyCut", companyCut, "Company cut from pool");
 
       console.log("Treasury Settlement");
       console.table([{ reserveUsed, remainingDistributable, newReserveWallet: companyWallet.reserveWallet }]);
     }
+
+
 
     // ---- End round (public) ---- //
     nsp.emit(EMIT.ROUND_ENDED, {
