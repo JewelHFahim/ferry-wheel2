@@ -23,7 +23,6 @@ const retryConnectDB = async (retries = 5, delay = 5000) => {
   }
 };
 
-// Start server and initialize game
 (async () => {
   try {
     // DB connection
@@ -35,10 +34,9 @@ const retryConnectDB = async (retries = 5, delay = 5000) => {
     const { io, game } = initSocket(server);
 
     server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`====> Server running on port ${PORT} <====`);
 
       startNewRound(game);
-      // startRoundLoop(game); 
     });
 
     // Graceful shutdown

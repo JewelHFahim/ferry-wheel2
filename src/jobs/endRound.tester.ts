@@ -19,8 +19,8 @@ import { ROUND_STATUS } from "../modules/round/round.types";
 import { startNewRound } from "./startNewRound.job";
 import { env } from "../config/env";
 import { groupName, transactionType } from "../utils/statics/statics";
-import { requiredDatas } from "../dashboard/game-log/gameLog.controller";
 import { logRoundEvent } from "../dashboard/game-log/logRoundEvent";
+import { logUserEvent } from "../dashboard/game-log/logUserEvent";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -391,26 +391,7 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
 
     console.log("Snapshot Saved");
     console.table([{ winnerBox, distributedAmount: totalPayout, companyCut }]);
-    console.log("Top Winners");
     console.table(topWinners.map(t => ({ userId: String(t.userId), amountWon: t.amountWon })));
-
-    try {
-
-    const gameId = "66f3b5c2e5f8f2d456789012";
-      await logRoundEvent({
-      gameId: gameId,         
-      roundId: String(round._id),
-      gameName: "Ferry Wheel",
-      identification: `Round #${round.roundNumber}`,
-      consumption: totalPool,
-      rewardAmount: totalPayout,
-      platformRevenue: companyCut,
-      gameVictoryResult: winnerBox ?? "",
-      date: new Date(),
-    });
-    } catch (error) {
-      console.log("Smothing wrong..")
-    }
 
     // ---- Reveal ---- //
     nsp.emit(EMIT.ROUND_UPDATED, {
@@ -503,7 +484,7 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
         type: transactionType.COMPANY_CUT,
         roundId: String(round._id),
         delta: +companyCut,
-        balanceAfter: freshCompany.balance ?? 0, // if you don't track balance, keep 0 and rely on meta
+        balanceAfter: freshCompany.balance ?? 0,
         meta: { reason: "Company cut from pool" }
       });
 
@@ -515,6 +496,46 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
         balanceAfter: freshCompany.reserveWallet,
         meta: { reason: "Leftover distributable moved to reserve" }
       });
+
+
+    // Genertate round event log
+    try {
+      const gameId = "66f3b5c2e5f8f2d456789012";
+      await logRoundEvent({
+      gameId: gameId,         
+      roundId: String(round._id),
+      identification: `Round #${round.roundNumber}`,
+      consumption: totalPool,        
+      rewardAmount: totalPayout,
+      platformRevenue: companyCut,
+      platformReserve: remainingDistributable,
+      gameVictoryResult: (normalRequiredRows.map(r => ({ box: r.box, boxTotal: r.boxTotal }))),
+      winnerBox,
+      date: new Date(),
+    });
+    } catch (error) {
+      console.log("'logRoundEvent' Server error: ", error);
+    }
+
+    // Genertate User event log
+    try {
+      const gameId = "66f3b5c2e5f8f2d456789012";
+      await logUserEvent({
+      gameId: gameId,         
+      roundId: String(round._id),
+      identification: `Round #${round.roundNumber}`,
+      userName: "Test User",
+      userConsumption: totalPool,        
+      userRewardAmount: totalPayout,
+      platformRevenue: companyCut,
+      platformReserve: remainingDistributable,
+      userVictoryResult: (normalRequiredRows.map(r => ({ box: r.box, boxTotal: r.boxTotal }))),
+      winnerBox,
+      date: new Date(),
+    });
+    } catch (error) {
+      console.log("'logRoundEvent' Server error: ", error);
+    }
 
       console.log("Treasury Settlement");
       console.table([{ reserveUsed, remainingDistributable, newReserveWallet: freshCompany.reserveWallet }]);

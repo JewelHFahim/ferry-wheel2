@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { boxDatas } from "../../utils/statics/statics";
-import { IRoundBox } from "../round/round.model";
 
 export interface IBoxConfig {
   title: string;

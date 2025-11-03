@@ -14,7 +14,6 @@ import { ROUND_STATUS } from "../modules/round/round.types";
 import { startNewRound } from "./startNewRound.job";
 import { env } from "../config/env";
 import { groupName, transactionType } from "../utils/statics/statics";
-import { addRoundToGameLog, requiredDatas } from "../dashboard/game-log/gameLog.controller";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

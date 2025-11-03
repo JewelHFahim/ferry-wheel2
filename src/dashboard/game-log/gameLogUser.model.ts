@@ -1,35 +1,35 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-export interface TopWinnersType {
+export interface UserBetsType {
   box: string;
   boxTotal: number;
 }
 
-export interface IRoundEvent {
+export interface IUserEvent {
   _id: Types.ObjectId;
   gameId: Types.ObjectId;
-  gameName: string;
+  userName: string;
   identification: string;
-  consumption: number;
-  rewardAmount: number;
+  userConsumption: number;
+  userRewardAmount: number;
   platformRevenue: number;
   platformReserve: number;
-  gameVictoryResult: TopWinnersType[];
+  userVictoryResult: UserBetsType[];
   winnerBox: string;
   date: Date;
 }
 
-const RoundEventSchema = new Schema<IRoundEvent>(
+const UserEventSchema = new Schema<IUserEvent>(
   {
     _id: { type: Schema.Types.ObjectId, required: true },
     gameId: { type: Schema.Types.ObjectId, required: true, index: true },
-    gameName: { type: String, required: true },
+    userName: { type: String, required: true },
     identification: { type: String, required: true },
-    consumption: { type: Number, required: true, default: 0 },
-    rewardAmount: { type: Number, required: true, default: 0 },
+    userConsumption: { type: Number, required: true, default: 0 },
+    userRewardAmount: { type: Number, required: true, default: 0 },
     platformRevenue: { type: Number, required: true, default: 0 },
     platformReserve: { type: Number, required: true, default: 0 },
-    gameVictoryResult: [
+    userVictoryResult: [
       {
         box: { type: String },
         boxTotal: { type: Number },
@@ -38,11 +38,11 @@ const RoundEventSchema = new Schema<IRoundEvent>(
     winnerBox:{ type: String, required: true },
     date: { type: Date, required: true, index: true },
   },
-  { timestamps: true, versionKey: false, collection: "round_events" }
+  { timestamps: true, versionKey: false, collection: "user_events" }
 );
 
 // fast queries by (gameId, date)
-RoundEventSchema.index({ gameId: 1, date: -1 });
-RoundEventSchema.index({ date: -1 });
+UserEventSchema.index({ gameId: 1, date: -1 });
+UserEventSchema.index({ date: -1 });
 
-export const RoundEvent = mongoose.models.RoundEvent || mongoose.model<IRoundEvent>("RoundEvent", RoundEventSchema);
+export const UserEvent = mongoose.models.UserEvent || mongoose.model<IUserEvent>("UserEvent", UserEventSchema);
