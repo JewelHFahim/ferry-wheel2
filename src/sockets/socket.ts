@@ -64,7 +64,7 @@ export const initSocket = (server: http.Server) => {
       callback({ ok: true });
     });
 
-    // Get current round snapshot (public) + user's private per-box totals
+    // Get current round snapshot
     socket.on(EMIT.GET_CURRENT_ROUND, async (_payload, ack) => {
       try {
         const snap = await MetService.getCurrentRoundSnapshot();

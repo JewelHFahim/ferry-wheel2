@@ -24,27 +24,25 @@ import { logUserEventsForRound } from "../dashboard/user-log/logUserEvents";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Local payout row type — box is REQUIRED to satisfy Round.pendingPayouts typing
 type PayoutRow = { userId: Types.ObjectId; box: string; amount: number };
 
-// small helper to write a company ledger row
-async function writeCompanyLedger(opts: {
-  type: string;
-  roundId: string;
-  delta: number;
-  balanceAfter: number;
-  meta?: any;
-}) {
-  await WalletLedger.create({
-    entityTypes: "company",
-    entityId: "company",
-    roundId: opts.roundId,
-    type: opts.type,
-    delta: opts.delta,
-    balanceAfter: opts.balanceAfter,
-    metaData: opts.meta ?? new Date(),
-  });
-}
+// async function writeCompanyLedger(opts: {
+//   type: string;
+//   roundId: string;
+//   delta: number;
+//   balanceAfter: number;
+//   meta?: any;
+// }) {
+//   await WalletLedger.create({
+//     entityTypes: "company",
+//     entityId: "company",
+//     roundId: opts.roundId,
+//     type: opts.type,
+//     delta: opts.delta,
+//     balanceAfter: opts.balanceAfter,
+//     metaData: opts.meta ?? new Date(),
+//   });
+// }
 
 export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<void> => {
   try {
@@ -232,13 +230,13 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
         "No eligible winner, moved to reserve wallet"
       );
 
-      await writeCompanyLedger({
-        type: transactionType.RESERVE_DEPOSIT,
-        roundId: String(round._id),
-        delta: +distributableAmount,
-        balanceAfter: companyWallet.reserveWallet,
-        meta: { reason: "No eligible winner (move distributable to reserve)" }
-      });
+      // await writeCompanyLedger({
+      //   type: transactionType.RESERVE_DEPOSIT,
+      //   roundId: String(round._id),
+      //   delta: +distributableAmount,
+      //   balanceAfter: companyWallet.reserveWallet,
+      //   meta: { reason: "No eligible winner (move distributable to reserve)" }
+      // });
 
       round.winningBox = null;
       round.distributedAmount = 0;
@@ -331,13 +329,13 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
         "Insufficient funds post-calc; moved to reserve"
       );
 
-      await writeCompanyLedger({
-        type: transactionType.RESERVE_DEPOSIT,
-        roundId: String(round._id),
-        delta: +distributableAmount,
-        balanceAfter: companyWallet.reserveWallet,
-        meta: { reason: "Insufficient funds after calc" }
-      });
+      // await writeCompanyLedger({
+      //   type: transactionType.RESERVE_DEPOSIT,
+      //   roundId: String(round._id),
+      //   delta: +distributableAmount,
+      //   balanceAfter: companyWallet.reserveWallet,
+      //   meta: { reason: "Insufficient funds after calc" }
+      // });
 
       round.winningBox = null;
       round.distributedAmount = 0;
@@ -429,13 +427,13 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
         await logTransaction("reserveWithdraw", reserveUsed, "Used reserve wallet to cover payout");
 
         // company ledger: reserve withdraw
-        await writeCompanyLedger({
-          type: transactionType.RESERVE_WITHDRAW,
-          roundId: String(round._id),
-          delta: -reserveUsed,
-          balanceAfter: companyWallet.reserveWallet,
-          meta: { reason: "Cover payout from reserve" }
-        });
+        // await writeCompanyLedger({
+        //   type: transactionType.RESERVE_WITHDRAW,
+        //   roundId: String(round._id),
+        //   delta: -reserveUsed,
+        //   balanceAfter: companyWallet.reserveWallet,
+        //   meta: { reason: "Cover payout from reserve" }
+        // });
       }
 
       // Credit winners (private emits) + user ledger
@@ -480,22 +478,22 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
       const freshCompany = await getCompanyWallet();
 
       // company ledger: company cut
-      await writeCompanyLedger({
-        type: transactionType.COMPANY_CUT,
-        roundId: String(round._id),
-        delta: +companyCut,
-        balanceAfter: freshCompany.balance ?? 0,
-        meta: { reason: "Company cut from pool" }
-      });
+      // await writeCompanyLedger({
+      //   type: transactionType.COMPANY_CUT,
+      //   roundId: String(round._id),
+      //   delta: +companyCut,
+      //   balanceAfter: freshCompany.balance ?? 0,
+      //   meta: { reason: "Company cut from pool" }
+      // });
 
       // company ledger: leftover distributable -> reserve deposit
-      await writeCompanyLedger({
-        type: transactionType.RESERVE_DEPOSIT,
-        roundId: String(round._id),
-        delta: +remainingDistributable,
-        balanceAfter: freshCompany.reserveWallet,
-        meta: { reason: "Leftover distributable moved to reserve" }
-      });
+      // await writeCompanyLedger({
+      //   type: transactionType.RESERVE_DEPOSIT,
+      //   roundId: String(round._id),
+      //   delta: +remainingDistributable,
+      //   balanceAfter: freshCompany.reserveWallet,
+      //   meta: { reason: "Leftover distributable moved to reserve" }
+      // });
 
 
     // Genertate round event log
