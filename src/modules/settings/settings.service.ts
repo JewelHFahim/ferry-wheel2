@@ -2,6 +2,7 @@ import { IBoxStat } from "../round/round.model";
 import { ISettings, SettingsModel, IBoxConfig } from "./settings.model";
 
 export const SettingsService = {
+  
   async getSettings(): Promise<ISettings> {
     let s = await SettingsModel.findOne();
     if (s) return s;

@@ -1,26 +1,52 @@
 import { Namespace } from "socket.io";
+import { Types } from "mongoose";
+
 import { SettingsService } from "../modules/settings/settings.service";
 import { UserService } from "../modules/user/user.service";
 import Round from "../modules/round/round.model";
-import { getBetsByRound } from "./../modules/bet/bet.service";
-import { Types } from "mongoose";
+import { getBetsByRound } from "../modules/bet/bet.service";
+
 import {
   addRoundFunds,
   getCompanyWallet,
   logTransaction,
 } from "../modules/company/company.service";
+
+import WalletLedger from "../modules/walletLedger/walletLedger.model";
+
 import { EMIT } from "../utils/statics/emitEvents";
 import { ROUND_STATUS } from "../modules/round/round.types";
 import { startNewRound } from "./startNewRound.job";
 import { env } from "../config/env";
 import { groupName, transactionType } from "../utils/statics/statics";
+import { logRoundEvent } from "../dashboard/game-log/logRoundEvent";
+import { logUserEvent } from "../dashboard/game-log/logUserEvent";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Local payout row type — box is REQUIRED to satisfy Round.pendingPayouts
+// Local payout row type — box is REQUIRED to satisfy Round.pendingPayouts typing
 type PayoutRow = { userId: Types.ObjectId; box: string; amount: number };
 
-export const endRound = async (roundId: string, nsp: Namespace): Promise<void> => {
+// small helper to write a company ledger row
+async function writeCompanyLedger(opts: {
+  type: string;
+  roundId: string;
+  delta: number;
+  balanceAfter: number;
+  meta?: any;
+}) {
+  await WalletLedger.create({
+    entityTypes: "company",
+    entityId: "company",
+    roundId: opts.roundId,
+    type: opts.type,
+    delta: opts.delta,
+    balanceAfter: opts.balanceAfter,
+    metaData: opts.meta ?? new Date(),
+  });
+}
+
+export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<void> => {
   try {
     // ---- Load state ------//
     const [round, settings, companyWallet] = await Promise.all([
@@ -206,6 +232,14 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         "No eligible winner, moved to reserve wallet"
       );
 
+      await writeCompanyLedger({
+        type: transactionType.RESERVE_DEPOSIT,
+        roundId: String(round._id),
+        delta: +distributableAmount,
+        balanceAfter: companyWallet.reserveWallet,
+        meta: { reason: "No eligible winner (move distributable to reserve)" }
+      });
+
       round.winningBox = null;
       round.distributedAmount = 0;
       round.topWinners = [];
@@ -287,7 +321,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
     }
 
     // Double-check funds (should match eligibility)
-    // console.log("Computed totalPayout:", totalPayout, "Available funds:", availableFunds);
     if (totalPayout > availableFunds) {
       console.warn("Post-calc payout exceeded available funds. Moving distributable to reserve.");
       companyWallet.reserveWallet += distributableAmount;
@@ -297,6 +330,14 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         distributableAmount,
         "Insufficient funds post-calc; moved to reserve"
       );
+
+      await writeCompanyLedger({
+        type: transactionType.RESERVE_DEPOSIT,
+        roundId: String(round._id),
+        delta: +distributableAmount,
+        balanceAfter: companyWallet.reserveWallet,
+        meta: { reason: "Insufficient funds after calc" }
+      });
 
       round.winningBox = null;
       round.distributedAmount = 0;
@@ -350,7 +391,6 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
 
     console.log("Snapshot Saved");
     console.table([{ winnerBox, distributedAmount: totalPayout, companyCut }]);
-    console.log("Top Winners");
     console.table(topWinners.map(t => ({ userId: String(t.userId), amountWon: t.amountWon })));
 
     // ---- Reveal ---- //
@@ -387,11 +427,32 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
         companyWallet.reserveWallet -= reserveUsed;
         await companyWallet.save();
         await logTransaction("reserveWithdraw", reserveUsed, "Used reserve wallet to cover payout");
+
+        // company ledger: reserve withdraw
+        await writeCompanyLedger({
+          type: transactionType.RESERVE_WITHDRAW,
+          roundId: String(round._id),
+          delta: -reserveUsed,
+          balanceAfter: companyWallet.reserveWallet,
+          meta: { reason: "Cover payout from reserve" }
+        });
       }
 
-      // Credit winners (private emits)
+      // Credit winners (private emits) + user ledger
       for (const p of payouts) {
         const updated = await UserService.updateBalance(String(p.userId), p.amount);
+
+        // user ledger: payout
+        await WalletLedger.create({
+          entityTypes: "user",
+          entityId: String(p.userId),
+          roundId: String(round._id),
+          betId: undefined,
+          type: transactionType.PAYOUT,
+          delta: +p.amount,
+          balanceAfter: updated.balance,
+          metaData: { box: p.box, reason: "round payout" },
+        });
 
         nsp.to(`user:${String(p.userId)}`).emit(EMIT.PAYOUT, {
           roundId: round._id,
@@ -413,12 +474,72 @@ export const endRound = async (roundId: string, nsp: Namespace): Promise<void> =
       await addRoundFunds(companyCut, remainingDistributable);
       round.reserveWallet = remainingDistributable;
       await round.save();
+      await logTransaction("companyCut", companyCut, "Company cut from pool");
 
-      console.log("Treasury Settlement");
-      console.table([{ reserveUsed, remainingDistributable, newReserveWallet: companyWallet.reserveWallet }]);
+      // refresh wallet snapshot if addRoundFunds changes balances
+      const freshCompany = await getCompanyWallet();
+
+      // company ledger: company cut
+      await writeCompanyLedger({
+        type: transactionType.COMPANY_CUT,
+        roundId: String(round._id),
+        delta: +companyCut,
+        balanceAfter: freshCompany.balance ?? 0,
+        meta: { reason: "Company cut from pool" }
+      });
+
+      // company ledger: leftover distributable -> reserve deposit
+      await writeCompanyLedger({
+        type: transactionType.RESERVE_DEPOSIT,
+        roundId: String(round._id),
+        delta: +remainingDistributable,
+        balanceAfter: freshCompany.reserveWallet,
+        meta: { reason: "Leftover distributable moved to reserve" }
+      });
+
+
+    // Genertate round event log
+    try {
+      const gameId = "66f3b5c2e5f8f2d456789012";
+      await logRoundEvent({
+      gameId: gameId,         
+      roundId: String(round._id),
+      identification: `Round #${round.roundNumber}`,
+      consumption: totalPool,        
+      rewardAmount: totalPayout,
+      platformRevenue: companyCut,
+      platformReserve: remainingDistributable,
+      gameVictoryResult: (normalRequiredRows.map(r => ({ box: r.box, boxTotal: r.boxTotal }))),
+      winnerBox,
+      date: new Date(),
+    });
+    } catch (error) {
+      console.log("'logRoundEvent' Server error: ", error);
     }
 
+    // Genertate User event log
+    try {
+      const gameId = "66f3b5c2e5f8f2d456789012";
+      await logUserEvent({
+      gameId: gameId,         
+      roundId: String(round._id),
+      identification: `Round #${round.roundNumber}`,
+      userName: "Test User",
+      userConsumption: totalPool,        
+      userRewardAmount: totalPayout,
+      platformRevenue: companyCut,
+      platformReserve: remainingDistributable,
+      userVictoryResult: (normalRequiredRows.map(r => ({ box: r.box, boxTotal: r.boxTotal }))),
+      winnerBox,
+      date: new Date(),
+    });
+    } catch (error) {
+      console.log("'logRoundEvent' Server error: ", error);
+    }
 
+      console.log("Treasury Settlement");
+      console.table([{ reserveUsed, remainingDistributable, newReserveWallet: freshCompany.reserveWallet }]);
+    }
 
     // ---- End round (public) ---- //
     nsp.emit(EMIT.ROUND_ENDED, {

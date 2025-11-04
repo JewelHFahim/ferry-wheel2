@@ -16,6 +16,12 @@ export const UserService = {
     return UserModel.findOne({ username });
   },
 
+  // get user name
+  async getName(userId: string): Promise<string | null> {
+    const user =  await UserModel.findById(userId).select({ username: 1 });
+    return user ? user.username : null;
+  },
+
   // update user balance
   async updateBalance(userId: string, amount: number, session?:any): Promise<IUser> {
     const updated = await UserModel.findByIdAndUpdate(

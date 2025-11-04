@@ -20,7 +20,7 @@ import { startNewRound } from "./startNewRound.job";
 import { env } from "../config/env";
 import { groupName, transactionType } from "../utils/statics/statics";
 import { logRoundEvent } from "../dashboard/game-log/logRoundEvent";
-import { logUserEvent } from "../dashboard/game-log/logUserEvent";
+import { logUserEventsForRound } from "../dashboard/user-log/logUserEvents";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -504,7 +504,7 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
       await logRoundEvent({
       gameId: gameId,         
       roundId: String(round._id),
-      identification: `Round #${round.roundNumber}`,
+      identification: round.roundNumber,
       consumption: totalPool,        
       rewardAmount: totalPayout,
       platformRevenue: companyCut,
@@ -520,21 +520,23 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
     // Genertate User event log
     try {
       const gameId = "66f3b5c2e5f8f2d456789012";
-      await logUserEvent({
-      gameId: gameId,         
-      roundId: String(round._id),
-      identification: `Round #${round.roundNumber}`,
-      userName: "Test User",
-      userConsumption: totalPool,        
-      userRewardAmount: totalPayout,
-      platformRevenue: companyCut,
-      platformReserve: remainingDistributable,
-      userVictoryResult: (normalRequiredRows.map(r => ({ box: r.box, boxTotal: r.boxTotal }))),
-      winnerBox,
-      date: new Date(),
-    });
+
+      await logUserEventsForRound({
+        gameId: gameId,
+        roundId: String(round._id),
+        identification: round.roundNumber,
+        winnerBox: winnerBox ?? "",
+        date: new Date(),
+        bets: bets.map(b => ({ userId: String(b.userId), box: b.box, amount: b.amount })),
+        payouts: payouts.map(p => ({ userId: String(p.userId), amount: p.amount })),
+        resolveUserName: async (userId: Types.ObjectId) => {
+          const name = await UserService.getName(String(userId));
+          return name || String(userId);
+        },
+      });
+
     } catch (error) {
-      console.log("'logRoundEvent' Server error: ", error);
+      console.log("'logUserEventsForRound' Server error: ", error);
     }
 
       console.log("Treasury Settlement");

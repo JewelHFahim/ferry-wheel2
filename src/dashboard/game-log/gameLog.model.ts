@@ -9,7 +9,7 @@ export interface IRoundEvent {
   _id: Types.ObjectId;
   gameId: Types.ObjectId;
   gameName: string;
-  identification: string;
+  identification: number;
   consumption: number;
   rewardAmount: number;
   platformRevenue: number;
@@ -24,7 +24,7 @@ const RoundEventSchema = new Schema<IRoundEvent>(
     _id: { type: Schema.Types.ObjectId, required: true },
     gameId: { type: Schema.Types.ObjectId, required: true, index: true },
     gameName: { type: String, required: true },
-    identification: { type: String, required: true },
+    identification: { type: Number, required: true },
     consumption: { type: Number, required: true, default: 0 },
     rewardAmount: { type: Number, required: true, default: 0 },
     platformRevenue: { type: Number, required: true, default: 0 },

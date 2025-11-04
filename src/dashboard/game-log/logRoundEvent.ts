@@ -5,7 +5,7 @@ import { SettingsService } from "../../modules/settings/settings.service";
 export async function logRoundEvent(payload: {
   gameId: string;
   roundId: string;
-  identification: string;
+  identification: number;
   consumption: number;
   rewardAmount: number;
   platformRevenue: number;

@@ -1,10 +1,12 @@
 import express from 'express'
-import { getRoundLogs, getUserLogs } from './RoundEvent.controller';
+import { getRoundLogs } from './RoundEvent.controller';
+import { getUserEvents } from '../user-log/UserEvent.controller';
 
 const router = express.Router();
 
 router.use("/game-logs", getRoundLogs);
-router.use("/user-logs", getUserLogs);
+router.get("/user-logs", getUserEvents);
+
 
 
 
