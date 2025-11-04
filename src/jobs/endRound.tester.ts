@@ -111,8 +111,8 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
       bettorsCount: perBoxCount.get(box) || 0,
       group: statByBox.get(box)?.group || "-",
     }));
-    console.log("Per-Box Totals / Counts / Multipliers");
-    console.table(perBoxRows);
+    // console.log("Per-Box Totals / Counts / Multipliers");
+    // console.table(perBoxRows);
 
     // per-group aggregates (only member boxes)
     let pizzaTotal = 0, pizzaCount = 0;
@@ -131,11 +131,11 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
     // DEBUG: group totals
     const pizzaMult = Number(statByBox.get(groupName.PIZZA)?.multiplier) || 1;
     const saladMult = Number(statByBox.get(groupName.SALAD)?.multiplier) || 1;
-    console.log("Group Totals / Multipliers");
-    console.table([
-      { group: groupName.PIZZA, totalAmount: pizzaTotal, bettorsCount: pizzaCount, multiplier: pizzaMult },
-      { group: groupName.SALAD, totalAmount: saladTotal, bettorsCount: saladCount, multiplier: saladMult },
-    ]);
+    // console.log("Group Totals / Multipliers");
+    // console.table([
+    //   { group: groupName.PIZZA, totalAmount: pizzaTotal, bettorsCount: pizzaCount, multiplier: pizzaMult },
+    //   { group: groupName.SALAD, totalAmount: saladTotal, bettorsCount: saladCount, multiplier: saladMult },
+    // ]);
 
     for (const s of round.boxStats) {
       if (s.box === groupName.PIZZA) {
@@ -157,8 +157,8 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
     const distributableAmount = totalPool - companyCut;
     const availableFunds = distributableAmount + companyWallet.reserveWallet;
 
-    console.log("Funds Snapshot");
-    console.table([{ totalPool, companyCut, distributableAmount, reserveWallet: companyWallet.reserveWallet, availableFunds }]);
+    // console.log("Funds Snapshot");
+    // console.table([{ totalPool, companyCut, distributableAmount, reserveWallet: companyWallet.reserveWallet, availableFunds }]);
 
     // ---- Eligibility (GROUP-AWARE) ------ //
     const groupRequiredPayout = (members: Set<string>, groupMult: number) => {
@@ -182,18 +182,18 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
       const boxTotal = perBoxTotal.get(s.box) || 0;
       normalRequiredRows.push({ box: s.box, boxTotal, multiplier: mult, required: boxTotal * mult });
     }
-    console.log("Required Payout (Normal Boxes)");
-    console.table(normalRequiredRows);
+    // console.log("Required Payout (Normal Boxes)");
+    // console.table(normalRequiredRows);
 
     // group required payout breakdowns
     const pizzaReq = groupRequiredPayout(pizzaMembers, pizzaMult);
     const saladReq = groupRequiredPayout(saladMembers, saladMult);
 
-    console.log("Required Payout (Groups)");
-    console.table([
-      { group: groupName.PIZZA, groupSum: pizzaReq.groupSum, subBoxComponent: pizzaReq.subBoxComponent, groupMult: pizzaMult, required: pizzaReq.required },
-      { group: groupName.SALAD, groupSum: saladReq.groupSum, subBoxComponent: saladReq.subBoxComponent, groupMult: saladMult, required: saladReq.required },
-    ]);
+    // console.log("Required Payout (Groups)");
+    // console.table([
+    //   { group: groupName.PIZZA, groupSum: pizzaReq.groupSum, subBoxComponent: pizzaReq.subBoxComponent, groupMult: pizzaMult, required: pizzaReq.required },
+    //   { group: groupName.SALAD, groupSum: saladReq.groupSum, subBoxComponent: saladReq.subBoxComponent, groupMult: saladMult, required: saladReq.required },
+    // ]);
 
     // Collect candidates with exact required payout
     const candidates: { box: string; required: number }[] = [];
@@ -211,16 +211,16 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
       }
     }
 
-    console.log("Eligible Candidates vs Available Funds");
-    console.table(candidates);
-    console.log(`Available funds: ${availableFunds}`);
+    // console.log("Eligible Candidates vs Available Funds");
+    // console.table(candidates);
+    // console.log(`Available funds: ${availableFunds}`);
 
     // ---- Choose winner from eligible candidates ----- //
     let winnerBox: string | null = null;
     if (candidates.length > 0) {
       winnerBox = candidates[Math.floor(Math.random() * candidates.length)].box;
     }
-    console.log("Chosen Winner:", winnerBox ?? "(none)");
+    // console.log("Chosen Winner:", winnerBox ?? "(none)");
 
     // No eligible winner -> move distributable to reserve and finish
     if (!winnerBox) {
@@ -308,8 +308,8 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
         payouts.push({ userId: new Types.ObjectId(uid), box: groupLabel, amount: totalForUser });
         totalPayout += totalForUser;
       }
-      console.log(`Per-User Payout Breakdown for ${groupLabel}`);
-      console.table(dbgRows);
+      // console.log(`Per-User Payout Breakdown for ${groupLabel}`);
+      // console.table(dbgRows);
     };
 
     if (winnerBox === groupName.PIZZA) {
@@ -389,9 +389,9 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
     round.payoutsApplied    = false;
     await round.save();
 
-    console.log("Snapshot Saved");
-    console.table([{ winnerBox, distributedAmount: totalPayout, companyCut }]);
-    console.table(topWinners.map(t => ({ userId: String(t.userId), amountWon: t.amountWon })));
+    // console.log("Snapshot Saved");
+    // console.table([{ winnerBox, distributedAmount: totalPayout, companyCut }]);
+    // console.table(topWinners.map(t => ({ userId: String(t.userId), amountWon: t.amountWon })));
 
     // ---- Reveal ---- //
     nsp.emit(EMIT.ROUND_UPDATED, {
@@ -539,8 +539,8 @@ export const endRoundTest = async (roundId: string, nsp: Namespace): Promise<voi
       console.log("'logUserEventsForRound' Server error: ", error);
     }
 
-      console.log("Treasury Settlement");
-      console.table([{ reserveUsed, remainingDistributable, newReserveWallet: freshCompany.reserveWallet }]);
+      // console.log("Treasury Settlement");
+      // console.table([{ reserveUsed, remainingDistributable, newReserveWallet: freshCompany.reserveWallet }]);
     }
 
     // ---- End round (public) ---- //
