@@ -27,6 +27,8 @@ export async function getRoundLogs(req: Request, res: Response) {
       cursor,             
     } = req.query as Record<string, string>;
 
+    console.log("req.query: ", req.query)
+
     // ---------- Build query ----------
     const q: any = {};
 
@@ -37,7 +39,6 @@ export async function getRoundLogs(req: Request, res: Response) {
       }
       q.gameId = new mongoose.Types.ObjectId(gameId);
     }
-
     if (gameName) {
       q.gameName = new RegExp(gameName, "i"); // contains
     }
@@ -73,13 +74,40 @@ export async function getRoundLogs(req: Request, res: Response) {
       if (cursor)    q.date.$lt  = new Date(cursor);     
     }
 
+
+    // escape regex from user input
+    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     if (search) {
+      const or: any[] = [];
+
+      // ObjectId match (id or gameId if you want)
       if (mongoose.isValidObjectId(search)) {
-        q._id = new mongoose.Types.ObjectId(search);
-      } else {
-        q.identification = new RegExp(search, "i");
+        or.push({ _id: new mongoose.Types.ObjectId(search) });
       }
+
+      // String fields (regex)
+      const rx = new RegExp(escapeRegExp(search), "i");
+      or.push({ userName: rx }, { gameName: rx });
+
+      // Numeric field: identification
+      const isDigits = /^\d+$/.test(search);
+      if (isDigits) {
+        or.push({ identification: Number(search) });
+        or.push({
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$identification" },
+              regex: escapeRegExp(search),
+              options: "i",
+            },
+          },
+        });
+      }
+
+      if (or.length) q.$or = or;
     }
+
 
     const pageSize = Math.min(Number(limit) || 50, 500);
 

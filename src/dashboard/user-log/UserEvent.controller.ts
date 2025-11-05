@@ -19,11 +19,7 @@ export async function getUserEvents(req: Request, res: Response) {
       limit = "50", cursor
     } = req.query as Record<string, string>;
 
-    console.log("req.query: ", req.query)
-
     const q: any = {};
-
-    console.log("query: ", q)
 
     if (gameId) {
       if (!mongoose.isValidObjectId(gameId)) return res.status(400).json({ status: false, message: "Invalid gameId" });
@@ -58,7 +54,7 @@ if (search) {
     ];
   } else {
     // optional: enforce a minimum length (2) to avoid super-broad scans
-    if (search.length < 2) {
+    if (search.length < 0) {
       return res.status(400).json({ status: false, message: "Search term too short" });
     }
     const rx = new RegExp(escapeRegex(search), "i");
