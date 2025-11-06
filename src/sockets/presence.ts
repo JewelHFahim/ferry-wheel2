@@ -19,7 +19,7 @@ export function createPresence(nsp: Namespace): Presence {
     hasActiveUsers: () => counts.size > 0,
     wireSocket(socket: any) {
       const uid: string | undefined = socket.data?.user?._id;
-      if (!uid) return; // ignore guests
+      if (!uid) return;
       inc(uid);
       socket.on("disconnect", () => dec(uid));
     },
